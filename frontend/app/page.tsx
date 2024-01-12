@@ -27,7 +27,7 @@ export default function Home() {
           <MediaFiles />
         </div>
         <div className="flex flex-grow border border-black">
-          <VideoPlayerWithControls videoUrl={'https://www.youtube.com/watch?v=Ow2eSjJR6TA&ab_channel=LeVieuxP%C3%A8re'}/>
+          <VideoPlayerWithControls videoUrl={'https://www.youtube.com/watch?v=JL-wFS2E-eM&ab_channel=PDTV'}/>
         </div>
        
       </div>
