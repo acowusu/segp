@@ -1,13 +1,13 @@
 'use client'
 import React from 'react';
 import Image from 'next/image';
+import TopicPick from './topic_pick';
 
-const TopicPick: React.FC<{callback: () => void }> = ({callback}) => {
+const UploadFile: React.FC<{callback: () => void }> = ({callback}) => {
 
   
-
   return (
-    <div className='w-3/5 h-[40rem] flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-red-600 text-white'>
+    <div className='w-3/5 h-[40rem] flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
       <div className=' w-full h-full flex flex-col items-center gap-8'>
         <h1 className='font-bold text-4xl m-8'>
@@ -22,13 +22,24 @@ const TopicPick: React.FC<{callback: () => void }> = ({callback}) => {
           <p>
             Uploaded files:
           </p>
-          
+          <p>
+            file1
+          </p>
+          <p>
+            file1
+          </p>
+          <p>
+            file1
+          </p>
+          <p>
+            file1
+          </p>
         </div>
 
         <button onClick={callback} disabled={false} className='border p-5'>Continue</button>
       </div>
     </div>
-  )
+  );
 };
 
-export default TopicPick;
+export default UploadFile;
