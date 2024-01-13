@@ -31,7 +31,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
     try {
       const response = await axios.post("/api/generate_script", {data: topic});
       // simulate script being generated
-      await new Promise(res => setTimeout(res, 5000));
+      await new Promise(res => setTimeout(res, 1000));
       if (response.status == 200) {
         setScripts(response.data.scripts) // get from response
         setLoading(false)
@@ -65,7 +65,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
 
         <button onClick={openModal} disabled={false} className='border p-5 rounded-lg'>Advanced</button>
 
-        <button onClick={() => generateScript("Architecture of AlexNet")} disabled={loading} className='border p-5 disabled:bg-gray-800'>{loading ? "Processing..." : "Continue"}</button>
+        <button onClick={() => generateScript(topics[selectedIndex].topic)} disabled={loading || selectedIndex == -1} className='border p-5 disabled:bg-gray-800'>{loading ? "Generating Scripts..." : "Continue"}</button>
       </div>
 
     </div>
