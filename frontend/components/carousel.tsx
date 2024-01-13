@@ -7,18 +7,7 @@ import UploadFile from './carouselSlides/uploadFile';
 import TopicPick from './carouselSlides/topic_pick';
 import VideoStructure from './carouselSlides/videoStructure';
 
-
-
-const DotButton = ({isSelected} : {isSelected: boolean}) => {
-  return (
-    <div className={'w-6 h-6 flex items-center mr-2 ml-2'}>
-      {isSelected ? (
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-800 to-blue-400 rounded-md" />
-      ) :  <div className="absolute inset-0 bg-white rounded-md h-1/3" />}
-    </div>
-  )
-}
-
+export type topics = {topic: string, summary: string}[]
 
 type PropType = {
   options?: EmblaOptionsType
@@ -68,11 +57,12 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   
   
   const [modalVisible, setModalVisible] = useState(false);
+  const [topics, setTopics] = useState<topics>([])
   
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false)
   
-  const slides = [<UploadFile callback={scrollNext}/>, <TopicPick callback={scrollNext} openModal={openModal}/>, <VideoStructure callback={scrollNext} openModal={openModal}/>]
+  const slides = [<UploadFile nextSlide={scrollNext} setTopics={setTopics}/>, <TopicPick nextSlide={scrollNext} openModal={openModal} topics={topics}/>, <VideoStructure callback={scrollNext} openModal={openModal}/>]
 
   function AdvancedModal() {
       return (
@@ -108,6 +98,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                               <p>Choose video length</p>
                               <p>Choose overlaying avatar</p>
                               <p>Choose level of formality</p>
+                              <p>Add Subtitles?</p>
                               <input className='text-black' placeholder='Add extra info'/>
                           </div>
                       </div>

@@ -1,14 +1,41 @@
 'use client'
-import React from 'react';
-import Image from 'next/image';
-import TopicPick from './topic_pick';
+import React, { useState } from 'react';
+import axios from "axios"
+import { topics } from '../carousel';
 
-const UploadFile: React.FC<{callback: () => void }> = ({callback}) => {
+interface UploadProps {
+  nextSlide: () => void;
+  setTopics: (topics: topics) => void;
+}
 
+const UploadFile: React.FC<UploadProps> = ({nextSlide, setTopics}) => {
+
+  const [loading, setLoading] = useState(false);
+
+  async function submitPDFs(content: string) {
+    setLoading(true)
+      // simulate script being generated
+      
+
+    try {
+      
+      const response = await axios.post("/api/analyse_script", {data: content});
+      await new Promise(res => setTimeout(res, 5000));
+      if (response.status == 200) {
+        setTopics(response.data.topics) // get from response
+        setLoading(false)
+        nextSlide()
+      } else {
+        console.log("ERROR ERROR ERROR TODO TODO TODO")
+      }
+
+    } catch {
+      console.log("ERROR ERROR ERROR")
+    }
+  }
   
   return (
     <div className='w-3/5 h-[40rem] flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-black text-white'>
-
       <div className=' w-full h-full flex flex-col items-center gap-8'>
         <h1 className='font-bold text-4xl m-8'>
           Upload PDF to turn into a video
@@ -36,7 +63,7 @@ const UploadFile: React.FC<{callback: () => void }> = ({callback}) => {
           </p>
         </div>
 
-        <button onClick={callback} disabled={false} className='border p-5'>Continue</button>
+        <button onClick={() => submitPDFs("content")} disabled={loading} className='border p-5 disabled:bg-gray-800'>{loading ? "Processing..." : "Continue"}</button>
       </div>
     </div>
   );
