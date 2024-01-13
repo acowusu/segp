@@ -8,7 +8,7 @@ import TopicPick from './carouselSlides/topic_pick';
 import VideoStructure from './carouselSlides/videoStructure';
 
 export type topicsProp = {topic: string, summary: string}[]
-export type scriptsProp = {topic: string, summary: string}[]
+export type scriptsProp = {section: string, script1: string, script2: string}[]
 
 type PropType = {
   options?: EmblaOptionsType

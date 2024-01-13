@@ -27,7 +27,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
     setLoading(true)
     
     try {
-      const response = await axios.post("/api/analyse_script", {data: topic});
+      const response = await axios.post("/api/generate_script", {data: topic});
       // simulate script being generated
       await new Promise(res => setTimeout(res, 5000));
       if (response.status == 200) {
