@@ -1,15 +1,16 @@
 'use client'
 import React, { useState } from 'react';
-import Image from 'next/image';
-import { topics } from '../carousel';
+import { topicsProp, scriptsProp } from '../carousel';
+import axios from 'axios';
 
 interface TopicProps {
   nextSlide: ()=>void;
   openModal: ()=>void;
-  topics: topics;
+  topics: topicsProp;
+  setScripts: (scripts: scriptsProp)=>void;
 }
 
-const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics}) => {
+const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScripts}) => {
 
 
   const Topic = ({label}: {label: string}) => {
@@ -24,15 +25,22 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics}) => {
 
   async function generateScript(topic: string) {
     setLoading(true)
+    
+    try {
+      const response = await axios.post("/api/analyse_script", {data: topic});
       // simulate script being generated
       await new Promise(res => setTimeout(res, 5000));
-
-      try {
+      if (response.status == 200) {
+        setScripts(response.data.scripts) // get from response
         setLoading(false)
         nextSlide()
-      } catch {
-        console.log("ERROR ERROR ERROR")
+      } else {
+        console.log("ERROR ERROR ERROR TODO TODO TODO")
       }
+
+    } catch {
+      console.log("ERROR ERROR ERROR")
+    }
   }
 
   return (

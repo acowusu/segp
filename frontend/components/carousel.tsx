@@ -7,7 +7,8 @@ import UploadFile from './carouselSlides/uploadFile';
 import TopicPick from './carouselSlides/topic_pick';
 import VideoStructure from './carouselSlides/videoStructure';
 
-export type topics = {topic: string, summary: string}[]
+export type topicsProp = {topic: string, summary: string}[]
+export type scriptsProp = {topic: string, summary: string}[]
 
 type PropType = {
   options?: EmblaOptionsType
@@ -57,12 +58,16 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   
   
   const [modalVisible, setModalVisible] = useState(false);
-  const [topics, setTopics] = useState<topics>([])
+  const [topics, setTopics] = useState<topicsProp>([])
+  const [scripts, setScripts] = useState<scriptsProp>([])
   
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false)
   
-  const slides = [<UploadFile nextSlide={scrollNext} setTopics={setTopics}/>, <TopicPick nextSlide={scrollNext} openModal={openModal} topics={topics}/>, <VideoStructure callback={scrollNext} openModal={openModal}/>]
+  const slides = [
+  <UploadFile nextSlide={scrollNext} setTopics={setTopics}/>, 
+  <TopicPick nextSlide={scrollNext} openModal={openModal} topics={topics} setScripts={setScripts}/>, 
+  <VideoStructure callback={scrollNext} openModal={openModal} scripts={scripts}/>]
 
   function AdvancedModal() {
       return (

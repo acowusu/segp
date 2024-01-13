@@ -1,10 +1,15 @@
 'use client'
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { scriptsProp } from '../carousel';
 
+interface VideoStructureProps {
+  callback: () => void;
+  openModal: () => void;
+  scripts: scriptsProp;
+}
 
-
-const VideoStructure: React.FC<{callback: () => void, openModal: () => void}> = ({callback, openModal}) => {
+const VideoStructure: React.FC<VideoStructureProps> = ({callback, openModal, scripts}) => {
 
   const ScriptBox = ({label}: {label: string}) => {
     return (

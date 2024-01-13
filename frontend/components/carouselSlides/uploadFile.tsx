@@ -1,11 +1,11 @@
 'use client'
 import React, { useState } from 'react';
 import axios from "axios"
-import { topics } from '../carousel';
+import { topicsProp } from '../carousel';
 
 interface UploadProps {
   nextSlide: () => void;
-  setTopics: (topics: topics) => void;
+  setTopics: (topics: topicsProp) => void;
 }
 
 const UploadFile: React.FC<UploadProps> = ({nextSlide, setTopics}) => {
