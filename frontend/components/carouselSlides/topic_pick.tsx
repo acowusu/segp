@@ -12,12 +12,14 @@ interface TopicProps {
 
 const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScripts}) => {
 
+  const [selectedIndex, setSelectedIndex] = useState(-1)
 
-  const Topic = ({label}: {label: string}) => {
+
+  const Topic = ({label, selected, index}: {label: string, selected: boolean, index: number}) => {
     return (
-      <div className='text-white p-4 border flex items-center justify-center border-white rounded shadow-md'>
+      <button onClick={() => setSelectedIndex(index)} className={`w-full text-white p-4 border flex items-center justify-center border-white rounded shadow-md ${selected && "bg-gray-700"}`}>
         {label}
-      </div>
+      </button>
     )
   }
 
@@ -55,7 +57,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
           {
             topics.map(({topic, summary}, index) => (
             <div key={index}>
-              <Topic label={topic} />
+              <Topic label={topic} selected={index == selectedIndex} index={index}/>
             </div>
             ))
           }
