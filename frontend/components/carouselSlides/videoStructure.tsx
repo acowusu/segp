@@ -1,7 +1,8 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { TextareaHTMLAttributes, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { scriptsProp } from '../carousel';
+import TextArea from '../textarea';
 
 interface VideoStructureProps {
   callback: () => void;
@@ -13,10 +14,23 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
 
   const [sectionIndex, setSectionIndex] = useState(0);
   const[sectionScriptChoice, setSectionScriptChoice] = useState<number[]>([]);
-  
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+
   useEffect(() => {
-    setSectionScriptChoice(Array(scripts.length).fill(-1))
+    if (sectionScriptChoice.length == 0) {
+      setSectionScriptChoice(Array(scripts.length).fill(-1))
+    }
   }, [scripts])
+
+  function updateScripts(content: string) {
+    if (sectionScriptChoice[sectionIndex] == 1) {
+      scripts[sectionIndex].script1 = content
+    } else {
+      scripts[sectionIndex].script2 = content
+    }
+    setModal(false)
+  }
 
   const modalContents = (
     <div className='h-full text-white'>
@@ -55,21 +69,23 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
               New Script
             </h1>
             <div className='border-white border rounded-lg h-4/5 p-4 shadow-xl shadow-green-600'>
-              hi
+              <textarea 
+              className='bg-inherit w-full h-full overflow-auto no-scrollbar focus:border-none focus:outline-none'
+              ref={textareaRef}
+              placeholder='Enter your ammended script here'
+              style={{ resize: 'none' }}
+              />
+              
             </div>
           </div>
         </div>
         <div className='flex items-center justify-center w-full'>
-          <button onClick={() => {}} className='my-2 border p-5 rounded-lg'>
-            save
+          <button onClick={() => updateScripts(textareaRef.current?.value??"")} className='my-2 border p-5 rounded-lg'>
+            Save
           </button>
         </div>
-        
     </div>
   )
-
-
-
 
   const updateElement = (index: number, value: number) => {
     const newArray = [...sectionScriptChoice]; 
