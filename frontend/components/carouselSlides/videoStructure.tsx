@@ -19,9 +19,9 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
   }, [scripts])
 
   const modalContents = (
-    <div className='h-full'>
+    <div className='h-full text-white'>
         {/* Top Bar with Title and Close Button */}
-        <div className="w-full py-4 px-6 flex justify-between items-center">
+        <div className="w-full h-[10%] py-4 px-6 flex justify-between items-center">
             <h2 className="text-4xl font-bold text-white">Edit the script!</h2>
             <button onClick={() => setModal(false)} className="text-gray-600 hover:text-black focus:outline-none">
                 <svg
@@ -40,13 +40,13 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
                 </svg>
             </button>
         </div>
-        <hr className="mt-4 mb-8"/>
-        <div className='flex flex-row gap-8 justify-center items-center h-4/5 overflow-auto no-scrollbar text-white'>
+        <hr className="mt-4 mb-8 h-1"/>
+        <div className='flex flex-row gap-8 justify-center items-center h-[70%] overflow-auto no-scrollbar'>
           <div className='w-[40%] h-full'>
             <h1 className='font-bold text-4xl my-2'>
               Old Script
             </h1>
-            <div className='border-white border rounded-lg h-3/5 p-4'>
+            <div className='border-white border rounded-lg h-4/5 p-4'>
               {sectionScriptChoice[sectionIndex] != -1 && (sectionScriptChoice[sectionIndex] == 1 ? scripts[sectionIndex]?.script1 : scripts[sectionIndex]?.script2)}
             </div>
           </div>
@@ -54,10 +54,15 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
             <h1 className='font-bold text-4xl my-2'>
               New Script
             </h1>
-            <div className='border-white border rounded-lg h-3/5 p-4'>
+            <div className='border-white border rounded-lg h-4/5 p-4'>
               hi
             </div>
           </div>
+        </div>
+        <div className='flex items-center justify-center w-full'>
+          <button onClick={() => {}} className='my-2 border p-5 rounded-lg'>
+            save
+          </button>
         </div>
         
     </div>
@@ -107,7 +112,7 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
                 <ScriptBox label={script1} selected={sectionScriptChoice[index] == 1} index={index} boxNumber={1}/>
                 <ScriptBox label={script2} selected={sectionScriptChoice[index] == 2} index={index} boxNumber={2}/>
               </div>
-              <button onClick={() => setModal(true, modalContents)} disabled={false} className='my-2 border p-5 rounded-lg disabled:bg-gray-700'>
+              <button onClick={() => setModal(true, modalContents)} disabled={sectionScriptChoice[index] == -1} className='my-2 border p-5 rounded-lg disabled:bg-gray-700'>
                 Edit selected script
               </button>
             </div>   
