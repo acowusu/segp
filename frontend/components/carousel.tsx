@@ -8,6 +8,27 @@ import TopicPick from './carouselSlides/topic_pick';
 import VideoStructure from './carouselSlides/videoStructure';
 import Modal from './screenmodals';
 
+export type settingItems = {
+  voice: number,
+  targetAudience: string, // stakeholders, children, adults, teens, accountants, engineers, scientist, student
+  videoLength: number,
+  avitar: number,
+  formality: number, // Intimate, Casual, Formal, Frozen, and 
+  subtitles: boolean,
+}
+
+const defaultSettings = {
+  voice: 1,
+  targetAudience: "Everyone", // stakeholders, children, adults, teens, accountants, engineers, scientist, student
+  videoLength: 2,
+  avitar: -1,
+  formality: 0, // Intimate, Casual, Formal, Frozen, and 
+  subtitles: false,
+}
+
+
+
+
 export type topicsProp = {topic: string, summary: string}[]
 export type scriptsProp = {section: string, script1: string, script2: string}[]
 
@@ -61,6 +82,8 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   const [modal, setModal] = useState({modalVisible: false,  children: (<></>)});
   const [topics, setTopics] = useState<topicsProp>([])
   const [scripts, setScripts] = useState<scriptsProp>([])
+
+  const [settings, setSettings] = useState(defaultSettings)
   
   const setModals = (modalVisible: boolean, children?: React.ReactNode) => {
     setModal({modalVisible: modalVisible, children: (<>{children}</>)})
@@ -68,7 +91,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
   const slides = [
     <UploadFile key="uploadFile" nextSlide={scrollNext} setTopics={setTopics}/>, 
-    <TopicPick key="topicPick" nextSlide={scrollNext} setModal={setModals} topics={topics} setScripts={setScripts}/>, 
+    <TopicPick key="topicPick" nextSlide={scrollNext} setModal={setModals} topics={topics} setScripts={setScripts} settings={settings} setSettings={setSettings}/>, 
     <VideoStructure key="videoStructure" callback={scrollNext} setModal={setModals} scripts={scripts}/>
   ];
 

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { topicsProp, scriptsProp } from '../carousel';
+import { topicsProp, scriptsProp, settingItems } from '../carousel';
 import axios from 'axios';
 import {
   Accordion,
@@ -14,21 +14,16 @@ interface TopicProps {
   setModal: (isOpened: boolean, children?: React.ReactNode)=>void;
   topics: topicsProp;
   setScripts: (scripts: scriptsProp)=>void;
+  settings: settingItems;
+  setSettings: (settings: settingItems) => void;
 }
 
-
-
-
-
-
 const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScripts}) => {
-
-
   const modalContents = (
-    <div>
+    <div className='text-white'>
         {/* Top Bar with Title and Close Button */}
         <div className="w-full py-4 px-6 flex justify-between items-center">
-            <h2 className="text-4xl font-bold text-white">Advanced Options</h2>
+            <h2 className="text-4xl font-bold">Advanced Options</h2>
             <button onClick={() => setModal(false)} className="text-gray-600 hover:text-black focus:outline-none">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -47,28 +42,48 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
             </button>
         </div>
         <hr className="mt-4 mb-8"/>
-        <div className="overflow-y-auto no-scrollbar text-white flex flex-col gap-4">
+        <div className="overflow-y-auto no-scrollbar flex flex-col gap-4">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger>Is it accessible?</AccordionTrigger>
+            <AccordionTrigger>Choose voice</AccordionTrigger>
             <AccordionContent>
-              Yes. It adheres to the WAI-ARIA design pattern.
+              <div>
+                voice choices:
+              </div>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
-            <AccordionTrigger>Is it styled?</AccordionTrigger>
+            <AccordionTrigger>Target Audience</AccordionTrigger>
             <AccordionContent>
-              Yes. It comes with default styles that matches the other
-              components&apos; aesthetic.
+              <div>
+                Choose audience
+              </div>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">
-            <AccordionTrigger>Is it animated?</AccordionTrigger>
+            <AccordionTrigger>Video Length</AccordionTrigger>
             <AccordionContent>
-              Yes. Its animated by default, but you can disable it if you prefer.
+              Choose Video Length
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-4">
+            <AccordionTrigger>Choose Avitar</AccordionTrigger>
+            <AccordionContent>
+              <div>
+                Choose Avitar
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-5">
+            <AccordionTrigger>Level of Formality</AccordionTrigger>
+            <AccordionContent>
+              <div>
+                Choose level of formality
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+        <p>Add Subtitles?</p>
           {/* <p>Choose voice</p>
           <p>Choose taget audience</p>
           <p>Choose video length</p>
@@ -76,6 +91,11 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
           <p>Choose level of formality</p>
           <p>Add Subtitles?</p>
           <input className='text-black' placeholder='Add extra info'/> */}
+        </div>
+        <div className='w-full flex items-center justify-center my-16'>
+          <button onClick={() => {}} className='my-2 border p-5 rounded-lg'>
+            Save
+          </button>
         </div>
     </div>
   )
