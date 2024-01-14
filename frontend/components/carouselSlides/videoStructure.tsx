@@ -11,6 +11,61 @@ interface VideoStructureProps {
 
 const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scripts}) => {
 
+  const [sectionIndex, setSectionIndex] = useState(0);
+  const[sectionScriptChoice, setSectionScriptChoice] = useState<number[]>([]);
+  
+  useEffect(() => {
+    setSectionScriptChoice(Array(scripts.length).fill(-1))
+  }, [scripts])
+
+  const modalContents = (
+    <div className='h-full'>
+        {/* Top Bar with Title and Close Button */}
+        <div className="w-full py-4 px-6 flex justify-between items-center">
+            <h2 className="text-4xl font-bold text-white">Edit the script!</h2>
+            <button onClick={() => setModal(false)} className="text-gray-600 hover:text-black focus:outline-none">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                    />
+                </svg>
+            </button>
+        </div>
+        <hr className="mt-4 mb-8"/>
+        <div className='flex flex-row gap-8 justify-center items-center h-4/5 overflow-auto no-scrollbar text-white'>
+          <div className='w-[40%] h-full'>
+            <h1 className='font-bold text-4xl my-2'>
+              Old Script
+            </h1>
+            <div className='border-white border rounded-lg h-3/5 p-4'>
+              {sectionScriptChoice[sectionIndex] != -1 && (sectionScriptChoice[sectionIndex] == 1 ? scripts[sectionIndex]?.script1 : scripts[sectionIndex]?.script2)}
+            </div>
+          </div>
+          <div className='w-[40%] h-full'>
+            <h1 className='font-bold text-4xl my-2'>
+              New Script
+            </h1>
+            <div className='border-white border rounded-lg h-3/5 p-4'>
+              hi
+            </div>
+          </div>
+        </div>
+        
+    </div>
+  )
+
+
+
+
   const updateElement = (index: number, value: number) => {
     const newArray = [...sectionScriptChoice]; 
     newArray[index] = value; 
@@ -28,11 +83,6 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
     )
   }
 
-  const [sectionIndex, setSectionIndex] = useState(0);
-  const[sectionScriptChoice, setSectionScriptChoice] = useState<number[]>([]);
-  useEffect(() => {
-    setSectionScriptChoice(Array(scripts.length).fill(-1))
-  }, [scripts])
 
   return (
     <div className='w-3/5 h-[40rem] flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-black text-white'>
@@ -57,7 +107,7 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
                 <ScriptBox label={script1} selected={sectionScriptChoice[index] == 1} index={index} boxNumber={1}/>
                 <ScriptBox label={script2} selected={sectionScriptChoice[index] == 2} index={index} boxNumber={2}/>
               </div>
-              <button onClick={callback} disabled={true} className='my-2 border p-5 rounded-lg disabled:bg-gray-700'>
+              <button onClick={() => setModal(true, modalContents)} disabled={false} className='my-2 border p-5 rounded-lg disabled:bg-gray-700'>
                 Edit selected script
               </button>
             </div>   
