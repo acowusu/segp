@@ -46,7 +46,7 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
             <h1 className='font-bold text-4xl my-2'>
               Old Script
             </h1>
-            <div className='border-white border rounded-lg h-4/5 p-4'>
+            <div className='border-white border rounded-lg h-4/5 p-4 shadow-xl shadow-red-600'>
               {sectionScriptChoice[sectionIndex] != -1 && (sectionScriptChoice[sectionIndex] == 1 ? scripts[sectionIndex]?.script1 : scripts[sectionIndex]?.script2)}
             </div>
           </div>
@@ -54,7 +54,7 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
             <h1 className='font-bold text-4xl my-2'>
               New Script
             </h1>
-            <div className='border-white border rounded-lg h-4/5 p-4'>
+            <div className='border-white border rounded-lg h-4/5 p-4 shadow-xl shadow-green-600'>
               hi
             </div>
           </div>
