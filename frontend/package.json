@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "concurrently \"next dev\" \"wait-on http://localhost:3000 && electron main.js\"",
+    "start": "npm-run-all -p dev electron",
+    "dev": "next dev",
+    "electron": "wait-on http://localhost:3000 && electron main.js",
     "lint": "next lint",
-    "electron": "electron .",
     "package": "electron-builder"
   },
   "build": {
@@ -22,7 +22,6 @@
     "axios": "^1.6.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "concurrently": "^8.2.2",
     "electron-is-dev": "^3.0.1",
     "embla-carousel": "^8.0.0-rc19",
     "embla-carousel-react": "^8.0.0-rc19",
