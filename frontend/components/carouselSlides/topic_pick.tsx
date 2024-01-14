@@ -18,7 +18,7 @@ interface TopicProps {
   setSettings: (settings: settingItems) => void;
 }
 
-const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScripts}) => {
+const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScripts, settings, setSettings}) => {
   const modalContents = (
     <div className='text-white'>
         {/* Top Bar with Title and Close Button */}
@@ -45,7 +45,14 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
         <div className="overflow-y-auto no-scrollbar flex flex-col gap-4">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger>Choose voice</AccordionTrigger>
+            <AccordionTrigger>
+              <div className='flex justify-between w-full mr-10'>
+                <p className='hover:underline'>Choose voice</p>
+                <p className='hover:no-underline'>
+                  {settings.subtitles ? "On" : "Off"}  
+                </p>
+              </div>
+            </AccordionTrigger>
             <AccordionContent>
               <div>
                 voice choices:
@@ -83,7 +90,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <p>Add Subtitles?</p>
+        <p>Add Subtitles</p>
           {/* <p>Choose voice</p>
           <p>Choose taget audience</p>
           <p>Choose video length</p>
