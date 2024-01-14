@@ -5,10 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "concurrently \"next dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "start": "concurrently \"next dev\" \"wait-on http://localhost:3000 && electron main.js\"",
     "lint": "next lint",
     "electron": "electron .",
     "package": "electron-builder"
+  },
+  "build": {
+    "asar": true
   },
   "dependencies": {
     "@devbookhq/splitter": "^1.4.2",
