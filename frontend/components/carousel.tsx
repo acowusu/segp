@@ -67,9 +67,10 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   }
 
   const slides = [
-  <UploadFile nextSlide={scrollNext} setTopics={setTopics}/>, 
-  <TopicPick nextSlide={scrollNext} setModal={setModals} topics={topics} setScripts={setScripts}/>, 
-  <VideoStructure callback={scrollNext} setModal={setModals} scripts={scripts}/>]
+    <UploadFile key="uploadFile" nextSlide={scrollNext} setTopics={setTopics}/>, 
+    <TopicPick key="topicPick" nextSlide={scrollNext} setModal={setModals} topics={topics} setScripts={setScripts}/>, 
+    <VideoStructure key="videoStructure" callback={scrollNext} setModal={setModals} scripts={scripts}/>
+  ];
 
   return (
     <div className=''>

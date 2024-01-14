@@ -95,7 +95,7 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
           scripts.length != 0 &&
           scripts.map(({section, script1, script2}, index) => (
             sectionIndex == index &&
-            <div className='w-full h-full flex flex-col justify-center gap-8 items-center'>
+            <div key = "Structure" className='w-full h-full flex flex-col justify-center gap-8 items-center'>
                <div className='flex items-center justify-center'>
                 <button disabled={sectionIndex == 0} onClick={() => setSectionIndex(prev => prev - 1)} className='p-4 border rounded-lg mx-4 disabled:bg-gray-700'>back</button>
                 <h1 className='font-bold border border-white text-xl p-4'>
