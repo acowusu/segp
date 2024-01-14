@@ -81,7 +81,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
             {slides.map((component, index) => (
               <div className="embla__slide flex flex-row items-center justify-center" key={index}>
        
-                <div className='flex items-center justify-center'>
+                <div className='flex items-center justify-center w-full'>
                   {component}
                 </div>
                 
