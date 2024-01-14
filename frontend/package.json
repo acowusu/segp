@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "electron": "electron .",
+    "package": "electron-builder"
   },
   "dependencies": {
     "@devbookhq/splitter": "^1.4.2",
@@ -18,7 +20,7 @@
     "clsx": "^2.1.0",
     "embla-carousel": "^8.0.0-rc19",
     "embla-carousel-react": "^8.0.0-rc19",
-    "next": "14.0.4",
+    "next": "^14.0.4",
     "nvm": "^0.0.4",
     "react": "^18",
     "react-dom": "^18",
