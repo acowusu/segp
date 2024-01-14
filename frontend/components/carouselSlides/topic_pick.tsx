@@ -5,12 +5,53 @@ import axios from 'axios';
 
 interface TopicProps {
   nextSlide: ()=>void;
-  openModal: ()=>void;
+  setModal: (isOpened: boolean, children?: React.ReactNode)=>void;
   topics: topicsProp;
   setScripts: (scripts: scriptsProp)=>void;
 }
 
-const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScripts}) => {
+
+
+
+
+
+const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScripts}) => {
+
+
+  const modalContents = (
+    <div>
+        {/* Top Bar with Title and Close Button */}
+        <div className="w-full py-4 px-6 flex justify-between items-center">
+            <h2 className="text-4xl font-bold text-white">Advanced Options</h2>
+            <button onClick={() => setModal(false)} className="text-gray-600 hover:text-black focus:outline-none">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                    />
+                </svg>
+            </button>
+        </div>
+        <hr className="mt-4 mb-8"/>
+        <div className="overflow-y-auto no-scrollbar text-white flex flex-col gap-4">
+            <p>Choose voice</p>
+            <p>Choose taget audience</p>
+            <p>Choose video length</p>
+            <p>Choose overlaying avatar</p>
+            <p>Choose level of formality</p>
+            <p>Add Subtitles?</p>
+            <input className='text-black' placeholder='Add extra info'/>
+        </div>
+    </div>
+  )
 
   const [selectedIndex, setSelectedIndex] = useState(-1)
 
@@ -63,7 +104,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
           }
         </div>
 
-        <button onClick={openModal} disabled={false} className='border p-5 rounded-lg'>Video Settings</button>
+        <button onClick={() => setModal(true, modalContents)} disabled={false} className='border p-5 rounded-lg'>Video Settings</button>
 
         <button onClick={() => generateScript(topics[selectedIndex].topic)} disabled={loading || selectedIndex == -1} className='border p-5 disabled:bg-gray-800'>{loading ? "Generating Scripts..." : "Continue"}</button>
       </div>

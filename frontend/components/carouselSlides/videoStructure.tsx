@@ -5,11 +5,11 @@ import { scriptsProp } from '../carousel';
 
 interface VideoStructureProps {
   callback: () => void;
-  openModal: () => void;
+  setModal: (isOpened: boolean, children?: React.ReactNode)=>void;
   scripts: scriptsProp;
 }
 
-const VideoStructure: React.FC<VideoStructureProps> = ({callback, openModal, scripts}) => {
+const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scripts}) => {
 
   const updateElement = (index: number, value: number) => {
     const newArray = [...sectionScriptChoice]; 
