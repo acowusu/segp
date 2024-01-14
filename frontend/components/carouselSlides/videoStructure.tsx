@@ -58,7 +58,7 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, openModal, scr
                 <ScriptBox label={script2} selected={sectionScriptChoice[index] == 2} index={index} boxNumber={2}/>
               </div>
               <button onClick={callback} disabled={true} className='my-2 border p-5 rounded-lg disabled:bg-gray-700'>
-                Edit selected script 
+                Edit selected script
               </button>
             </div>   
           ))

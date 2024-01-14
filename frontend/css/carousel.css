@@ -10,7 +10,7 @@
 .embla__container {
   backface-visibility: hidden;
   display: flex;
-  touch-action: pan-y;
+  /* touch-action: pan-y; */
   margin-left: calc(var(--slide-spacing) * -1);
 }
 .embla__slide {
@@ -60,7 +60,7 @@
 .embla__button {
   -webkit-appearance: none;
   background-color: transparent;
-  touch-action: manipulation;
+  /* touch-action: manipulation; */
   display: inline-flex;
   text-decoration: none;
   cursor: pointer;
@@ -96,7 +96,7 @@
 .embla__dot {
   -webkit-appearance: none;
   background-color: transparent;
-  touch-action: manipulation;
+  /* touch-action: manipulation; */
   display: inline-flex;
   text-decoration: none;
   cursor: pointer;

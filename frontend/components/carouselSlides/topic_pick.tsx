@@ -17,7 +17,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
 
   const Topic = ({label, selected, index}: {label: string, selected: boolean, index: number}) => {
     return (
-      <button onClick={() => setSelectedIndex(index)} className={`w-full text-white p-4 border flex items-center justify-center border-white rounded shadow-md ${selected && "bg-gray-700"}`}>
+      <button onClick={() => setSelectedIndex(index)} className={`w-full text-white p-4 border flex items-center justify-center border-white rounded shadow-md ${selected ? "bg-gray-600" : "hover:bg-gray-800"}`}>
         {label}
       </button>
     )
@@ -46,7 +46,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
   }
 
   return (
-    <div className='w-3/5 h-[40rem] flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='h-[40rem] flex flex-row items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
       <div className=' w-full h-full flex flex-col items-center gap-8'>
         <h1 className='font-bold text-4xl m-8'>
@@ -56,16 +56,35 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, openModal, topics, setScrip
         <div className='min-w-[40%] flex flex-col gap-4 overflow-auto no-scrollbar h-2/5'>
           {
             topics.map(({topic, summary}, index) => (
-            <div key={index}>
+              <div key={index}>
               <Topic label={topic} selected={index == selectedIndex} index={index}/>
             </div>
             ))
           }
         </div>
 
-        <button onClick={openModal} disabled={false} className='border p-5 rounded-lg'>Advanced</button>
+        <button onClick={openModal} disabled={false} className='border p-5 rounded-lg'>Video Settings</button>
 
         <button onClick={() => generateScript(topics[selectedIndex].topic)} disabled={loading || selectedIndex == -1} className='border p-5 disabled:bg-gray-800'>{loading ? "Generating Scripts..." : "Continue"}</button>
+      </div>
+
+      {/* Setting view */}
+
+      <div className=' w-[30rem] p-8 h-full flex flex-col gap-4 border-l-2 shadow-2xl shadow-red-700'>
+        <h1 className='font-bold text-4xl'>
+          Chosen Topic
+        </h1>
+        <div className='text-xl'>
+          {selectedIndex == -1 ? "Please select a topic for the video" : topics[selectedIndex].topic}
+        </div>
+
+        <h1 className='font-bold text-4xl'>
+          Summary
+        </h1>
+        <div className='overflow-auto no-scrollbar'>
+          {selectedIndex == -1 ? "..." : topics[selectedIndex].summary}
+        </div>
+
       </div>
 
     </div>
