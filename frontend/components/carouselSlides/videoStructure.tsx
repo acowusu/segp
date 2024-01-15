@@ -98,7 +98,7 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
     return (
       <div 
       onClick={() => updateElement(index, boxNumber)}
-      className={`text-white p-4 border w-1/2 border-white rounded shadow-md overflow-auto no-scrollbar hover:cursor-pointer  ${selected ? "bg-blue-600" : "hover:bg-gray-800"}`}>
+      className={`text-white p-4 border w-1/2 border-white rounded  overflow-auto no-scrollbar hover:cursor-pointer  ${selected ? "bg-blue-600" : "hover:bg-gray-800"}`}>
         {label}
       </div>
     )

@@ -11,16 +11,11 @@ const VideoSettings = () => {
 
   const settings = [
   {name: "Overview", component: <DefaultScreen />},
-  {name: "Voiceover voice", component: <AudioSelection />},
+  {name: "Voiceover audio", component: <AudioSelection />},
   {name: "Avatar overlay", component: <AvatarSelection />},
   {name: "Subtitles", component: <Subtitles />},
   {name: "Target Audience", component: <TargetAudience />},
 ]
-
-
-
-
-
 
   const SettingOption = ({setting, index}: {setting: string, index: number}) => {
     return (
@@ -53,7 +48,7 @@ const VideoSettings = () => {
         </div>
         <button onClick={() => saveSettings()} className='text-lg border rounded-xl p-2 m-2'>Continue</button>
       </div>
-      <div className='col-span-4'>
+      <div className='col-span-4 h-full'>
         {settings.map((settingComponent, index) => (
           index == settingChoice &&
           <div className="h-full w-full flex" key={index}>
