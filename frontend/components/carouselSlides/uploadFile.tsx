@@ -34,7 +34,7 @@ const UploadFile: React.FC<UploadProps> = ({nextSlide, setTopics}) => {
   }
   
   return (
-    <div className='h-[40rem] w-full flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='h-full w-full flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-black text-white'>
       <div className=' w-full h-full flex flex-col items-center gap-8'>
         <h1 className='font-bold text-4xl m-8'>
           Upload PDF to turn into a video

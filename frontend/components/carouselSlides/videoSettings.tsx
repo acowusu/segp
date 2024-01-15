@@ -35,26 +35,28 @@ const VideoSettings = () => {
   }
 
   return (
-    <div className='h-[40rem] w-full flex flex-row items-start justify border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='w-full h-full grid grid-cols-5 items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
-      <div className=' w-2/5 p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-green-600'>
-        <h1 className='font-bold text-4xl h-[10%]'>
+      <div className='col-span-1 p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-green-600 overflow-auto'>
+        <h1 className='font-bold text-2xl 2xl:text-4xl'>
           Settings
         </h1>
-        <div className='text-xl h-[70%] overflow-auto no-scrollbar flex flex-col items-start gap-4'>
-          
+        <div className='text-xl overflow-auto no-scrollbar flex flex-col items-start gap-4 2xl:text-2xl'>
           {settings.map((settingComponent, index) => (
-            <button onClick={() => setSettingChoice(index)} className='text-2xl p-2 font-bold' key={index}>
-              {settingComponent.name}
+            <button onClick={() => setSettingChoice(index)} 
+              className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${index == settingChoice && "text-green-600"}`}
+              style={{ textAlign: 'left', whiteSpace: 'normal' }}
+              key={index}>
+                {settingComponent.name}
             </button>
           ))}
         </div>
-        <button onClick={() => saveSettings()} className='text-lg border rounded-xl w-1/2 p-2 m-2'>Continue</button>
+        <button onClick={() => saveSettings()} className='text-lg border rounded-xl p-2 m-2'>Continue</button>
       </div>
-      <div className='w-3/5'>
+      <div className='col-span-4'>
         {settings.map((settingComponent, index) => (
           index == settingChoice &&
-          <div className="h-full w-full flex flex-shrink" key={index}>
+          <div className="h-full w-full flex" key={index}>
                 {settingComponent.component}
               </div>
             ))}

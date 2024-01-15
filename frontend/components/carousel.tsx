@@ -98,14 +98,14 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   ];
 
   return (
-    <div className='w-full h-full'>
+    <div className='w-screen h-screen'>
       <Modal {...modal}/>
-      <div className="embla">
-        <div className="embla__viewport" ref={emblaRef}>
-          <div className="embla__container">
+      <div className="embla h-full">
+        <div className="embla__viewport h-full" ref={emblaRef}>
+          <div className="embla__container h-full">
             {slides.map((component, index) => (
-              <div className="embla__slide flex flex-row w-full items-center justify-center" key={index}>
-                <div className='flex items-center justify-center w-3/5'>
+              <div className="embla__slide flex flex-row w-full items-center justify-center h-full" key={index}>
+                <div className='w-4/5 h-4/5'>
                   {component}
                 </div>
               </div>

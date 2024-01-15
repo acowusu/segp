@@ -98,48 +98,44 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
     return (
       <div 
       onClick={() => updateElement(index, boxNumber)}
-      className={`text-white p-4 border w-1/2 border-white rounded shadow-md overflow-auto no-scrollbar hover:cursor-pointer  ${selected ? "bg-green-400" : "hover:bg-gray-800"}`}>
+      className={`text-white p-4 border w-1/2 border-white rounded shadow-md overflow-auto no-scrollbar hover:cursor-pointer  ${selected ? "bg-blue-600" : "hover:bg-gray-800"}`}>
         {label}
       </div>
     )
   }
 
-
   return (
-    <div className='w-full h-[40rem] flex items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='w-full h-full grid grid-cols-5 items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
-      <div className=' w-[30rem] p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600'>
-        <h1 className='font-bold text-4xl h-[10%]'>
+      <div className='col-span-1 p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600 overflow-auto'>
+        <h1 className='font-bold text-2xl 2xl:text-4xl'>
           Structure
         </h1>
-        <div className='text-xl h-[70%] overflow-auto no-scrollbar flex flex-col justify-start items-start gap-4'>
+        <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-4'>
           {scripts.map(({section, script1, script2}, index) => (
-            <button onClick={() => setSectionIndex(index)} className='text-2xl p-2 font-bold'>
+            <button onClick={() => setSectionIndex(index)}
+            className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${index == sectionIndex && "text-blue-400"}`}
+            style={{ textAlign: 'left', whiteSpace: 'normal' }}
+            key={index}
+             >
               {section}
             </button>
           ))}
         </div>
-          
       </div>
 
-
-      <div className=' w-full h-full flex flex-col items-center'>
-        <h1 className='font-bold text-4xl m-8'>
-          Structure of Video
-        </h1>
+      <div className='col-span-4 h-full flex flex-col items-center'>
         {
           scripts.length != 0 &&
           scripts.map(({section, script1, script2}, index) => (
             sectionIndex == index &&
             <div key = "Structure" className='w-full h-full flex flex-col justify-center gap-8 items-center'>
                <div className='flex items-center justify-center'>
-                <button disabled={sectionIndex == 0} onClick={() => setSectionIndex(prev => prev - 1)} className='p-4 border rounded-lg mx-4 disabled:bg-gray-700'>back</button>
-                <h1 className='font-bold border border-white text-xl p-4'>
+                <h1 className='font-bold text-4xl p-4'>
                   {section}
                 </h1>
-                <button disabled={sectionIndex == scripts.length - 1} onClick={() => setSectionIndex(prev => prev + 1)} className='p-4 border rounded-lg mx-4 disabled:bg-gray-700'>next</button>
               </div>
-              <div className='max-h-[60%] max-w-[80%] flex flex-grow gap-4 overflow-auto no-scrollbar h-2/5'>
+              <div className='w-4/5 flex flex-grow gap-4 overflow-auto no-scrollbar'>
                 <ScriptBox label={script1} selected={sectionScriptChoice[index] == 1} index={index} boxNumber={1}/>
                 <ScriptBox label={script2} selected={sectionScriptChoice[index] == 2} index={index} boxNumber={2}/>
               </div>
@@ -149,10 +145,8 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
             </div>   
           ))
         }
-        <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-5 rounded-lg disabled:bg-gray-700'>
-          <a href='./'>
-            Create Video
-          </a>  
+        <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-5 rounded-lg disabled:bg-gray-700 m-4'>
+          Create Video
         </button>
       </div>
 

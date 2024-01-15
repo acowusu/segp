@@ -107,3 +107,27 @@ export const TargetAudience = () => {
     </div>
   )
 }
+
+
+
+
+
+
+
+// <div className='col-span-1 p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600 overflow-auto'>
+//         <h1 className='font-bold text-2xl 2xl:text-4xl'>
+//           Structure
+//         </h1>
+//         <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-4'>
+//           {scripts.map(({section, script1, script2}, index) => (
+//             <button onClick={() => setSectionIndex(index)}
+//             className='text-lg 2xl:text-xl p-2 font-bold hover:underline'
+//             style={{ textAlign: 'left', whiteSpace: 'normal' }}
+//             key={index}
+//              >
+//               {section}
+//             </button>
+//           ))}
+//         </div>
+//         <button className='text-lg border rounded-xl p-2 m-2'>Continue</button>
+//       </div>

@@ -141,14 +141,14 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
   }
 
   return (
-    <div className='h-[40rem] w-full flex flex-row items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='h-full w-full flex flex-row items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
       <div className=' w-full h-full flex flex-col items-center gap-8'>
         <h1 className='font-bold text-4xl m-8'>
         Select a topic that you would like a video of
         </h1>
 
-        <div className='min-w-[40%] flex flex-col gap-4 overflow-auto no-scrollbar h-2/5'>
+        <div className='flex flex-col gap-4 overflow-auto no-scrollbar h-2/5'>
           {
             topics.map(({topic, summary}, index) => (
               <div key={index}>
