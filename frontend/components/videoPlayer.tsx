@@ -53,7 +53,7 @@ const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) =
 
   return (
     <div className="w-full p-4 flex flex-col items-center justify-center">
-      <ReactPlayer
+      {/* <ReactPlayer
         ref={playerRef}
         url={videoUrl}
         width="70%"
@@ -61,7 +61,7 @@ const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) =
         playing={isPlaying}
         volume={volume}
         onProgress={handleProgress}
-      />
+      /> */}
       <div className="w-[80%] flex flex-col">
           <input
             type="range"
@@ -77,7 +77,7 @@ const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) =
           </div>
           <button onClick={handlePlayPause} className='p-2 mx-16 w-2/5'>
             
-            {isPlaying ? <Image src={pauseButton} alt="play" width={50} height={50}/> : <Image src={playButton} alt="play" width={50} height={50}/>}
+            {isPlaying ? "play" : "pause"}
           </button>
 
           <input

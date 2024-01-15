@@ -13,8 +13,6 @@ export async function POST(req: NextRequest) {
 }
 
 
-
-
 const scriptData = 
 [
   {

@@ -17,6 +17,7 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -webkit-user-drag: none;
+  touch-action: none;
 }
 .embla__slide {
   flex: 0 0 var(--slide-size);
@@ -66,6 +67,7 @@
   -webkit-appearance: none;
   background-color: transparent;
   /* touch-action: manipulation; */
+  touch-action: none;
   display: inline-flex;
   text-decoration: none;
   cursor: pointer;
@@ -102,6 +104,7 @@
   -webkit-appearance: none;
   background-color: transparent;
   /* touch-action: manipulation; */
+  touch-action: none;
   display: inline-flex;
   text-decoration: none;
   cursor: pointer;

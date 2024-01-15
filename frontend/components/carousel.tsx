@@ -7,6 +7,7 @@ import UploadFile from './carouselSlides/uploadFile';
 import TopicPick from './carouselSlides/topic_pick';
 import VideoStructure from './carouselSlides/videoStructure';
 import Modal from './screenmodals';
+import VideoSettings from './carouselSlides/videoSettings';
 
 export type settingItems = {
   voice: number,
@@ -91,7 +92,8 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
   const slides = [
     <UploadFile key="uploadFile" nextSlide={scrollNext} setTopics={setTopics}/>, 
-    <TopicPick key="topicPick" nextSlide={scrollNext} setModal={setModals} topics={topics} setScripts={setScripts} settings={settings} setSettings={setSettings}/>, 
+    <TopicPick key="topicPick" nextSlide={scrollNext} setModal={setModals} topics={topics} setScripts={setScripts} settings={settings} setSettings={setSettings}/>,
+    <VideoSettings />, 
     <VideoStructure key="videoStructure" callback={scrollNext} setModal={setModals} scripts={scripts}/>
   ];
 

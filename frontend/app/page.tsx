@@ -7,15 +7,7 @@ import Tools from '@/components/tools'
 import VideoPlayerWithControls from '@/components/videoPlayer'
 
 
-export default function Home() {
-  function Tile() {
-    return (
-      <div>
-        <p>Tile</p>
-      </div>
-    )
-  }
-  
+export default function Home() {  
   return (
     <main className="flex flex-col min-h-screen h-full bg-gray-700">
       <Toolbar />
@@ -29,9 +21,11 @@ export default function Home() {
         <div className="flex flex-grow border border-black">
           <VideoPlayerWithControls videoUrl={'https://www.youtube.com/watch?v=JL-wFS2E-eM&ab_channel=PDTV'}/>
         </div>
-       
       </div>
-      <div className="flex flex-grow">hi howdie</div>
+      <div className="flex flex-grow">hi howdie
+        <a href="uploadpdf">swap page</a>
+      </div>
+      <button onClick={() => console.log("lasdkjadsjkh")}>press me to log</button>
     </main>
   );
   
