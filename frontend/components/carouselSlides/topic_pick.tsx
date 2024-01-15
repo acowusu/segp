@@ -141,7 +141,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
   }
 
   return (
-    <div className='h-[40rem] flex flex-row items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='h-[40rem] w-full flex flex-row items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
       <div className=' w-full h-full flex flex-col items-center gap-8'>
         <h1 className='font-bold text-4xl m-8'>

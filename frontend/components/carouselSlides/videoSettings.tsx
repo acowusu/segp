@@ -35,9 +35,9 @@ const VideoSettings = () => {
   }
 
   return (
-    <div className='h-[40rem] w-3/5 flex flex-row items-start justify-start border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='h-[40rem] w-full flex flex-row items-start justify border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
-      <div className=' w-[30rem] p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-green-600'>
+      <div className=' w-2/5 p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-green-600'>
         <h1 className='font-bold text-4xl h-[10%]'>
           Settings
         </h1>
@@ -51,13 +51,14 @@ const VideoSettings = () => {
         </div>
         <button onClick={() => saveSettings()} className='text-lg border rounded-xl w-1/2 p-2 m-2'>Continue</button>
       </div>
-
-      {settings.map((settingComponent, index) => (
-            index == settingChoice &&
-            <div className="h-full" key={index}>
-              {settingComponent.component}
-            </div>
-          ))}
+      <div className='w-3/5'>
+        {settings.map((settingComponent, index) => (
+          index == settingChoice &&
+          <div className="h-full w-full flex flex-shrink" key={index}>
+                {settingComponent.component}
+              </div>
+            ))}
+      </div>
     </div>
   )
 };

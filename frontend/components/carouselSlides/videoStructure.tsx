@@ -106,7 +106,22 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
 
 
   return (
-    <div className='w-3/5 h-[40rem] flex items-center justify-center p-4 border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='w-full h-[40rem] flex items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
+
+      <div className=' w-[30rem] p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600'>
+        <h1 className='font-bold text-4xl h-[10%]'>
+          Structure
+        </h1>
+        <div className='text-xl h-[70%] overflow-auto no-scrollbar flex flex-col justify-start items-start gap-4'>
+          {scripts.map(({section, script1, script2}, index) => (
+            <button onClick={() => setSectionIndex(index)} className='text-2xl p-2 font-bold'>
+              {section}
+            </button>
+          ))}
+        </div>
+          
+      </div>
+
 
       <div className=' w-full h-full flex flex-col items-center'>
         <h1 className='font-bold text-4xl m-8'>
