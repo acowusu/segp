@@ -4,8 +4,13 @@ import { topicsProp, scriptsProp, settingItems } from '../carousel';
 import axios from 'axios';
 import { AudioSelection, AvatarSelection, DefaultScreen, Subtitles, TargetAudience } from '../settings';
 
+interface VideoSettingProps {
+  currSettings: settingItems;
+  setSettings: (settings: settingItems) => void;
+}
 
-const VideoSettings = () => {
+
+const VideoSettings = ({currSettings, setSettings} : VideoSettingProps) => {
 
   const [settingChoice, setSettingChoice] = useState(0)
 
