@@ -5,10 +5,18 @@ import useSound from 'use-sound';
 import Image from 'next/image';
 import SoundIcon from "../public/soundIcon.svg"
 
-
 export const DefaultScreen = () => {
+
+  const OverviewLabel = () => {
+    return  (
+      <div className='w-full flex justify-between mx-32'>
+        hi
+      </div>
+    )
+  }
+
   return (
-    <div className=' w-full h-full flex flex-col items-center gap-8'>
+    <div className=' w-full h-full flex flex-col items-center gap-8 p-2'>
       <h1 className='font-bold text-4xl m-8'>
         Configure your video settings
       </h1>
@@ -16,8 +24,8 @@ export const DefaultScreen = () => {
         Here are the projects current settings
       </h1>
 
-      <div className='min-w-[40%] flex flex-col gap-4 overflow-auto no-scrollbar h-2/5'>
-        
+      <div className='w-full border flex flex-col gap-4 overflow-auto no-scrollbar h-full'>
+        <OverviewLabel />
       </div>
       
     </div>
@@ -42,7 +50,7 @@ export const VideoLength = () => {
   )
 }
 
-export const AudioSelection = ({selectedVoice, setSelectedVoice}: {selectedVoice: number, setSelectedVoice: (index: number)=>void}) => {
+export const AudioSelection = ({selectedVoice, setSelectedVoice}: {selectedVoice: string, setSelectedVoice: (index: string)=>void}) => {
 
   const voices = [
     {name: "Alloy", sampleAudio: "/alloy.wav"},
@@ -53,13 +61,13 @@ export const AudioSelection = ({selectedVoice, setSelectedVoice}: {selectedVoice
     {name: "Shimmer", sampleAudio: "/shimmer.wav"},
   ]
 
-  const AudioIcon = ({name, sampleAudio, index}: {name: string, sampleAudio: string, index: number}) => {
+  const AudioIcon = ({name, sampleAudio}: {name: string, sampleAudio: string}) => {
     const [playSound] = useSound(sampleAudio);
     return (
-      <div className='w-full h-full flex flex-col gap-4'>
+      <div className='w-full h-full flex flex-col gap-2 2xl:gap-4'>
         <button 
-          className={`text-4xl font-bold border rounded-lg p-4 flex items-center justify-center ${selectedVoice == index && "text-green-600 shadow-2xl shadow-green-600"}`}
-          onClick={() => setSelectedVoice(index)}
+          className={`text-2xl 2xl:text-4xl font-bold border rounded-lg p-2 2xl:p-4 flex items-center justify-center ${selectedVoice == name && "text-green-600 shadow-2xl shadow-green-600"}`}
+          onClick={() => setSelectedVoice(name)}
         >
           {name}
           </button>
@@ -74,17 +82,17 @@ export const AudioSelection = ({selectedVoice, setSelectedVoice}: {selectedVoice
   }
 
   return (
-    <div className=' w-full h-full flex flex-col items-center gap-8'>
-      <h1 className='font-bold text-4xl m-8'>
+    <div className=' w-full h-full flex flex-col items-center gap-2 2xl:gap-8'>
+      <h1 className='font-bold text-2xl 2xl:text-4xl m-4 2xl:m-8'>
         Select Audio
       </h1>
-      <h1 className='font-bold text-2xl m-2'>
+      <h1 className='font-bold text-xl 2xl:text-2xl m-2'>
         Here are a list of voices you can choose from
       </h1>
 
-      <div className='w-full h-full overflow-auto no-scrollbar grid grid-cols-3 gap-8 p-8'>
+      <div className='w-full h-full overflow-auto no-scrollbar grid grid-cols-3 gap-4 2xl:gap-8 p-8'>
         {voices.map((voice, index) => (
-          <AudioIcon {...voice} index={index}/>
+          <AudioIcon {...voice} key={index}/>
         ))}
       </div>
     </div>
@@ -109,15 +117,22 @@ export const AvatarSelection = () => {
   )
 }
 
-export const Subtitles = () => {
+export const Subtitles = ({subtitlesState, toggleSubtitleState}: {subtitlesState: boolean, toggleSubtitleState: (state: boolean)=>void}) => {
   return (
     <div className=' w-full h-full flex flex-col items-center gap-8'>
       <h1 className='font-bold text-4xl m-8'>
         Add subtitles to your project
       </h1>
-      <h1 className='font-bold text-2xl m-2'>
-        Subtitles on/off
-      </h1>
+      <div className='flex flex-row w-full justify-between px-32 font-bold text-3xl'>
+        <h1>
+          Subtitles 
+        </h1>
+        <div>
+          <span onClick={() => toggleSubtitleState(true)} className={`${subtitlesState && "text-green-600"} hover:underline`}>on</span>
+          /
+          <span onClick={() => toggleSubtitleState(false)}className={`${!subtitlesState && "text-green-600"} hover:underline`}>off</span>
+        </div>
+      </div>
       <h1 className='font-bold text-2xl m-2'>
         Subtitles style
       </h1>

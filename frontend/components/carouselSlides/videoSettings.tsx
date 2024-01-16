@@ -15,10 +15,16 @@ const VideoSettings = ({currSettings, setSettings, nextSlide} : VideoSettingProp
 
   const [settingChoice, setSettingChoice] = useState(0)
 
-  function setSettingVoice(index: number) {
+  function setSettingVoice(name: string) {
     setSettings({
       ...currSettings,
-      voice: index,
+      voice: name,
+    });
+  }
+  function toggleSubtitleState(state: boolean) {
+    setSettings({
+      ...currSettings,
+      subtitles: state
     });
   }
 
@@ -27,7 +33,7 @@ const VideoSettings = ({currSettings, setSettings, nextSlide} : VideoSettingProp
   {name: "Video Length", component: <VideoLength />},
   {name: "Voiceover audio", component: <AudioSelection selectedVoice={currSettings.voice} setSelectedVoice={setSettingVoice}/>},
   {name: "Avatar overlay", component: <AvatarSelection />},
-  {name: "Subtitles", component: <Subtitles />},
+  {name: "Subtitles", component: <Subtitles subtitlesState={currSettings.subtitles} toggleSubtitleState={toggleSubtitleState}/>},
   {name: "Target Audience", component: <TargetAudience />},
 ]
 

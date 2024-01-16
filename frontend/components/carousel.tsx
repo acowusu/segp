@@ -10,7 +10,7 @@ import Modal from './screenmodals';
 import VideoSettings from './carouselSlides/videoSettings';
 
 export type settingItems = {
-  voice: number,
+  voice: string,
   targetAudience: string, // stakeholders, children, adults, teens, accountants, engineers, scientist, student
   videoLength: number,
   avitar: number,
@@ -19,7 +19,7 @@ export type settingItems = {
 }
 
 const defaultSettings = {
-  voice: 1,
+  voice: "Alloy",
   targetAudience: "Everyone", // stakeholders, children, adults, teens, accountants, engineers, scientist, student
   videoLength: 2,
   avitar: -1,
