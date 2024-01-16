@@ -1,6 +1,9 @@
 'use client'
 import React, { useState } from 'react';
 import axios from 'axios';
+import useSound from 'use-sound';
+import Image from 'next/image';
+
 
 export const DefaultScreen = () => {
   return (
@@ -39,6 +42,23 @@ export const VideoLength = () => {
 }
 
 export const AudioSelection = () => {
+
+  const voices = [
+    {name: "Alloy", sampleAudio: "/alloy.wav", image: "/alloy.png"},
+    {name: "Echo", sampleAudio: "/echo.wav", image: "/echo.png"},
+    {name: "Fable", sampleAudio: "/fable.wav", image: "/fable.png"},
+    
+  ]
+
+  const AudioIcon = ({name, sampleAudio, image}: {name: string, sampleAudio: string, image: string}) => {
+    const [playSound] = useSound(sampleAudio);
+    return (
+      <button onClick={playSound} className='border rounded-xl p-4'>
+        <img src={image} alt={name} className="object-cover"/>
+      </button>
+    )
+  }
+
   return (
     <div className=' w-full h-full flex flex-col items-center gap-8'>
       <h1 className='font-bold text-4xl m-8'>
@@ -48,10 +68,10 @@ export const AudioSelection = () => {
         Here are a list of voices you can choose from
       </h1>
 
-      <div className='border w-full h-full grid grid-cols-3'>
-        <div className='border'>
-          hi
-        </div>
+      <div className='w-full h-full overflow-auto no-scrollbar grid grid-cols-3 gap-8 p-8'>
+        {voices.map((voice) => (
+          <AudioIcon {...voice}/>
+        ))}
       </div>
     </div>
   )
@@ -111,27 +131,3 @@ export const TargetAudience = () => {
     </div>
   )
 }
-
-
-
-
-
-
-
-// <div className='col-span-1 p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600 overflow-auto'>
-//         <h1 className='font-bold text-2xl 2xl:text-4xl'>
-//           Structure
-//         </h1>
-//         <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-4'>
-//           {scripts.map(({section, script1, script2}, index) => (
-//             <button onClick={() => setSectionIndex(index)}
-//             className='text-lg 2xl:text-xl p-2 font-bold hover:underline'
-//             style={{ textAlign: 'left', whiteSpace: 'normal' }}
-//             key={index}
-//              >
-//               {section}
-//             </button>
-//           ))}
-//         </div>
-//         <button className='text-lg border rounded-xl p-2 m-2'>Continue</button>
-//       </div>
