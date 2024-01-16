@@ -7,10 +7,11 @@ import { AudioSelection, AvatarSelection, DefaultScreen, Subtitles, TargetAudien
 interface VideoSettingProps {
   currSettings: settingItems;
   setSettings: (settings: settingItems) => void;
+  nextSlide: ()=>void;
 }
 
 
-const VideoSettings = ({currSettings, setSettings} : VideoSettingProps) => {
+const VideoSettings = ({currSettings, setSettings, nextSlide} : VideoSettingProps) => {
 
   const [settingChoice, setSettingChoice] = useState(0)
 
@@ -31,7 +32,7 @@ const VideoSettings = ({currSettings, setSettings} : VideoSettingProps) => {
   }
 
   function saveSettings() {
-
+    nextSlide()
   }
 
   return (

@@ -48,10 +48,11 @@ export const AudioSelection = () => {
         Here are a list of voices you can choose from
       </h1>
 
-      <div className='min-w-[40%] flex flex-col gap-4 overflow-auto no-scrollbar h-2/5'>
-        
+      <div className='border w-full h-full grid grid-cols-3'>
+        <div className='border'>
+          hi
+        </div>
       </div>
-      
     </div>
   )
 }
@@ -81,9 +82,12 @@ export const Subtitles = () => {
         Add subtitles to your project
       </h1>
       <h1 className='font-bold text-2xl m-2'>
-        On Off
+        Subtitles on/off
       </h1>
-
+      <h1 className='font-bold text-2xl m-2'>
+        Subtitles style
+      </h1>
+      
       <div className='min-w-[40%] flex flex-col gap-4 overflow-auto no-scrollbar h-2/5'>
         
       </div>

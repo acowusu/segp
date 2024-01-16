@@ -92,8 +92,8 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
   const slides = [
     <UploadFile key="uploadFile" nextSlide={scrollNext} setTopics={setTopics} />, 
-    <TopicPick key="topicPick" nextSlide={scrollNext}topics={topics} setScripts={setScripts} />,
-    <VideoSettings currSettings={settings} setSettings={setSettings} />, 
+    <TopicPick key="topicPick" nextSlide={scrollNext} topics={topics} setScripts={setScripts} />,
+    <VideoSettings currSettings={settings} setSettings={setSettings} nextSlide={scrollNext} />, 
     <VideoStructure key="videoStructure" callback={scrollNext} setModal={setModals} scripts={scripts} />
   ];
 
@@ -101,7 +101,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     <div className='w-screen h-screen'>
       <Modal {...modal}/>
       <div className="embla h-full">
-        <div className="embla__viewport h-full" ref={emblaRef}>
+        <div className="embla__viewport h-full" ref={emblaRef} >
           <div className="embla__container h-full">
             {slides.map((component, index) => (
               <div className="embla__slide flex flex-row w-full items-center justify-center h-full" key={index}>

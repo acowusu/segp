@@ -105,49 +105,50 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
   }
 
   return (
-    <div className='w-full h-full grid grid-cols-5 items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='flex flex-row h-full items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
-      <div className='col-span-1 p-8 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600 overflow-auto'>
+      <div className='p-8 basis-1/4 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600 overflow-auto'>
         <h1 className='font-bold text-2xl 2xl:text-4xl'>
           Structure
         </h1>
-        <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-4'>
+        <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-2 2xl:gap-4'>
           {scripts.map(({section, script1, script2}, index) => (
             <button onClick={() => setSectionIndex(index)}
             className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${index == sectionIndex && "text-blue-400"}`}
             style={{ textAlign: 'left', whiteSpace: 'normal' }}
             key={index}
-             >
+            >
               {section}
             </button>
           ))}
         </div>
       </div>
 
-      <div className='col-span-4 h-full flex flex-col items-center'>
+      <div className='basis-3/4 h-full flex flex-col items-center'>
         {
           scripts.length != 0 &&
           scripts.map(({section, script1, script2}, index) => (
             sectionIndex == index &&
-            <div key = "Structure" className='w-full h-full flex flex-col justify-center gap-8 items-center'>
-               <div className='flex items-center justify-center'>
+            <div key = "Structure" className='w-full h-full flex flex-col justify-center gap-4 2xl:gap-8 items-center'>
+              <div className='flex items-center justify-center'>
                 <h1 className='font-bold text-4xl p-4'>
                   {section}
                 </h1>
               </div>
-              <div className='w-4/5 flex flex-grow gap-4 overflow-auto no-scrollbar'>
+              <div className='w-4/5 flex grow gap-4 overflow-auto no-scrollbar'>
                 <ScriptBox label={script1} selected={sectionScriptChoice[index] == 1} index={index} boxNumber={1}/>
                 <ScriptBox label={script2} selected={sectionScriptChoice[index] == 2} index={index} boxNumber={2}/>
               </div>
-              <button onClick={() => setModal(true, modalContents)} disabled={sectionScriptChoice[index] == -1} className='my-2 border p-5 rounded-lg disabled:bg-gray-700'>
+              <button onClick={() => setModal(true, modalContents)} disabled={sectionScriptChoice[index] == -1} className='border p-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
                 Edit selected script
+              </button>
+              <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-2 mb-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
+                Create Video
               </button>
             </div>   
           ))
         }
-        <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-5 rounded-lg disabled:bg-gray-700 m-4'>
-          Create Video
-        </button>
+        
       </div>
     </div>
   )
