@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { topicsProp, scriptsProp, settingItems } from '../carousel';
 import axios from 'axios';
-import { AudioSelection, AvatarSelection, DefaultScreen, Subtitles, TargetAudience } from '../settings';
+import { AudioSelection, AvatarSelection, DefaultScreen, Subtitles, TargetAudience, VideoLength } from '../settings';
 
 interface VideoSettingProps {
   currSettings: settingItems;
@@ -15,9 +15,17 @@ const VideoSettings = ({currSettings, setSettings, nextSlide} : VideoSettingProp
 
   const [settingChoice, setSettingChoice] = useState(0)
 
+  function setSettingVoice(index: number) {
+    setSettings({
+      ...currSettings,
+      voice: index,
+    });
+  }
+
   const settings = [
   {name: "Overview", component: <DefaultScreen />},
-  {name: "Voiceover audio", component: <AudioSelection />},
+  {name: "Video Length", component: <VideoLength />},
+  {name: "Voiceover audio", component: <AudioSelection selectedVoice={currSettings.voice} setSelectedVoice={setSettingVoice}/>},
   {name: "Avatar overlay", component: <AvatarSelection />},
   {name: "Subtitles", component: <Subtitles />},
   {name: "Target Audience", component: <TargetAudience />},

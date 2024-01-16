@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import useSound from 'use-sound';
 import Image from 'next/image';
+import SoundIcon from "../public/soundIcon.svg"
 
 
 export const DefaultScreen = () => {
@@ -41,21 +42,34 @@ export const VideoLength = () => {
   )
 }
 
-export const AudioSelection = () => {
+export const AudioSelection = ({selectedVoice, setSelectedVoice}: {selectedVoice: number, setSelectedVoice: (index: number)=>void}) => {
 
   const voices = [
-    {name: "Alloy", sampleAudio: "/alloy.wav", image: "/alloy.png"},
-    {name: "Echo", sampleAudio: "/echo.wav", image: "/echo.png"},
-    {name: "Fable", sampleAudio: "/fable.wav", image: "/fable.png"},
-    
+    {name: "Alloy", sampleAudio: "/alloy.wav"},
+    {name: "Echo", sampleAudio: "/echo.wav"},
+    {name: "Fable", sampleAudio: "/fable.wav"},
+    {name: "Onyx", sampleAudio: "/onyx.wav"},
+    {name: "Nova", sampleAudio: "/nova.wav"},
+    {name: "Shimmer", sampleAudio: "/shimmer.wav"},
   ]
 
-  const AudioIcon = ({name, sampleAudio, image}: {name: string, sampleAudio: string, image: string}) => {
+  const AudioIcon = ({name, sampleAudio, index}: {name: string, sampleAudio: string, index: number}) => {
     const [playSound] = useSound(sampleAudio);
     return (
-      <button onClick={playSound} className='border rounded-xl p-4'>
-        <img src={image} alt={name} className="object-cover"/>
-      </button>
+      <div className='w-full h-full flex flex-col gap-4'>
+        <button 
+          className={`text-4xl font-bold border rounded-lg p-4 flex items-center justify-center ${selectedVoice == index && "text-green-600 shadow-2xl shadow-green-600"}`}
+          onClick={() => setSelectedVoice(index)}
+        >
+          {name}
+          </button>
+          <button onClick={playSound} className='border rounded-xl p-4 w-full flex items-center justify-between'>
+            <span>Sample {name}</span>
+            <div className="flex-shrink-0">
+              <Image src={SoundIcon} alt='sound icon' width={24} height={24} />
+            </div>
+          </button>
+      </div>
     )
   }
 
@@ -69,8 +83,8 @@ export const AudioSelection = () => {
       </h1>
 
       <div className='w-full h-full overflow-auto no-scrollbar grid grid-cols-3 gap-8 p-8'>
-        {voices.map((voice) => (
-          <AudioIcon {...voice}/>
+        {voices.map((voice, index) => (
+          <AudioIcon {...voice} index={index}/>
         ))}
       </div>
     </div>
