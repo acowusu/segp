@@ -148,7 +148,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
         Select a topic that you would like a video of
         </h1>
 
-        <div className='flex flex-col gap-4 overflow-auto no-scrollbar h-2/5'>
+        <div className='flex flex-col flex-grow gap-4 overflow-auto no-scrollbar h-2/5'>
           {
             topics.map(({topic, summary}, index) => (
               <div key={index}>
@@ -158,9 +158,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, setModal, topics, setScript
           }
         </div>
 
-        <button onClick={() => setModal(true, modalContents)} disabled={false} className='border p-5 rounded-lg'>Video Settings</button>
-
-        <button onClick={() => generateScript(topics[selectedIndex].topic)} disabled={loading || selectedIndex == -1} className='border p-5 disabled:bg-gray-800'>{loading ? "Generating Scripts..." : "Continue"}</button>
+        <button onClick={() => generateScript(topics[selectedIndex].topic)} disabled={loading || selectedIndex == -1} className='border p-4 rounded-lg m-4  disabled:bg-gray-800'>{loading ? "Generating Scripts..." : "Continue"}</button>
       </div>
 
       {/* Setting view */}

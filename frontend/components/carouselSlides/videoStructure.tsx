@@ -149,7 +149,6 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
           Create Video
         </button>
       </div>
-
     </div>
   )
 };
