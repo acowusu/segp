@@ -21,20 +21,45 @@ const VideoSettings = ({currSettings, setSettings, nextSlide} : VideoSettingProp
       voice: name,
     });
   }
+  function setSettingAvatar(name: string) {
+    setSettings({
+      ...currSettings,
+      avatar: name,
+    });
+  }
   function toggleSubtitleState(state: boolean) {
     setSettings({
       ...currSettings,
       subtitles: state
     });
   }
+  function setFormality(formality: string) {
+    setSettings({
+      ...currSettings,
+      formality: formality
+    });
+  }
+  function setAudience(type: string) {
+    setSettings({
+      ...currSettings,
+      targetAudience: type
+    });
+  }
+  function setLength(length: number[]) {
+    setSettings({
+      ...currSettings,
+      videoLength: length
+    });
+  }
+
 
   const settings = [
-  {name: "Overview", component: <DefaultScreen />},
-  {name: "Video Length", component: <VideoLength />},
+  {name: "Overview", component: <DefaultScreen currSettings={currSettings}/>},
+  {name: "Video Length", component: <VideoLength length={currSettings.videoLength} setLength={setLength}/>},
   {name: "Voiceover audio", component: <AudioSelection selectedVoice={currSettings.voice} setSelectedVoice={setSettingVoice}/>},
-  {name: "Avatar overlay", component: <AvatarSelection />},
+  {name: "Avatar overlay", component: <AvatarSelection selectedAvatar={currSettings.avatar} setSelectedAvatar={setSettingAvatar}/>},
   {name: "Subtitles", component: <Subtitles subtitlesState={currSettings.subtitles} toggleSubtitleState={toggleSubtitleState}/>},
-  {name: "Target Audience", component: <TargetAudience />},
+  {name: "Target Audience", component: <TargetAudience setAudience={setAudience} setFormality={setFormality} audience={currSettings.targetAudience} formality={currSettings.formality}/>},
 ]
 
   const SettingOption = ({setting, index}: {setting: string, index: number}) => {

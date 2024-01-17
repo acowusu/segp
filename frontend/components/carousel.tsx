@@ -12,23 +12,20 @@ import VideoSettings from './carouselSlides/videoSettings';
 export type settingItems = {
   voice: string,
   targetAudience: string, // stakeholders, children, adults, teens, accountants, engineers, scientist, student
-  videoLength: number,
-  avitar: number,
-  formality: number, // Intimate, Casual, Formal, Frozen, and 
+  videoLength: number[],
+  avatar: string,
+  formality: string, // Intimate, Casual, Formal, Frozen, and 
   subtitles: boolean,
 }
 
 const defaultSettings = {
   voice: "Alloy",
   targetAudience: "Everyone", // stakeholders, children, adults, teens, accountants, engineers, scientist, student
-  videoLength: 2,
-  avitar: -1,
-  formality: 0, // Intimate, Casual, Formal, Frozen, and 
+  videoLength: [1,2],
+  avatar: "None",
+  formality: "Casual", // Intimate, Casual, Formal, Frozen, and Consultative
   subtitles: false,
 }
-
-
-
 
 export type topicsProp = {topic: string, summary: string}[]
 export type scriptsProp = {section: string, script1: string, script2: string}[]
