@@ -4,22 +4,38 @@ import Image from 'next/image';
 
 const MediaFiles: React.FC = () => {
 
+  // array of promts for images to generate/look-up
   const searchTerms = ['AI', 'Neural Network', 'Layers', 'Connected', 'Line Graph', 'Future'];
-  const [photos, setPhotos] = useState([])
   const [selectedTerm, setSelectedTerm] = useState(searchTerms[0]);
+  const [termPhotos, setTermPhotos] = useState<{ [key: string]: any[] }>({});
+  const [photos, setPhotos] = useState([]);
 
-  const fetchPhotos = async () => {
+  const getPhotos = async () => {
     try {
-      const response = await fetch(
-        `https://api.unsplash.com/photos/random?query=${selectedTerm}&count=10&client_id=uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y`
-      );
 
-      if (response.ok) {
-        const data = await response.json();
-        setPhotos(data.map(photo => ({ term: selectedTerm, photo })));
-      } else {
-        console.error(`Failed to fetch photos for term "${selectedTerm}"`);
-      }
+      // get 10 photos for each search term
+      const termPhotoMap = searchTerms.map(async (term) => {
+        const response = await fetch(
+          `https://api.unsplash.com/photos/random?query=${term}&count=10&client_id=uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          return { term, photos: data };
+        } else {
+          console.error(`Failed to fetch photos for term "${term}"`);
+          return null;
+        }
+      });
+
+      const resolvedTermPhotos = await Promise.all(termPhotoMap);
+      const termPhotosMap: { [key: string]: any[] } = {};
+
+      resolvedTermPhotos.forEach(({ term, photos }) => {
+        termPhotosMap[term] = photos;
+      });
+
+      setTermPhotos(termPhotosMap);
     } catch (error) {
       console.error('Error fetching photos:', error);
     }
@@ -27,11 +43,12 @@ const MediaFiles: React.FC = () => {
 
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTerm(e.target.value);
+    setPhotos(termPhotos[e.target.value]);
   };
 
   useEffect(() => {
-    fetchPhotos();
-  }, [selectedTerm]);
+    getPhotos();
+  }, []);
 
   const MediaElement = ({ photo }) => {
     return (
@@ -53,7 +70,7 @@ const MediaFiles: React.FC = () => {
         </select>
       </div>
       <div className='grid grid-cols-3 gap-4 overflow-auto no-scrollbar p-2 border-t-2 border-black'>
-        {photos.map(({ term, photo }, index) => (
+        {photos.map((photo, index) => (
           <MediaElement key={index} photo={photo} />
         ))}
       </div>
