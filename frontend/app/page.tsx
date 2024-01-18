@@ -1,13 +1,14 @@
-'use client'
-import Toolbar from '@/components/toolbar'
-import Image from 'next/image'
-import ReactSplit, { SplitDirection } from '@devbookhq/splitter'
-import MediaFiles from '@/components/mediaFiles'
-import Tools from '@/components/tools'
-import VideoPlayerWithControls from '@/components/videoPlayer'
+"use client";
+import Toolbar from "@/components/toolbar";
+import Image from "next/image";
+import ReactSplit, { SplitDirection } from "@devbookhq/splitter";
+import MediaFiles from "@/components/mediaFiles";
+import Tools from "@/components/tools";
+import VideoPlayerWithControls from "@/components/videoPlayer";
 
+let mockupURL: string = "video-mockup.mp4";
 
-export default function Home() {  
+export default function Home() {
   return (
     <main className="flex flex-col min-h-screen h-full bg-gray-700">
       <Toolbar />
@@ -19,14 +20,16 @@ export default function Home() {
           <MediaFiles />
         </div>
         <div className="flex flex-grow border border-black">
-          <VideoPlayerWithControls videoUrl={'https://www.youtube.com/watch?v=JL-wFS2E-eM&ab_channel=PDTV'}/>
+          <VideoPlayerWithControls videoUrl={mockupURL} />
         </div>
       </div>
-      <div className="flex flex-grow">hi howdie
+      <div className="flex flex-grow">
+        hi howdie
         <a href="uploadpdf">swap page</a>
       </div>
-      <button onClick={() => console.log("lasdkjadsjkh")}>press me to log</button>
+      <button onClick={() => console.log("lasdkjadsjkh")}>
+        press me to log
+      </button>
     </main>
   );
-  
 }

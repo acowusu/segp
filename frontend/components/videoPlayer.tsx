@@ -1,20 +1,20 @@
-import React, { useRef, useState } from 'react';
-import ReactPlayer from 'react-player';
-import Image from "next/image"
-import playButton from "../public/playButton.svg"
-import pauseButton from "../public/pauseButton.svg"
-import fullscreen from "../public/fullscreen.svg"
+import React, { useRef, useState } from "react";
+import ReactPlayer from "react-player";
+import Image from "next/image";
+import playButton from "../public/playButton.svg";
+import pauseButton from "../public/pauseButton.svg";
+import fullscreen from "../public/fullscreen.svg";
 
-const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) => {
+const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({
+  videoUrl,
+}) => {
   const playerRef = useRef<ReactPlayer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
 
   const handlePlayPause = () => {
-      
     setIsPlaying(!isPlaying);
-    
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +22,10 @@ const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) =
     setVolume(newVolume);
   };
 
-  const handleProgress = (progress: { played: number; playedSeconds: number }) => {
+  const handleProgress = (progress: {
+    played: number;
+    playedSeconds: number;
+  }) => {
     setCurrentTime(progress.playedSeconds);
   };
 
@@ -46,14 +49,14 @@ const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) =
       } else if (playerElement.msRequestFullscreen) {
         playerElement.msRequestFullscreen();
       } else {
-        console.log("as,jfdbajsmdfmnasbf")
+        console.log("as,jfdbajsmdfmnasbf");
       }
     }
   };
 
   return (
     <div className="w-full p-4 flex flex-col items-center justify-center">
-      {/* <ReactPlayer
+      <ReactPlayer
         ref={playerRef}
         url={videoUrl}
         width="70%"
@@ -61,22 +64,22 @@ const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) =
         playing={isPlaying}
         volume={volume}
         onProgress={handleProgress}
-      /> */}
+      />
       <div className="w-[80%] flex flex-col">
-          <input
-            type="range"
-            min="0"
-            max={playerRef.current?.getDuration() || 0}
-            step="0.1"
-            value={currentTime}
-            onChange={handleSeek}
-          />
-        <div className='flex flex-row w-full justify-row items-center gap-4'>
+        <input
+          type="range"
+          min="0"
+          max={playerRef.current?.getDuration() || 0}
+          step="0.1"
+          value={currentTime}
+          onChange={handleSeek}
+        />
+        <div className="flex flex-row w-full justify-row items-center gap-4">
           <div className="w-[16rem]">
-            {currentTime.toFixed(1)}s / {playerRef.current?.getDuration()?.toFixed(1)}s
+            {currentTime.toFixed(1)}s /{" "}
+            {playerRef.current?.getDuration()?.toFixed(1)}s
           </div>
-          <button onClick={handlePlayPause} className='p-2 mx-16 w-2/5'>
-            
+          <button onClick={handlePlayPause} className="p-2 mx-16 w-2/5">
             {isPlaying ? "play" : "pause"}
           </button>
 
@@ -89,8 +92,9 @@ const VideoPlayerWithControls: React.FC<{ videoUrl: string }> = ({ videoUrl }) =
             onChange={handleVolumeChange}
           />
 
-          
-          <button onClick={handleFullScreen}><Image src={fullscreen} alt="fullscreen" width={30} height={30}/></button>
+          <button onClick={handleFullScreen}>
+            <Image src={fullscreen} alt="fullscreen" width={30} height={30} />
+          </button>
         </div>
       </div>
     </div>
