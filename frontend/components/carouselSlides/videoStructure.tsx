@@ -3,6 +3,7 @@ import React, { TextareaHTMLAttributes, useEffect, useRef, useState } from 'reac
 import Image from 'next/image';
 import { scriptsProp } from '../carousel';
 import TextArea from '../textarea';
+import axios from 'axios';
 
 interface VideoStructureProps {
   callback: () => void;
@@ -104,6 +105,31 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
     )
   }
 
+  const [loading, setLoading] = useState<boolean>(false)
+
+  async function generateVideo() {
+    setLoading(true)
+
+    var finalScript = ""
+
+    sectionScriptChoice.forEach((scriptNumber, index) => {
+      finalScript += (scriptNumber == 1 ? scripts[index].script1: scripts[index].script2) + " "
+    });
+
+    try {
+      const response = await axios.post("/api/generate_video", {data: finalScript});
+      if (response.status == 200) {
+        setLoading(false)
+        console.log("complete")
+      } else {
+        console.log("ERROR ERROR ERROR TODO TODO TODO")
+      }
+
+    } catch {
+      console.log("ERROR ERROR ERROR")
+    }
+  }
+
   return (
     <div className='flex flex-row h-full items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
@@ -142,8 +168,8 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
               <button onClick={() => setModal(true, modalContents)} disabled={sectionScriptChoice[index] == -1} className='border p-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
                 Edit selected script
               </button>
-              <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-2 mb-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
-                Create Video
+              <button onClick={generateVideo} disabled={sectionScriptChoice.some(item => item == -1) || loading} className='border p-2 mb-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
+                {loading ? "Generating Video" : "Create Video"}
               </button>
             </div>   
           ))

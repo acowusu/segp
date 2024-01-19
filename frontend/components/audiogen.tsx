@@ -3,9 +3,9 @@ import * as PlayHT from 'playht';
 import { saveAs } from 'file-saver';
 
 const PlayHTComponent = () => {
-  const [audioUrl, setAudioUrl] = useState(null);
+  const [audioUrl, setAudioUrl] = useState<string>("");
 
-  const generateAudio = async (text) => {
+  const generateAudio = async (text: string) => {
     try {
       const generated = await PlayHT.generate(text);
       const { audioUrl } = generated;

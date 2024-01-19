@@ -30,7 +30,7 @@ const TopicPick: React.FC<TopicProps> = ({nextSlide, topics, setScripts}) => {
     try {
       const response = await axios.post("/api/generate_script", {data: topic});
       // simulate script being generated
-      await new Promise(res => setTimeout(res, 1000));
+      // await new Promise(res => setTimeout(res, 1000));
       if (response.status == 200) {
         setScripts(response.data.scripts) // get from response
         setLoading(false)

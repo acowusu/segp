@@ -12,7 +12,6 @@ const MediaFiles: React.FC = () => {
 
   const getPhotos = async () => {
     try {
-
       // get 10 photos for each search term
       const termPhotoMap = searchTerms.map(async (term) => {
         const response = await fetch(

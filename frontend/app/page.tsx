@@ -5,9 +5,30 @@ import ReactSplit, { SplitDirection } from '@devbookhq/splitter'
 import MediaFiles from '@/components/mediaFiles'
 import Tools from '@/components/tools'
 import VideoPlayerWithControls from '@/components/videoPlayer'
+import { createVideo } from '@/createVideo'
+import axios from 'axios'
 
 
 export default function Home() {  
+  
+  async function generateVideo() {
+
+    var finalScript = ""
+
+    try {
+      const response = await axios.post("/api/generate_video", {data: finalScript});
+      if (response.status == 200) {
+        console.log("complete")
+      } else {
+        console.log("ERROR ERROR ERROR TODO TODO TODO")
+      }
+
+    } catch {
+      console.log("ERROR ERROR ERROR")
+    }
+  }
+
+
   return (
     <main className="flex flex-col min-h-screen h-full bg-gray-700">
       <Toolbar />
@@ -25,7 +46,7 @@ export default function Home() {
       <div className="flex flex-grow">hi howdie
         <a href="uploadpdf">swap page</a>
       </div>
-      <button onClick={() => console.log("lasdkjadsjkh")}>press me to log</button>
+      <button onClick={() => generateVideo()}>press me to log</button>
     </main>
   );
   

@@ -19,7 +19,7 @@ const UploadFile: React.FC<UploadProps> = ({nextSlide, setTopics}) => {
 
     try {
       const response = await axios.post("/api/analyse_script", {data: content});
-      await new Promise(res => setTimeout(res, 1000));
+      // await new Promise(res => setTimeout(res, 1000));
       if (response.status == 200) {
         setTopics(response.data.topics) // get from response
         setLoading(false)
