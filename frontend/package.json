@@ -42,6 +42,7 @@
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
     "timers": "^0.1.1",
+    "use-sound": "^4.0.1",
     "wait-on": "^7.2.0"
   },
   "devDependencies": {

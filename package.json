@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "file-loader": "^6.2.0",
-    "use-sound": "^4.0.1"
-  }
-}
