@@ -3,116 +3,59 @@ import React, { TextareaHTMLAttributes, useEffect, useRef, useState } from 'reac
 import Image from 'next/image';
 import { scriptsProp } from '../carousel';
 import TextArea from '../textarea';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../videoSlideAccordian';
+
+
+
+
+
+
 
 interface VideoStructureProps {
   callback: () => void;
   setModal: (isOpened: boolean, children?: React.ReactNode)=>void;
-  scripts: scriptsProp;
+  allScripts: scriptsProp;
 }
 
-const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scripts}) => {
+const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, allScripts}) => {
+
+  console.log(allScripts)
 
   const [sectionIndex, setSectionIndex] = useState(0);
   const[sectionScriptChoice, setSectionScriptChoice] = useState<number[]>([]);
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
 
   useEffect(() => {
     if (sectionScriptChoice.length == 0) {
-      setSectionScriptChoice(Array(scripts.length).fill(-1))
+      setSectionScriptChoice(Array(allScripts.length).fill(0))
     }
-  }, [scripts])
+  }, [allScripts])
 
-  function updateScripts(content: string) {
-    if (sectionScriptChoice[sectionIndex] == 1) {
-      scripts[sectionIndex].script1 = content
-    } else {
-      scripts[sectionIndex].script2 = content
-    }
-    setModal(false)
+  function updateScripts(content: string, innerIndex: number) {
+    console.log(sectionIndex)
+    console.log(innerIndex)
+    console.log(sectionScriptChoice[sectionIndex])
+    allScripts[sectionIndex].scripts[innerIndex] = content
   }
 
-  const modalContents = (
-    <div className='h-full text-white'>
-        {/* Top Bar with Title and Close Button */}
-        <div className="w-full h-[10%] py-4 px-6 flex justify-between items-center">
-            <h2 className="text-4xl font-bold text-white">Edit the script!</h2>
-            <button onClick={() => setModal(false)} className="text-gray-600 hover:text-black focus:outline-none">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                    />
-                </svg>
-            </button>
-        </div>
-        <hr className="mt-4 mb-8 h-1"/>
-        <div className='flex flex-row gap-8 justify-center items-center h-[70%] overflow-auto no-scrollbar'>
-          <div className='w-[40%] h-full'>
-            <h1 className='font-bold text-4xl my-2'>
-              Old Script
-            </h1>
-            <div className='border-white border overflow-auto no-scrollbar rounded-lg h-4/5 p-4 shadow-xl shadow-red-600'>
-              {sectionScriptChoice[sectionIndex] != -1 && (sectionScriptChoice[sectionIndex] == 1 ? scripts[sectionIndex]?.script1 : scripts[sectionIndex]?.script2)}
-            </div>
-          </div>
-          <div className='w-[40%] h-full'>
-            <h1 className='font-bold text-4xl my-2'>
-              New Script
-            </h1>
-            <div className='border-white border rounded-lg h-4/5 p-4 shadow-xl shadow-green-600'>
-              <textarea 
-              className='bg-inherit w-full h-full overflow-auto no-scrollbar focus:border-none focus:outline-none'
-              ref={textareaRef}
-              placeholder='Enter your ammended script here'
-              style={{ resize: 'none' }}
-              />
-              
-            </div>
-          </div>
-        </div>
-        <div className='flex items-center justify-center w-full'>
-          <button onClick={() => updateScripts(textareaRef.current?.value??"")} className='my-2 border p-5 rounded-lg'>
-            Save
-          </button>
-        </div>
-    </div>
-  )
-
+  
   const updateElement = (index: number, value: number) => {
+    
     const newArray = [...sectionScriptChoice]; 
     newArray[index] = value; 
     setSectionScriptChoice(newArray); 
   };
 
 
-  const ScriptBox = ({label, selected, index, boxNumber}: {label: string, selected: boolean, index: number, boxNumber: number}) => {
-    return (
-      <div 
-      onClick={() => updateElement(index, boxNumber)}
-      className={`text-white p-4 border w-1/2 border-white rounded  overflow-auto no-scrollbar hover:cursor-pointer  ${selected ? "bg-blue-600" : "hover:bg-gray-800"}`}>
-        {label}
-      </div>
-    )
-  }
-
   return (
-    <div className='flex flex-row h-full items-center justify-center border rounded-xl shadow-lg shadow-white bg-black text-white'>
+    <div className='flex flex-row h-full border rounded-xl shadow-lg shadow-white bg-black text-white'>
 
-      <div className='p-8 basis-1/4 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600 overflow-auto'>
+      <div className='p-8 basis-1/4 h-full flex flex-col gap-4 border-r shadow-2xl shadow-blue-600'>
         <h1 className='font-bold text-2xl 2xl:text-4xl'>
           Structure
         </h1>
         <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-2 2xl:gap-4'>
-          {scripts.map(({section, script1, script2}, index) => (
+          {allScripts.map(({section, scripts}, index) => (
             <button onClick={() => setSectionIndex(index)}
             className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${index == sectionIndex && "text-blue-400"}`}
             style={{ textAlign: 'left', whiteSpace: 'normal' }}
@@ -124,30 +67,48 @@ const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, scri
         </div>
       </div>
 
-      <div className='basis-3/4 h-full flex flex-col items-center'>
+      <div className='basis-3/4 h-full flex flex-col p-4 gap-8 items-center overflow-auto no-scrollbar'>
         {
-          scripts.length != 0 &&
-          scripts.map(({section, script1, script2}, index) => (
-            sectionIndex == index &&
-            <div key = "Structure" className='w-full h-full flex flex-col justify-center gap-4 2xl:gap-8 items-center'>
-              <div className='flex items-center justify-center'>
-                <h1 className='font-bold text-4xl p-4'>
-                  {section}
-                </h1>
-              </div>
-              <div className='w-4/5 flex grow gap-4 overflow-auto no-scrollbar'>
-                <ScriptBox label={script1} selected={sectionScriptChoice[index] == 1} index={index} boxNumber={1}/>
-                <ScriptBox label={script2} selected={sectionScriptChoice[index] == 2} index={index} boxNumber={2}/>
-              </div>
-              <button onClick={() => setModal(true, modalContents)} disabled={sectionScriptChoice[index] == -1} className='border p-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
-                Edit selected script
-              </button>
-              <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-2 mb-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
-                Create Video
-              </button>
-            </div>   
+          allScripts.length != 0 &&
+          allScripts.map(({section, scripts}, index) => (
+
+            <div 
+            key={index}
+            onFocus={() => setSectionIndex(index)}
+            className={`w-4/5 h-2/5 p-4 2xl:p-8 flex-shrink-0 border bg-zinc-800 rounded-lg overflow-auto no-scrollbar hover:bg-gray-800 ${index == sectionIndex && "shadow-lg shadow-blue-600 border-2 border-blue-400"}`}>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="item-1">
+                  <AccordionTrigger >
+                  <div className="w-full flex items-center justify-end text-neutral-400 text-xs 2xl:text-sm font-normal font-['Inter'] mb-4 hover:cursor-pointer">
+                    View other Drafts
+                  </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className='flex flex-row gap-4 2xl:gap-8 overflow-auto'>
+                      {
+                        allScripts[index].scripts.map((content, innerIndex) => (
+                          <div 
+                          key={innerIndex} 
+                          onClick={() => {updateElement(index, innerIndex); updateScripts(scripts[innerIndex], innerIndex)}}
+                          className={`hover:cursor-pointer border-2 h-[6rem] rounded-lg p-4 ${innerIndex == sectionScriptChoice[index] && "border-blue-400"} overflow-auto no-scrollbar`}>
+                            {content}
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion> 
+              <blockquote contentEditable="true" onBlur={(event) => updateScripts(event.target.textContent ?? "", sectionScriptChoice[index])} suppressContentEditableWarning={true}>
+                {scripts[sectionScriptChoice[index]]}
+              </blockquote>
+            </div>
+
           ))
         }
+        <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
+          Create Video
+        </button>
         
       </div>
     </div>

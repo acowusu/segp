@@ -5,9 +5,11 @@ import useEmblaCarousel from 'embla-carousel-react'
 import '../css/carousel.css'; 
 import UploadFile from './carouselSlides/uploadFile';
 import TopicPick from './carouselSlides/topic_pick';
+// import VideoStructure from './carouselSlides/videoStructure';
 import VideoStructure from './carouselSlides/videoStructure';
 import Modal from './screenmodals';
 import VideoSettings from './carouselSlides/videoSettings';
+import { scriptData } from '@/app/api/generate_script/route';
 
 export type settingItems = {
   voice: string,
@@ -28,7 +30,7 @@ const defaultSettings = {
 }
 
 export type topicsProp = {topic: string, summary: string}[]
-export type scriptsProp = {section: string, script1: string, script2: string}[]
+export type scriptsProp = {section: string, scripts: string[]}[]
 
 type PropType = {
   options?: EmblaOptionsType
@@ -91,7 +93,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     <UploadFile key="uploadFile" nextSlide={scrollNext} setTopics={setTopics} />, 
     <TopicPick key="topicPick" nextSlide={scrollNext} topics={topics} setScripts={setScripts} />,
     <VideoSettings currSettings={settings} setSettings={setSettings} nextSlide={scrollNext} />, 
-    <VideoStructure key="videoStructure" callback={scrollNext} setModal={setModals} scripts={scripts} />
+    <VideoStructure key="videoStructure" callback={scrollNext} setModal={setModals} allScripts={scriptData} />
   ];
 
   return (

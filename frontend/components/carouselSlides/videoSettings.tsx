@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { topicsProp, scriptsProp, settingItems } from '../carousel';
+import { settingItems } from '../carousel';
 import axios from 'axios';
 import { AudioSelection, AvatarSelection, DefaultScreen, Subtitles, TargetAudience, VideoLength } from '../settings';
 
