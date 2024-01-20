@@ -15,7 +15,6 @@ const UploadFile: React.FC<UploadProps> = ({nextSlide, setTopics}) => {
   async function submitPDFs(content: string) {
     setLoading(true)
       // simulate script being generated
-      
 
     try {
       const response = await axios.post("/api/analyse_script", {data: content});

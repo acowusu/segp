@@ -9,6 +9,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import DraggableIcon from "../../public/draggable.svg"
 
+
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface VideoStructureProps {
@@ -110,7 +111,7 @@ type layout = {
         <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-2 2xl:gap-4'>
 
           {layout.slice().sort((a, b) => a.y - b.y).map(({i, y}, index) => (
-            <button onClick={() => {setSectionIndex(Number(i)); scrollToSection(Number(i));}}
+            <button onClick={() => {setSectionIndex(Number(i));}}
             className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${Number(i) == sectionIndex && "text-blue-400"}`}
             style={{ textAlign: 'left', whiteSpace: 'normal' }}
             key={index}

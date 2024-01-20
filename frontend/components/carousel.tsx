@@ -1,12 +1,9 @@
 "use client"
-import React, { useState, useEffect, useCallback, PropsWithChildren, useRef } from 'react'
-import { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel'
-import useEmblaCarousel from 'embla-carousel-react'
+import React, { useState, useRef } from 'react'
 import '../css/carousel.css'; 
 import UploadFile from './carouselSlides/uploadFile';
 import TopicPick from './carouselSlides/topic_pick';
 import VideoStructure from './carouselSlides/videoStructure';
-import Modal from './screenmodals';
 import Slider from "react-slick";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
