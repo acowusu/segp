@@ -1,13 +1,15 @@
 "use client"
-import React, { useState, useEffect, useCallback, PropsWithChildren } from 'react'
+import React, { useState, useEffect, useCallback, PropsWithChildren, useRef } from 'react'
 import { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel'
 import useEmblaCarousel from 'embla-carousel-react'
 import '../css/carousel.css'; 
 import UploadFile from './carouselSlides/uploadFile';
 import TopicPick from './carouselSlides/topic_pick';
-// import VideoStructure from './carouselSlides/videoStructure';
 import VideoStructure from './carouselSlides/videoStructure';
 import Modal from './screenmodals';
+import Slider from "react-slick";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import VideoSettings from './carouselSlides/videoSettings';
 import { scriptData } from '@/app/api/generate_script/route';
 
@@ -32,88 +34,47 @@ const defaultSettings = {
 export type topicsProp = {topic: string, summary: string}[]
 export type scriptsProp = {section: string, scripts: string[]}[]
 
-type PropType = {
-  options?: EmblaOptionsType
-}
+const EmblaCarousel: React.FC = () => {
 
-const EmblaCarousel: React.FC<PropType> = (props) => {
-  const { options } = props
-  const [emblaRef, emblaApi] = useEmblaCarousel(options)
-  const [prevBtnDisabled, setPrevBtnDisabled] = useState(true)
-  const [nextBtnDisabled, setNextBtnDisabled] = useState(true)
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
-  
-  const scrollPrev = useCallback(
-    () => emblaApi && emblaApi.scrollPrev(),
-    [emblaApi]
-    )
-    const scrollNext = useCallback(
-      () => emblaApi && emblaApi.scrollNext(),
-      [emblaApi]
-      )
-      const scrollTo = useCallback(
-        (index: number) => emblaApi && emblaApi.scrollTo(index),
-    [emblaApi]
-    )
-    
-    const onInit = useCallback((emblaApi: EmblaCarouselType) => {
-      setScrollSnaps(emblaApi.scrollSnapList())
-    }, [])
-
-    
-    const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
-      setSelectedIndex(emblaApi.selectedScrollSnap())
-      setPrevBtnDisabled(!emblaApi.canScrollPrev())
-      setNextBtnDisabled(!emblaApi.canScrollNext())
-    }, [])
-    
-    useEffect(() => {
-      if (!emblaApi) return
-
-    onInit(emblaApi)
-    onSelect(emblaApi)
-    emblaApi.on('reInit', onInit)
-    emblaApi.on('reInit', onSelect)
-    emblaApi.on('select', onSelect)
-  }, [emblaApi, onInit, onSelect])
-  
-  
-  const [modal, setModal] = useState({modalVisible: false,  children: (<></>)});
   const [topics, setTopics] = useState<topicsProp>([])
   const [scripts, setScripts] = useState<scriptsProp>([])
 
   const [settings, setSettings] = useState(defaultSettings)
-  
-  const setModals = (modalVisible: boolean, children?: React.ReactNode) => {
-    setModal({modalVisible: modalVisible, children: (<>{children}</>)})
-  }
+  const sliderRef = useRef<Slider>(null);
+
+  const scrollNext = () => {
+    sliderRef.current?.slickNext();
+  };
 
   const slides = [
     <UploadFile key="uploadFile" nextSlide={scrollNext} setTopics={setTopics} />, 
     <TopicPick key="topicPick" nextSlide={scrollNext} topics={topics} setScripts={setScripts} />,
     <VideoSettings currSettings={settings} setSettings={setSettings} nextSlide={scrollNext} />, 
-    <VideoStructure key="videoStructure" callback={scrollNext} setModal={setModals} allScripts={scriptData} />
+    <VideoStructure key="videoStructure" callback={scrollNext} allScripts={scriptData} />
   ];
 
-  return (
+  const carouselSettings = {
+    dots: false,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    swipe: false,
+    arrows: false
+  };
+
+ return (
     <div className='w-screen h-screen'>
-      <Modal {...modal}/>
-      <div className="embla h-full">
-        <div className="embla__viewport h-full" ref={emblaRef} >
-          <div className="embla__container h-full">
-            {slides.map((component, index) => (
-              <div className="embla__slide flex flex-row w-full items-center justify-center h-full" key={index}>
-                <div className='w-4/5 h-4/5'>
-                  {component}
-                </div>
-              </div>
-            ))}
+      <Slider {...carouselSettings} ref={sliderRef} >
+        {slides.map((component, index) => (
+          <div key={index} className='h-screen w-screen'>
+            <div className='w-4/5 h-4/5 mx-auto mt-20'>
+              {component}
+            </div>
           </div>
-        </div>
-      </div>
+        ))}
+      </Slider>
     </div>
-  )
+  );
 }
 
 export default EmblaCarousel

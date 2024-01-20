@@ -16,13 +16,13 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface VideoStructureProps {
   callback: () => void;
-  setModal: (isOpened: boolean, children?: React.ReactNode)=>void;
   allScripts: scriptsProp;
 }
 
-const VideoStructure: React.FC<VideoStructureProps> = ({callback, setModal, allScripts}) => {
+const VideoStructure: React.FC<VideoStructureProps> = ({callback, allScripts}) => {
   const [sectionIndex, setSectionIndex] = useState(0);
   const[sectionScriptChoice, setSectionScriptChoice] = useState<number[]>([]);
+  const [sectionOrder, setSectionOrder] = useState<number[]>([])
 
 type layout = {
   i: string;
@@ -38,6 +38,7 @@ type layout = {
   useEffect(() => {
     if (sectionScriptChoice.length == 0) {
       setSectionScriptChoice(Array(allScripts.length).fill(0))
+      setSectionOrder(Array.from(Array(10).keys()))
     }
     const initialLayout = allScripts.map((script, index) => ({
       i: index.toString(),
@@ -48,6 +49,16 @@ type layout = {
     }));
     setLayout(initialLayout);
   }, [allScripts])
+
+  const sectionRefs = allScripts.map(() => useRef<HTMLDivElement>(null));
+
+
+  const scrollToSection = (index: number) => {
+    sectionRefs[index].current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   const onLayoutChange = (newLayout: layout) => {
     setLayout(newLayout);
@@ -80,7 +91,7 @@ type layout = {
         </h1>
         <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-2 2xl:gap-4'>
           {allScripts.map(({section, scripts}, index) => (
-            <button onClick={() => setSectionIndex(index)}
+            <button onClick={() => {setSectionIndex(index); scrollToSection(index)}}
             className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${index == sectionIndex && "text-blue-400"}`}
             style={{ textAlign: 'left', whiteSpace: 'normal' }}
             key={index}
@@ -89,9 +100,14 @@ type layout = {
             </button>
           ))}
         </div>
+        <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} 
+        className='border p-2 2xl:p-5 rounded-lg disabled:bg-gray-700'
+        >
+          Create Video
+        </button>
       </div>
 
-      <div className='basis-3/4 h-full w-full flex flex-col p-4 gap-8 items-center overflow-auto no-scrollbar'>
+      <div className='basis-3/4 h-full w-full flex flex-col items-center overflow-auto no-scrollbar'>
         {
           allScripts.length != 0 &&
           <ResponsiveGridLayout
@@ -99,19 +115,18 @@ type layout = {
             breakpoints={breakpoints}
             cols={cols}
             rowHeight={300}
-            width={600}
             onLayoutChange={onLayoutChange}
             draggableHandle=".drag-handle"
-            className='flex flex-col items-center justify-center w-full'
+            className='flex flex-col items-center w-full m-4'
           >
 
           {allScripts.map(({scripts}, index) => (
-
             <div 
             key={index}
+            ref={sectionRefs[index]}
             onFocus={() => setSectionIndex(index)}
             data-grid={layout.find(item => item.i === index.toString())}
-            className={`max-w-lg h-2/5 p-4 2xl:p-8 flex-shrink-0 border bg-zinc-800 rounded-lg overflow-auto no-scrollbar hover:bg-gray-800 ${index == sectionIndex && "shadow-lg shadow-blue-600 border-2 border-blue-400"}`}>
+            className={`max-w-2xl h-2/5 p-4 2xl:p-6 flex-shrink-0 border bg-zinc-800 rounded-lg overflow-auto no-scrollbar hover:bg-gray-800 ${index == sectionIndex && "shadow-lg shadow-blue-600 border-2 border-blue-400"}`}>
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
                   <AccordionTrigger >
@@ -148,9 +163,7 @@ type layout = {
           ))}
         </ResponsiveGridLayout>
         }
-        <button onClick={callback} disabled={sectionScriptChoice.some(item => item == -1)} className='border p-2 2xl:p-5 rounded-lg disabled:bg-gray-700'>
-          Create Video
-        </button>
+        
         
       </div>
     </div>
