@@ -59,7 +59,8 @@ const EmblaCarousel: React.FC = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     swipe: false,
-    arrows: false
+    arrows: false,
+    accessibility: false,
   };
 
  return (

@@ -12,8 +12,6 @@ import DraggableIcon from "../../public/draggable.svg"
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 
-
-
 interface VideoStructureProps {
   callback: () => void;
   allScripts: scriptsProp;
@@ -90,13 +88,14 @@ type layout = {
           Structure
         </h1>
         <div className='h-full overflow-auto no-scrollbar flex flex-col justify-start items-start gap-2 2xl:gap-4'>
-          {allScripts.map(({section, scripts}, index) => (
-            <button onClick={() => {setSectionIndex(index); scrollToSection(index)}}
-            className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${index == sectionIndex && "text-blue-400"}`}
+
+          {layout.slice().sort((a, b) => a.y - b.y).map(({i, y}, index) => (
+            <button onClick={() => {setSectionIndex(Number(i)); scrollToSection(Number(i));}}
+            className={`text-lg 2xl:text-xl p-2 font-bold hover:underline ${Number(i) == sectionIndex && "text-blue-400"}`}
             style={{ textAlign: 'left', whiteSpace: 'normal' }}
             key={index}
             >
-              {section}
+              {allScripts[Number(i)].section}
             </button>
           ))}
         </div>
@@ -159,12 +158,9 @@ type layout = {
                 </div>
               </div>
             </div>
-
           ))}
         </ResponsiveGridLayout>
         }
-        
-        
       </div>
     </div>
   )
