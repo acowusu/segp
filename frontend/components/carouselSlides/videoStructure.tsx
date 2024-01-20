@@ -11,7 +11,6 @@ import DraggableIcon from "../../public/draggable.svg"
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-
 interface VideoStructureProps {
   callback: () => void;
   allScripts: scriptsProp;
@@ -32,7 +31,6 @@ type layout = {
 
   const [layout, setLayout] = useState<layout>([]);
 
-
   useEffect(() => {
     if (sectionScriptChoice.length == 0) {
       setSectionScriptChoice(Array(allScripts.length).fill(0))
@@ -48,30 +46,14 @@ type layout = {
     setLayout(initialLayout);
   }, [allScripts])
 
-  const sectionRefs = allScripts.map(() => useRef<HTMLDivElement>(null));
-
-
-  
-  const scrollToSection = (index: number) => {
-    sectionRefs[index].current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  };
-
   const onLayoutChange = (newLayout: layout) => {
     setLayout(newLayout);
   };
 
-  useEffect(() => {
-    // Access the refs here
-    console.log(sectionRefs);
-  }, []);
 
   function updateScripts(content: string, innerIndex: number) {
     allScripts[sectionIndex].scripts[innerIndex] = content
   }
-
   
   const updateElement = (index: number, value: number) => {
     
@@ -82,6 +64,41 @@ type layout = {
 
   const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
   const cols = { lg: 1, md: 1, sm: 1, xs: 1, xxs: 1 };
+
+
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [dropdownCoords, setDropdownCoords] = useState({ x: 0, y: 0 });
+
+  const handleContextMenu = (event: { preventDefault: () => void; clientX: any; clientY: any; }) => {
+    event.preventDefault(); // Prevent the default right-click menu
+    setShowDropdown(true);
+    setDropdownCoords({ x: event.clientX, y: event.clientY });
+  };
+
+  const handleCloseDropdown = () => {
+    setShowDropdown(false);
+  };
+
+  const DropdownMenu = ({x, y, onClose}:{ x: number, y: number, onClose: () => void }) => {
+    const style = {
+      position: 'absolute',
+      top: `${y}px`,
+      left: `${x}px`,
+      zIndex: 1000, 
+    };
+  
+    return (
+      <ul className="bg-white rounded-xl text-black">
+        {/* List your menu items here */}
+        <li>Menu Item 1</li>
+        <li>Menu Item 2</li>
+        {/* ... other items */}
+      </ul>
+    );
+  };
+
+
+
 
   return (
     <div className='flex flex-row h-full border rounded-xl shadow-lg shadow-white bg-black text-white'>
@@ -124,12 +141,13 @@ type layout = {
 
           {allScripts.map(({scripts}, index) => (
             <div 
+            onContextMenu={handleContextMenu} 
             key={index}
-            ref={sectionRefs[index]}
             onFocus={() => setSectionIndex(index)}
-            onClick={() => setSectionIndex(index)}
+            onClick={() => {setSectionIndex(index); handleCloseDropdown()}}
             data-grid={layout.find(item => item.i === index.toString())}
             className={`max-w-2xl h-2/5 p-4 2xl:p-6 flex-shrink-0 border bg-zinc-800 rounded-lg overflow-auto no-scrollbar hover:bg-gray-800 ${index == sectionIndex && "shadow-lg shadow-blue-600 border-2 border-blue-400"}`}>
+              {showDropdown && <DropdownMenu x={dropdownCoords.x} y={dropdownCoords.y} onClose={handleCloseDropdown} />}
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
                   <AccordionTrigger >
