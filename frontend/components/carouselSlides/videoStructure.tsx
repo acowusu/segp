@@ -51,6 +51,7 @@ type layout = {
   const sectionRefs = allScripts.map(() => useRef<HTMLDivElement>(null));
 
 
+  
   const scrollToSection = (index: number) => {
     sectionRefs[index].current?.scrollIntoView({
       behavior: 'smooth',
@@ -62,10 +63,12 @@ type layout = {
     setLayout(newLayout);
   };
 
+  useEffect(() => {
+    // Access the refs here
+    console.log(sectionRefs);
+  }, []);
+
   function updateScripts(content: string, innerIndex: number) {
-    console.log(sectionIndex)
-    console.log(innerIndex)
-    console.log(sectionScriptChoice[sectionIndex])
     allScripts[sectionIndex].scripts[innerIndex] = content
   }
 
@@ -124,6 +127,7 @@ type layout = {
             key={index}
             ref={sectionRefs[index]}
             onFocus={() => setSectionIndex(index)}
+            onClick={() => setSectionIndex(index)}
             data-grid={layout.find(item => item.i === index.toString())}
             className={`max-w-2xl h-2/5 p-4 2xl:p-6 flex-shrink-0 border bg-zinc-800 rounded-lg overflow-auto no-scrollbar hover:bg-gray-800 ${index == sectionIndex && "shadow-lg shadow-blue-600 border-2 border-blue-400"}`}>
               <Accordion type="single" collapsible>
