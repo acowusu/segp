@@ -20,7 +20,7 @@
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
   },
   "win": {
-    "icon": "build/windows11/Square150x150Logo.scale-200.png",
+    "icon": "build/ios/512.png",
     "target": [
       {
         "target": "nsis",
