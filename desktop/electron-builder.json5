@@ -14,6 +14,7 @@
     "dist-electron"
   ],
   "mac": {
+    "icon": "build/ios/512.png",
     "target": [
       "dmg"
     ],
@@ -38,6 +39,7 @@
     "deleteAppDataOnUninstall": false
   },
   "linux": {
+    "icon": "build/ios/512.png", -
     "target": [
       "AppImage"
     ],
