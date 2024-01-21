@@ -1,14 +1,22 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import { Topic, Audience, Voiceover, Visual } from './mockData/data'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))
 contextBridge.exposeInMainWorld('electronAPI', {
   openFile: () => ipcRenderer.invoke('dialog:openFile'),
-  analyseScript: () => ipcRenderer.invoke('dialog:analyseScript'),
-  generateScript: () => ipcRenderer.invoke('dialog:generateScript')
+  getTopics: () => ipcRenderer.invoke('dialog:getTopics'),
+  setTopic: (topic: Topic) => ipcRenderer.invoke('dialog:setTopic', topic),
+  setAudiences: (audience: Audience) => ipcRenderer.invoke('dialog:setAudience', audience),
+  setVoiceovers: (voiceover: Voiceover) => ipcRenderer.invoke('dialog:setVoiceover', voiceover),
+  setVisuals: (visuals: Visual) => ipcRenderer.invoke('dialog:setVisuals', visuals),
+  getScript: () => ipcRenderer.invoke('dialog:getScript')
 
 })
+
+
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function withPrototype(obj: Record<string, any>) {
   const protos = Object.getPrototypeOf(obj)
 
@@ -17,6 +25,7 @@ function withPrototype(obj: Record<string, any>) {
 
     if (typeof value === 'function') {
       // Some native APIs, like `NodeJS.EventEmitter['on']`, don't work in the Renderer process. Wrapping them into a function.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       obj[key] = function (...args: any) {
         return value.call(obj, ...args)
       }
@@ -112,11 +121,11 @@ function useLoading() {
 
 // ----------------------------------------------------------------------
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 const { appendLoading, removeLoading } = useLoading()
 domReady().then(appendLoading)
 
 window.onmessage = ev => {
   ev.data.payload === 'removeLoading' && removeLoading()
 }
-
 setTimeout(removeLoading, 4999)

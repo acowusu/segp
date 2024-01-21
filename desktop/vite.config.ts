@@ -1,13 +1,12 @@
-import fs from 'node:fs'
+import { resolve } from 'path'
+
 import path from 'node:path'
 import {
-  type Plugin,
   defineConfig,
-  normalizePath,
 } from 'vite'
 import electron from 'vite-plugin-electron/simple'
 import react from '@vitejs/plugin-react'
-import os from 'os'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -29,6 +28,10 @@ export default defineConfig({
                 'serialport',
                 // other `C/C++` addons
               ],
+              input: {
+                main: resolve(__dirname, 'electron/main.ts'),
+                worker: resolve(__dirname, 'electron/workers/worker.ts')
+              }
             },
           },
         },

@@ -1,0 +1,44 @@
+import React from "react";
+import { cn } from "../lib/utils"
+interface OverlayPreviewProps {
+  backgroundUrl: string;
+  avatarUrl: string;
+  showAvatar?: boolean;
+  showSubtitle?: boolean;
+}
+
+export const OverlayPreview: React.FC<OverlayPreviewProps> = ({
+  backgroundUrl,
+  avatarUrl,
+  showAvatar = false,
+  showSubtitle = false,
+}) => {
+  return (
+    <div className="overflow-hidden rounded-md mt-4 relative   aspect-[16/9] w-full">
+      <img
+        src={backgroundUrl}
+        alt={"background"}
+        className={cn(
+          "h-auto w-auto object-cover transition-all absolute bottom-0 right-0"
+        )}
+      />
+     {showAvatar && ( <img
+        src={avatarUrl}
+        alt={"avatar"}
+        width={300}
+        height={400}
+        className={cn(
+          "h-32 w-auto object-cover transition-all  absolute bottom-0 right-0"
+        )}
+      />)}
+      
+      {showSubtitle && (
+        <div className="absolute bottom-5 inset-x-5 opacity-75	">
+          <div className="bg-black text-white rounded-lg  p-1">
+            <div className="text-sm font-bold">Lorem ipsum dolor sit amet consectetur adipiscing elit. Aliquam efficitur, magna</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

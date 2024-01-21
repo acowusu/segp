@@ -1,0 +1,21 @@
+ [
+    {
+      "name": "Bar Chart",
+      "description": "A simple bar chart visualization",
+      "thumbnail": "https://example.com/bar-chart-thumbnail.png",
+      "sample": "https://example.com/bar-chart-sample.png"
+    },
+    {
+      "name": "Line Chart",
+      "description": "A line chart visualization",
+      "thumbnail": "https://example.com/line-chart-thumbnail.png",
+      "sample": "https://example.com/line-chart-sample.png"
+    },
+    {
+      "name": "Pie Chart",
+      "description": "A pie chart visualization",
+      "thumbnail": "/example.jpg",
+      "sample": "https://example.com/pie-chart-sample.png"
+    }
+  ]
+

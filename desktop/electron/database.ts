@@ -1,27 +1,10 @@
 
 
-import { app } from 'electron'
-import path from 'node:path'
-import {
-  type Database,
-  verbose,
-} from 'sqlite3'
+import * as DB from 'better-sqlite3';
+import type { Database } from 'better-sqlite3';
 
-const TAG = '[sqlite3]'
-let database: Promise<Database>
+let database : Database | undefined;
 
-export function getDatabase(filename = path.join(app.getPath('userData'), 'database.sqlite3')) {
-  return database ??= new Promise<Database>((resolve, reject) => {
-    const db = new (verbose().Database)(filename, error => {
-      if (error) {
-        console.log(TAG, 'initialize failed :(')
-        console.log(TAG, error)
-        reject(error)
-      } else {
-        console.log(TAG, 'initialize success :)')
-        console.log(TAG, filename)
-        resolve(db)
-      }
-    })
-  })
+export function getDatabase(filename:string) {
+  return database ??= new DB(filename);
 }

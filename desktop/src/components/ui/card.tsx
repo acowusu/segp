@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "/src/lib/utils"
+import { cn } from "../../lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -16,6 +16,21 @@ const Card = React.forwardRef<
   />
 ))
 Card.displayName = "Card"
+
+const FramelessCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg bg-card text-card-foreground ",
+      className
+    )}
+    {...props}
+  />
+))
+FramelessCard.displayName = "FramelessCard"
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -76,4 +91,4 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, FramelessCard }
