@@ -13,7 +13,6 @@
 
 //       <code className=" text-center	 text-pink-700 monospace">{location.pathname}</code>
 
-
 //       {/* An <Outlet> renders whatever child route is currently active,
 //           so you can think about this <Outlet> as a placeholder for
 //           the child routes we defined above. */}
@@ -21,8 +20,6 @@
 //     </div>
 //   );
 // }
-
-
 
 import { Outlet } from "react-router-dom";
 
@@ -46,12 +43,15 @@ const sidebarNavItems = [
     title: "Visuals",
     href: "/welcome/set-visuals",
   },
+  {
+    title: "Editor",
+    href: "/welcome/video-editor",
+  },
 ];
 
 export function WelcomeLayout() {
   return (
     <>
-
       <div className=" space-y-6 p-10 pb-16 md:block">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
