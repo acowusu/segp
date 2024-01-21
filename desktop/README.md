@@ -1,4 +1,6 @@
 #  IC 📽️
+[![DeepSource](https://app.deepsource.com/gh/acowusu/segp.svg/?label=active+issues&show_trend=true&token=0kYCUSPcWEImKG2Bw9ObDPtx)](https://app.deepsource.com/gh/acowusu/segp/)
+
 ![logo](https://github.com/acowusu/segp/blob/main/desktop/build/windows11/Wide310x150Logo.scale-400.png?raw=true)
 
 This project aims to develop an application that seamlessly converts large PDF reports into dynamic and informative videos. The key features of the generated videos will include:
