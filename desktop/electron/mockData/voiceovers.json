@@ -1,0 +1,23 @@
+[
+  {
+    "name": "John Smith",
+    "description": "Deep and authoritative voice",
+    "thumbnail": "https://example.com/thumbnails/john_smith.jpg",
+    "audioSample": "https://example.com/audio/john_smith.mp3",
+    "id": "1"
+  },
+  {
+    "name": "Emily Johnson",
+    "description": "Smooth and soothing voice",
+    "thumbnail": "https://example.com/thumbnails/emily_johnson.jpg",
+    "audioSample": "https://example.com/audio/emily_johnson.mp3",
+    "id": "2"
+  },
+  {
+    "name": "Michael Davis",
+    "description": "Energetic and enthusiastic voice",
+    "thumbnail": "https://example.com/thumbnails/michael_davis.jpg",
+    "audioSample": "https://example.com/audio/michael_davis.mp3",
+    "id": "3"
+  }
+]

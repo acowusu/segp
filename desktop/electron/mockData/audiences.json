@@ -1,0 +1,38 @@
+[
+  {
+    "name": "everyone",
+    "description": "Audience for everyone"
+  },
+  {
+    "name": "children",
+    "description": "Audience for children"
+  },
+  {
+    "name": "adults",
+    "description": "Audience for adults"
+  },
+  {
+    "name": "students",
+    "description": "Audience for students"
+  },
+  {
+    "name": "general",
+    "description": "Audience for general"
+  },
+  {
+    "name": "accountants",
+    "description": "Audience for accountants"
+  },
+  {
+    "name": "engineers",
+    "description": "Audience for engineers"
+  },
+  {
+    "name": "scientists",
+    "description": "Audience for scientists"
+  },
+  {
+    "name": "stakeholders",
+    "description": "Audience for stakeholders"
+  }
+]

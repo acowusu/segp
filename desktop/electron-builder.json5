@@ -3,9 +3,9 @@
  */
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "uk.ac.ic.doc",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "Imperial <> DeepSearch Labs Video Editor",
   "directories": {
     "output": "release/${version}"
   },
@@ -20,6 +20,7 @@
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
   },
   "win": {
+    "icon": "build/windows11/Square150x150Logo.scale-200.png",
     "target": [
       {
         "target": "nsis",

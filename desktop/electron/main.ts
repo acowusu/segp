@@ -1,8 +1,8 @@
 import { app, BrowserWindow, ipcMain, dialog  } from 'electron'
 import path from 'node:path'
-import { getDatabase } from './database'
-
-import { extractTextFromPDF } from './reportProcessing'
+// import { getDatabase } from './database'
+import api, { IAPI } from './routes'
+import { extractTextFromPDF, getScript, getTopics, setTopic} from './reportProcessing'
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -21,12 +21,14 @@ let win: BrowserWindow | null
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 async function handleFileOpen () {
-  const { canceled, filePaths } = await dialog.showOpenDialog()
+  const { canceled, filePaths } = await dialog.showOpenDialog(win as BrowserWindow)
   let path = ""
   if (!canceled) {
-    path =  filePaths[0] 
+    path = filePaths[0] 
   }
-  return await extractTextFromPDF(path)
+  path = await extractTextFromPDF(path)
+  console.log("GOT PATH", path)
+  return path
 }
 function createWindow() {
   win = new BrowserWindow({
@@ -69,8 +71,27 @@ app.on('activate', () => {
 
 app.whenReady().then(() => {
   ipcMain.handle('dialog:openFile', handleFileOpen)
-  ipcMain.handle('dialog:analyseScript', handleFileOpen)
-  ipcMain.handle('dialog:generateScript', handleFileOpen)
+  ipcMain.handle('dialog:getTopics', getTopics)
+  ipcMain.handle('dialog:getScript', getScript)
+  ipcMain.handle('dialog:setTopic', (_, args) => setTopic(args))
+  ipcMain.handle('api:generic', (_, { property, args }) => {
+    console.log(property)
+    const methodName = property as keyof IAPI
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const method = api[methodName] as (...items: any[]) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const methodArgs = args as any[]//(Parameters < IAPI[typeof methodName] > )
+    if (typeof method === 'function') {
+      return method(...(methodArgs)) as unknown as Promise<ReturnType<IAPI[typeof methodName]>>
+    }
+    else {
+      return {
+          error: `api.${property} is not a function`,
+          hint: `have you defined ${property} in ./electron/routes.ts?`
+       }
+    }
+  })
+
   createWindow()
 
   setTimeout(() => {
