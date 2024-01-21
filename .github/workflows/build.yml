@@ -18,7 +18,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 18.17.0
-
+      - name: Install test app dependencies
+        run: |
+          cd desktop
+          npm ci
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
