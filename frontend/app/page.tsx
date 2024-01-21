@@ -1,7 +1,5 @@
 'use client'
 import Toolbar from '@/components/toolbar'
-import Image from 'next/image'
-import ReactSplit, { SplitDirection } from '@devbookhq/splitter'
 import MediaFiles from '@/components/mediaFiles'
 import Tools from '@/components/tools'
 import VideoPlayerWithControls from '@/components/videoPlayer'
