@@ -13,7 +13,7 @@ export const Editor: React.FC = () => {
 }
 
 export const VideoEditor: React.FC = () => {
-    const mediaStore = React.useContext(MediaStoreContext);
+    // const mediaStore = React.useContext(MediaStoreContext);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
