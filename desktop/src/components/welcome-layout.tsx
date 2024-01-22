@@ -46,6 +46,14 @@ const sidebarNavItems = [
     title: "Visuals",
     href: "/welcome/set-visuals",
   },
+  {
+    title: "Script",
+    href: "/welcome/script-editor",
+  },
+  {
+    title: "Edit Video Test",
+    href: "/welcome/etro-test",
+  },
 ];
 
 export function WelcomeLayout() {
