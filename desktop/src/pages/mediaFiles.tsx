@@ -5,7 +5,7 @@ const pexelsApiKey = 'J4nKc6oJDyKJeRJTlC0x5EiQQDZkTuvAyJ1uXt6gC98IGwDleAYqI0RR';
 const unsplashAccessKey = 'rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA';
 const queries = ['AI', 'Neural Network', 'Connected', 'City', 'Future'];
 
-const MediaFiles: React.FC = () => {
+export const Media: React.FC = () => {
   const [selectedQuery, setSelectedQuery] = useState<string>(queries[0]);
   const [media, setMedia] = useState<(Video | string)[]>([]);
 
@@ -82,5 +82,3 @@ const MediaFiles: React.FC = () => {
     </div>
   );
 };
-
-export default MediaFiles;

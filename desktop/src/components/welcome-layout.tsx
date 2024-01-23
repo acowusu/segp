@@ -46,6 +46,11 @@ const sidebarNavItems = [
     title: "Visuals",
     href: "/welcome/set-visuals",
   },
+  {
+    title: "Media",
+    href: "/welcome/media",
+  },
+
 ];
 
 export function WelcomeLayout() {

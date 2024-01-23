@@ -49,6 +49,7 @@
     "match-sorter": "^6.3.3",
     "next-themes": "^0.2.1",
     "path2d-polyfill": "^2.0.1",
+    "pexels": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.49.3",

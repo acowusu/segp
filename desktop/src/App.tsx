@@ -13,6 +13,7 @@ import { SetVoiceover } from "./pages/set-voiceover";
 import { ScriptEditor } from "./pages/script-editor";
 import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
+import { Media } from "./pages/mediaFiles";
 
 function App() {
   // const [count, setCount] = useState(0);
@@ -30,6 +31,7 @@ function App() {
               <Route path="set-voiceover" element={<SetVoiceover />} />
               <Route path="set-visuals" element={<SetVisuals />} />
               <Route path="script-editor" element={<ScriptEditor />} />
+              <Route path="media" element={<Media/>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Route>
