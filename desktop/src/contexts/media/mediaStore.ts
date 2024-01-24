@@ -1,5 +1,5 @@
 import etro from 'etro';
- import { MediaElement } from '../../lib/types';
+ import { MediaElement } from './types';
 
 export class MediaStore {
  
