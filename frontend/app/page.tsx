@@ -3,6 +3,7 @@ import Toolbar from '@/components/toolbar'
 import MediaFiles from '@/components/mediaFiles'
 import Tools from '@/components/tools'
 import VideoPlayerWithControls from '@/components/videoPlayer'
+import Websocket from '@/components/websocket'
 
 
 export default function Home() {  
@@ -23,7 +24,7 @@ export default function Home() {
       <div className="flex flex-grow">hi howdie
         <a href="uploadpdf">swap page</a>
       </div>
-      <button onClick={() => console.log("lasdkjadsjkh")}>press me to log</button>
+      <Websocket />
     </main>
   );
   
