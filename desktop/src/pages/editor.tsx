@@ -2,7 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { MediaStore } from "../lib/mediaStore";
 import { MediaStoreContext } from "../lib";
 import etro from "etro";
-import { Timeline, TimelineEffect, TimelineRow } from '@xzdarcy/react-timeline-editor'
+import { Timeline, TimelineEffect, TimelineRow, TimelineAction, TimelineState } from '@xzdarcy/react-timeline-editor';
+import { Switch } from "../components/ui/switch";
+import { TimeFrame } from "../components/timeline-components/timeFrame";
+import TimelinePlayer from "../components/timeline-components/timelinePlayer";
 
 export const Editor: React.FC = () => {
     const [mediaStore] = useState(new MediaStore())
@@ -18,11 +21,65 @@ export const VideoEditor: React.FC = () => {
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
-
     const movieRef = useRef<etro.Movie | null>();
+    const timelineState = useRef<TimelineState>(null);
+    const domRef = useRef<HTMLDivElement>(null);
 
-    const [timelinedata, setTimelineData] = useState<TimelineRow[]>([]);
+    const [data, setData] = useState<TimelineRow[]>([]);
     const [effects, setEffects] = useState<Record<string, TimelineEffect>>({});
+    const [allowEdit, setAllowEdit] = useState(true);
+    const [showCursor, setShowCursor] = useState(true);
+    const [autoScrollWhenPlay, setAutoScrollWhenPlay] = useState(true);
+    const idRef = useRef(5);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const handlePlayPause = () => {
+        setIsPlaying(!isPlaying);
+        isPlaying ? movieRef.current?.pause() : movieRef.current?.play();
+    };
+
+    const handleAllowEdit = () => {
+        setAllowEdit(!allowEdit);
+    };
+
+    const handleShowCursor = () => {
+        setShowCursor(!showCursor);
+    };
+
+    const handleAutoScrollWhenPlay = () => {
+        setAutoScrollWhenPlay(!autoScrollWhenPlay);
+    };
+
+    const handleCursorSeek = (time: number) => {
+        if (movieRef.current) {
+            movieRef.current.seek(time);
+            isPlaying ? movieRef.current.play() : movieRef.current.refresh();
+        }
+    };
+
+    const handleProgress = (time: number, _: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (movieRef.current) {
+            movieRef.current.seek(time);
+            isPlaying ? movieRef.current.play() : movieRef.current.refresh();
+        }
+        return true;
+    };
+
+    const handleAddNewAction = (_: React.MouseEvent<HTMLElement, MouseEvent>, param: { row: TimelineRow; time: number; }) => {
+        const { row, time } = param;
+        setData((prev) => { 
+            const rowIndex = prev.findIndex(item => item.id === row.id);
+            const newAction: TimelineAction = {
+                id: `action${idRef.current++}`,
+                start: time,
+                end: time + 0.5,
+                effectId: "effect0",
+            }
+            prev[rowIndex] = {...row, actions: row.actions.concat(newAction)};
+            return [...prev];
+        })
+    };
+
 
     useEffect(() => {
         // Use the canvas ref to get the canvas element
@@ -33,7 +90,7 @@ export const VideoEditor: React.FC = () => {
         // Create a new movie instance
         const movie = new etro.Movie({
             canvas,
-            repeat: true,
+            repeat: false,
             background: etro.parseColor("#ccc"),
         });
 
@@ -43,17 +100,17 @@ export const VideoEditor: React.FC = () => {
         canvas.height = 1080;
         const layer1 = new etro.layer.Visual({
             startTime: 0,
-            duration: 1,
+            duration: 2,
             background: etro.parseColor("#f1c40f"),
         });
         const layer2 = new etro.layer.Visual({
-            startTime: 1,
-            duration: 1,
+            startTime: 2,
+            duration: 2,
             background: etro.parseColor("#f39c12"),
         });
         const layer3 = new etro.layer.Image({
             startTime: 0,
-            duration: 0.5,
+            duration: 2,
             source: imageRef.current,
             sourceX: 0, // default: 0
             sourceY: 0, // default: 0
@@ -66,8 +123,8 @@ export const VideoEditor: React.FC = () => {
             opacity: 0.8 , // default: 1
         });
         const layer4 = new etro.layer.Image({
-            startTime: 0.5,
-            duration: 1,
+            startTime: 2,
+            duration: 2,
             source: imageRef.current,
             sourceX: 0, // default: 0
             sourceY: 0, // default: 0
@@ -87,18 +144,19 @@ export const VideoEditor: React.FC = () => {
         movie.play();
         movieRef.current = movie;
 
-        setTimelineData([{
+        setData([{
             id: '0',
-            actions: [{id: 'action0', start: 0, end: 1, effectId: 'effect0'}],
+            actions: [{id: 'action0', start: 0, end: 2, effectId: 'effect0'},
+                {id: 'action01', start: 4, end: 6, effectId: 'effect01'}],
         }, {
             id: '1',
-            actions: [{id: 'action1', start: 0.5, end: 4, effectId: 'effect1'}],
+            actions: [{id: 'action2', start: 2, end: 4, effectId: 'effect1'}],
         }, {
             id: '2',
-            actions: [{id: 'action2', start: 2, end: 7, effectId: 'effect2'}],
+            actions: [{id: 'action3', start: 0, end: 2, effectId: 'effect2'}],
         }, {
             id: '3',
-            actions: [{id: 'action3', start: 3, end: 5, effectId: 'effect3'}],
+            actions: [{id: 'action4', start: 2, end: 4, effectId: 'effect3'}],
         }]); 
 
         setEffects({
@@ -115,9 +173,60 @@ export const VideoEditor: React.FC = () => {
 
     return ( 
       <>
+      <div className="w-full p-4 flex flex-col items-center justify-center">
         <img  className="hidden" src="/person.png" alt="" ref={imageRef} />
         <canvas className="w-full" ref={canvasRef} />
-        <Timeline editorData={timelinedata} effects={effects} />
+        <div className="w-[80%] flex flex-col">
+            <div className='flex flex-row w-full justify-row items-center gap-4'>
+                <Switch checked={allowEdit} onCheckedChange={handleAllowEdit}/> 
+                <Switch checked={showCursor} onCheckedChange={handleShowCursor}/> 
+                <Switch checked={autoScrollWhenPlay} onCheckedChange={handleAutoScrollWhenPlay}/> 
+                <TimelinePlayer 
+                    handlePlayPause={handlePlayPause} 
+                    timelineState={timelineState} 
+                    autoScrollWhenPlay={autoScrollWhenPlay} 
+                />
+            </div>
+        </div>
+        <div className="flex">
+            <div
+                ref={domRef}
+                style={{ overflow: 'overlay' }}
+                onScroll={(e) => {
+                    const target = e.target as HTMLDivElement;
+                    timelineState.current?.setScrollTop(target.scrollTop);
+                }}
+                className="w-1/4"
+            >
+                {data.map((item) => {
+                    return (
+                        <div key={item.id} className="p-px flex w-full">
+                            <div className="bg-teal-950 w-full">{`Media Component: ${item.id}`}</div>
+                        </div>
+                    );
+                })}
+            </div>
+            <Timeline 
+                editorData={data} 
+                effects={effects}
+                ref={timelineState}
+                onChange={setData}
+                autoScroll={true}
+                minScaleCount={movieRef.current?.duration}
+                onCursorDrag={handleCursorSeek}
+                onClickTimeArea={handleProgress}
+                disableDrag={!allowEdit}
+                hideCursor={!showCursor}
+                getActionRender={(action, row) => {return <TimeFrame action={action} row={row} />}}
+                dragLine={true}
+                onDoubleClickRow={handleAddNewAction}
+                onScroll={({ scrollTop }) => {
+                    if (domRef.current)
+                        domRef.current.scrollTop = scrollTop;
+                }}
+            />
+        </div>
+      </div>
       </>
     );
 };
