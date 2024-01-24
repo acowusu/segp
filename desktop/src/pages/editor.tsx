@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { MediaStore } from "../lib/mediaStore";
-import { MediaStoreContext } from "../lib";
+import { MediaStore } from "../contexts/media/mediaStore";
+import { MediaStoreContext } from "../contexts/media";
 import etro from "etro";
 import { Timeline, TimelineEffect, TimelineRow, TimelineAction, TimelineState } from '@xzdarcy/react-timeline-editor';
 import { Switch } from "../components/ui/switch";
