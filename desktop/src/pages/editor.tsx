@@ -17,7 +17,7 @@ export const Editor: React.FC = () => {
 }
 
 export const VideoEditor: React.FC = () => {
-    // const mediaStore = React.useContext(MediaStoreContext);
+    const mediaStore = React.useContext(MediaStoreContext);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
@@ -144,31 +144,33 @@ export const VideoEditor: React.FC = () => {
         movie.play();
         movieRef.current = movie;
 
-        setData([{
-            id: '0',
-            actions: [{id: 'action0', start: 0, end: 2, effectId: 'effect0'},
-                {id: 'action01', start: 4, end: 6, effectId: 'effect01'}],
-        }, {
-            id: '1',
-            actions: [{id: 'action2', start: 2, end: 4, effectId: 'effect1'}],
-        }, {
-            id: '2',
-            actions: [{id: 'action3', start: 0, end: 2, effectId: 'effect2'}],
-        }, {
-            id: '3',
-            actions: [{id: 'action4', start: 2, end: 4, effectId: 'effect3'}],
-        }]); 
+        // setData([{
+        //     id: '0',
+        //     actions: [{id: 'action0', start: 0, end: 2, effectId: 'effect0'},
+        //         {id: 'action01', start: 4, end: 6, effectId: 'effect01'}],
+        // }, {
+        //     id: '1',
+        //     actions: [{id: 'action2', start: 2, end: 4, effectId: 'effect1'}],
+        // }, {
+        //     id: '2',
+        //     actions: [{id: 'action3', start: 0, end: 2, effectId: 'effect2'}],
+        // }, {
+        //     id: '3',
+        //     actions: [{id: 'action4', start: 2, end: 4, effectId: 'effect3'}],
+        // }]); 
+        setData(mediaStore.data);
+        setEffects(mediaStore.effects);
 
-        setEffects({
-            effect0: {
-                id: 'effect0',
-                name: 'effect0',
-            },
-            effect1: {
-                id: 'effect1',
-                name: 'effect1',
-            },
-        });
+        // setEffects({
+        //     effect0: {
+        //         id: 'effect0',
+        //         name: 'effect0',
+        //     },
+        //     effect1: {
+        //         id: 'effect1',
+        //         name: 'effect1',
+        //     },
+        // });
     }, []);
 
     return ( 
