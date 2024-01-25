@@ -38,7 +38,7 @@ export const Media: React.FC = () => {
   const MediaElement: React.FC<{ media: Video | string }> = ({ media }) => {
     return (
       <div
-        className='border border-black rounded-lg h-32 transform transition duration-700 ease-in-out hover:scale-105 cursor-pointer flex flex-col items-center justify-between p-2'
+        className='h-32 transform transition duration-700 ease-in-out hover:scale-105 cursor-pointer flex flex-col items-center justify-between p-2'
       >
         {typeof media === 'string' ? (
           <img
@@ -62,8 +62,8 @@ export const Media: React.FC = () => {
   };
 
   return (
-    <div className="border border-black w-full h-full flex flex-col">
-      <h1 className='font-bold text-2xl p-2 border-b-2 border-black'>Media Files</h1>
+    <div className="w-full h-full flex flex-col">
+      <h1 className='font-bold text-2xl p-2'>Media Files</h1>
       <div>
         <label htmlFor="querySelector">Select a category: </label>
         <select id="querySelector" value={selectedQuery} onChange={handleQueryChange} style={{ color: 'black' }}>
@@ -74,7 +74,7 @@ export const Media: React.FC = () => {
           ))}
         </select>
       </div>
-      <div className='grid grid-cols-3 gap-4 overflow-auto no-scrollbar p-2 border-t-2 border-black'>
+      <div className='grid grid-cols-3 gap-4 overflow-auto no-scrollbar p-2 '>
         {media.map((item, index) => (
           <MediaElement key={index} media={item} />
         ))}
