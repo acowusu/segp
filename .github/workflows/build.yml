@@ -1,4 +1,4 @@
-name: Build/release
+name: Build/release/test
 
 on:
   pull_request:
@@ -21,17 +21,20 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 18.17.0
+
       - name: Install test app dependencies
         run: |
           cd desktop
           npm ci
+
+      - name: Run tests
+        run: |
+          cd desktop
+          npm test
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
           package_root: desktop
-
-          
           release: true

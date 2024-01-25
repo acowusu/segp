@@ -11,7 +11,8 @@
     "postinstall": "electron-builder install-app-deps",
     "build": "tsc && vite build && electron-builder",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest --passWithNoTests"
   },
   "overrides": {
     "node-canvas": "npm:dry-uninstall",
@@ -19,6 +20,10 @@
     "unpdf": {
       "canvas": "npm:dry-uninstall"
     }
+  },
+  "jest": {
+    "runner": "jest-electron/runner",
+    "testEnvironment": "jest-electron/environment"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -76,6 +81,7 @@
     "eslint": "^8.48.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "jest-electron": "^0.1.12",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
