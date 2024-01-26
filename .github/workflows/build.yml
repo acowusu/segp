@@ -1,9 +1,6 @@
 name: Build/release/test
 
-on:
-  pull_request:
-    types:
-      - closed
+on: workflow_dispatch
 
 jobs:
   release:
