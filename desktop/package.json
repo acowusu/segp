@@ -1,7 +1,7 @@
 {
   "name": "desktop",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": "https://github.com/acowusu/segp.git",
   "postinstall": "electron-builder install-app-deps",
   "scripts": {
@@ -48,6 +48,7 @@
     "clsx": "^2.1.0",
     "embla-carousel": "^8.0.0-rc19",
     "embla-carousel-react": "^8.0.0-rc19",
+    "file-saver": "^2.0.5",
     "jotai": "^2.6.2",
     "localforage": "^1.10.0",
     "lucide-react": "^0.311.0",
@@ -55,6 +56,7 @@
     "next-themes": "^0.2.1",
     "path2d-polyfill": "^2.0.1",
     "pexels": "^1.4.0",
+    "playht": "^0.9.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.49.3",

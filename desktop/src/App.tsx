@@ -14,6 +14,7 @@ import { ScriptEditor } from "./pages/script-editor";
 import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
+import { AudioGenerator } from "./pages/audiogen";
 
 function App() {
   // const [count, setCount] = useState(0);
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Upload />} />
+            <Route path="audiogen" element={<AudioGenerator/>} />
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="about" element={<About />} />
               <Route path="set-topic" element={<SetTopic />} />

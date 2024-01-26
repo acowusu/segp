@@ -8,6 +8,7 @@ import voiceovers from "./mockData/voiceovers.json";
 import type { Audience, ScriptData, Topic, Visual, Voiceover } from "./mockData/data";
 import path from 'path';
 import { Worker } from 'worker_threads';
+import * as PlayHT from 'playht';
 
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {
@@ -37,6 +38,44 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
 
 }
 
+export async function textToAudio() {
+    PlayHT.init({
+      apiKey: '75fc21e75dfc45f5aa8e1947018966e6',
+      userId: 'aYxdHRiwjRdnqCoco5rZ6kJ6AvH3',
+      defaultVoiceId: 's3://peregrine-voices/oliver_narrative2_parrot_saad/manifest.json',
+      defaultVoiceEngine: 'PlayHT2.0',
+    });
+    
+    // Generate audio from text
+    // const generated = await PlayHT.generate('Computers can speak now!');
+    
+    // Grab the generated file URL
+    // const { generationId, audioUrl } = generated;
+    const generationId = "UzqG23PBNBfI4lS025"
+    const playHtConfig = {
+      userId: 'aYxdHRiwjRdnqCoco5rZ6kJ6AvH3',
+      apiKey: '75fc21e75dfc45f5aa8e1947018966e6',
+    };
+    
+    //console.log('The url for the audio file is', audioUrl);
+
+    const transcriptionUrl = `https://api.play.ht/api/v2/transcriptions/${generationId}`;
+const transcriptionOptions = {
+  method: 'GET',
+  headers: {
+    accept: 'application/json',
+    Authorization: `Bearer ${playHtConfig.apiKey}`,
+    'X-USER-ID': playHtConfig.userId,
+  },
+};
+
+  fetch(transcriptionUrl, transcriptionOptions)
+  .then(res => res.json())
+  .then(json => console.log(JSON.stringify(json)))
+  .catch(err => console.error('Error:', err));
+
+    // return [generationId, audioUrl];
+}
 
 export async function myWorkerFunction(filepath:string): Promise<number> {
   const worker = new Worker(path.resolve(__dirname, './worker.js'), {});

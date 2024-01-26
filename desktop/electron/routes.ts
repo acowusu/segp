@@ -11,6 +11,7 @@ import {
   setVoiceover,
   getVoiceovers,
   myWorkerFunction,
+  textToAudio
 } from "./reportProcessing";
 // Import your API methods here
 
@@ -26,6 +27,7 @@ const api = {
   setVoiceover,
   getVoiceovers,
   myWorkerFunction,
+  textToAudio
   // Add your API methods here
 };
 export default api;

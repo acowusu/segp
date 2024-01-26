@@ -24,6 +24,7 @@ export const Upload: React.FC = () => {
   const [filePath, setFilePath] = useState("");
   const [disableFilePicker, setDisableFilePicker] = useState(false);
   const [disabledNext, setDisabledNext] = useState(false);
+  const [disabledCancel, setDisabledCancel] = useState(false);
 
   const setFile = async () => {
     if (disableFilePicker) return;
@@ -38,6 +39,11 @@ export const Upload: React.FC = () => {
     if (disabledNext) return;
     navigate("/welcome/set-topic");
     setDisabledNext(true);
+  };
+  const handleCancel = () => {
+    if (disabledCancel) return;
+    navigate("/audiogen");
+    setDisabledCancel(false);
   };
   return (
     <div className="flex items-center justify-center h-screen">
@@ -76,7 +82,7 @@ export const Upload: React.FC = () => {
               </form>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline">Cancel</Button>
+              <Button disabled={disabledCancel} onClick={handleCancel}>Cancel</Button>
               <Button disabled={disabledNext} onClick={handleNext}>
                 Next
               </Button>
@@ -110,7 +116,7 @@ export const Upload: React.FC = () => {
               </form>
             </CardContent>
             <CardFooter className="flex justify-between mt-3">
-              <Button variant="outline">Cancel</Button>
+              <Button disabled={disabledCancel} onClick={handleCancel}>Cancel</Button>
               <Button disabled={disabledNext} onClick={handleNext}>
                 Next
               </Button>
