@@ -50,7 +50,14 @@ const sidebarNavItems = [
     title: "Media",
     href: "/welcome/media",
   },
-
+  {
+    title: "Script",
+    href: "/welcome/script-editor",
+  },
+  {
+    title: "Video Editor",
+    href: "/welcome/video-editor",
+  },
 ];
 
 export function WelcomeLayout() {
