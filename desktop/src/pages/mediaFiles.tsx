@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-// import { createClient, Video } from 'pexels';
+import { createClient, Video } from 'pexels';
+import { TimelineAction } from '@xzdarcy/react-timeline-editor';
 
 // const pexelsApiKeys = ['6MMWrcLkoVjZ8rtjHHeD2YCw9uR2xy6livsQXIZjFrBqoYQDKhpjlTWW', 'J4nKc6oJDyKJeRJTlC0x5EiQQDZkTuvAyJ1uXt6gC98IGwDleAYqI0RR', 'nNKofGGjX3XW9Je67z7AdJkla5dUExm1cmx3hsILW0u7ekRm3WWoH5Us'];
 const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI'];
 const queries = ['AI', 'Neural Network', 'Connected', 'City', 'Future'];
 
-export const Media: React.FC<{handleAddToPlayer: (media: Video | string) => void}> = ({handleAddToPlayer}) => {
+export const Media: React.FC<{handleAddToPlayer: (media: Video | string) => void, toReplace: TimelineAction | null}> = ({handleAddToPlayer, toReplace}) => {
   const [selectedQuery, setSelectedQuery] = useState<string>(queries[0]);
   const [mediaMap, setMediaMap] = useState<{ [key: string]: ( string)[] }>({});
   // const [pexelsKeyIndex, setPexelsKeyIndex] = useState<number>(0);
@@ -35,7 +36,6 @@ export const Media: React.FC<{handleAddToPlayer: (media: Video | string) => void
         }
 
         setMediaMap(mediaData);
-
         // Rotate Pexels key
         // setPexelsKeyIndex((prevIndex) => (prevIndex + 1) % pexelsApiKeys.length);
 
