@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createClient, Video } from "pexels";
+import { TimelineAction } from "@xzdarcy/react-timeline-editor";
 
 const pexelsApiKeys = [
   "6MMWrcLkoVjZ8rtjHHeD2YCw9uR2xy6livsQXIZjFrBqoYQDKhpjlTWW",
@@ -25,7 +26,8 @@ import {
 
 export const Media: React.FC<{
   handleAddToPlayer: (media: Video | string) => void;
-}> = ({ handleAddToPlayer }) => {
+  toReplace: TimelineAction | null;
+}> = ({ handleAddToPlayer, toReplace }) => {
   const [selectedQuery, setSelectedQuery] = useState<string>(queries[0]);
   const [mediaMap, setMediaMap] = useState<{
     [key: string]: (Video | string)[];

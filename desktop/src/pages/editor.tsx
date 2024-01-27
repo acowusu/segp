@@ -63,6 +63,8 @@ export const VideoEditor: React.FC = () => {
   const idRef = useRef(5);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [selectedToReplace, setSelectedToReplace] =
+    useState<TimelineAction | null>(null);
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
@@ -114,6 +116,7 @@ export const VideoEditor: React.FC = () => {
         ...prev,
         {
           id: newAction.id,
+          rowid: row.id,
           additionalData: {
             img: typeof media === "string" ? media : undefined,
             video: typeof media !== "string" ? media : undefined,
@@ -242,9 +245,12 @@ export const VideoEditor: React.FC = () => {
   return (
     <>
       <div className="flex h-screen w-full flex-col items-center overflow-auto border p-4">
-        <div className="grid h-3/5 grid-cols-2 border">
+        <div className="grid h-2/5 grid-cols-2 border">
           <div className="no-scrollbar h-full overflow-auto border">
-            <Media handleAddToPlayer={handleAddNewAction} />
+            <Media
+              handleAddToPlayer={handleAddNewAction}
+              toReplace={selectedToReplace}
+            />
           </div>
           <div>
             <img className="hidden" src="/person.png" alt="" ref={imageRef} />
