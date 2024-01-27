@@ -5,7 +5,7 @@ const pexelsApiKeys = ['6MMWrcLkoVjZ8rtjHHeD2YCw9uR2xy6livsQXIZjFrBqoYQDKhpjlTWW
 const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI'];
 const queries = ['AI', 'Neural Network', 'Connected', 'City', 'Future'];
 
-export const Media: React.FC = () => {
+export const Media: React.FC<{handleAddToPlayer: (media: Video | string) => void}> = ({handleAddToPlayer}) => {
   const [selectedQuery, setSelectedQuery] = useState<string>(queries[0]);
   const [mediaMap, setMediaMap] = useState<{ [key: string]: (Video | string)[] }>({});
   const [pexelsKeyIndex, setPexelsKeyIndex] = useState<number>(0);
@@ -53,7 +53,7 @@ export const Media: React.FC = () => {
 
   const MediaElement: React.FC<{ media: Video | string }> = ({ media }) => {
     return (
-      <div className='border border-black rounded-lg h-32 transform transition duration-700 ease-in-out hover:scale-105 cursor-pointer flex flex-col items-center justify-between p-2'>
+      <div className='relative border border-black rounded-lg h-32 transform transition duration-700 ease-in-out hover:scale-105 flex flex-col items-center justify-between p-2'>
         {typeof media === 'string' ? (
           <img src={media} alt="Unsplash Photo" className="h-full w-full object-cover object-center mb-2" style={{ maxHeight: '100%', maxWidth: '100%' }} />
         ) : (
@@ -61,6 +61,9 @@ export const Media: React.FC = () => {
             <source src={media.video_files[0].link} type="video/mp4" />
           </video>
         )}
+        <div onClick={() => handleAddToPlayer(media)} className='bg-green-400 border rounded w-8 h-8 flex items-center justify-center absolute right-4 bottom-4 cursor-pointer'>
+          +
+        </div>
       </div>
     );
   };

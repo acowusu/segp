@@ -24,7 +24,8 @@ function App() {
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Editor/>} />
+          {/* <Route path="/" element={<Layout />}>
             <Route index element={<Upload />} />
             <Route path="audiogen" element={<AudioGenerator/>} />
             <Route path="welcome/" element={<WelcomeLayout />}>
@@ -38,7 +39,7 @@ function App() {
               <Route path="video-editor" element={<Editor/>} />
             </Route>
             <Route path="*" element={<NotFound />} />
-          </Route>
+          </Route> */}
         </Routes>
       </ThemeProvider>
     </>
