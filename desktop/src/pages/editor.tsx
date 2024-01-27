@@ -24,7 +24,7 @@ export const Editor: React.FC = () => {
 export type additionalDataType = {img?: string, video?: Video}
 
 export const VideoEditor: React.FC = () => {
-    const [additionalData, setAdditionalData] = useState<{id: string, additionalData: additionalDataType}[]>([])
+    const [additionalData, setAdditionalData] = useState<{id: string, rowid: string, additionalData: additionalDataType}[]>([])
 
     const mediaStore = React.useContext(MediaStoreContext);
 
@@ -42,11 +42,16 @@ export const VideoEditor: React.FC = () => {
     const idRef = useRef(5);
     const [isPlaying, setIsPlaying] = useState(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null)
-
+    const [selectedToReplace, setSelectedToReplace] = useState<TimelineAction | null>(null)
 
     const handlePlayPause = () => {
-        setIsPlaying(!isPlaying);
-        isPlaying ? movieRef.current?.pause() : movieRef.current?.play();
+      const time = timelineState.current?.getTime() ?? 0
+      if (!isPlaying) {
+        reRenderVideo()
+      }
+      movieRef.current?.seek(time)
+      isPlaying ? movieRef.current?.pause() : movieRef.current?.play();
+      setIsPlaying(!isPlaying);
     };
 
     const handleAllowEdit = () => {
@@ -62,19 +67,74 @@ export const VideoEditor: React.FC = () => {
     };
 
     const handleCursorSeek = (time: number) => {
-        if (movieRef.current) {
-            movieRef.current.seek(time);
-            isPlaying ? movieRef.current.play() : movieRef.current.refresh();
-        }
+      if (movieRef.current) {
+        movieRef.current.pause()
+        setIsPlaying(false)
+        movieRef.current.seek(time);
+        movieRef.current.refresh();
+      }
     };
 
     const handleProgress = (time: number, _: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (movieRef.current) {
-            movieRef.current.seek(time);
-            isPlaying ? movieRef.current.play() : movieRef.current.refresh();
-        }
+      if (movieRef.current) {
+        reRenderVideo()
+        console.log(time)
+        movieRef.current.pause()
+        setIsPlaying(false)
+        movieRef.current.seek(time);
+        movieRef.current.refresh();
+      }
         return true;
     };
+
+    const reRenderVideo = () => {
+      if (!canvasRef.current) return; // If the canvas ref is null, 
+      if (!imageRef.current) return; // If the image ref is null,
+      const canvas = canvasRef.current;
+
+      // Create a new movie instance
+      mediaStore.setMovie(
+          new etro.Movie({
+              canvas: canvas,
+              repeat: false,
+              background: etro.parseColor("#FF0000"),
+          })
+      );
+
+      const layers = data[0].actions.map((action) => {
+        const img = (additionalData.find(({ id }) => action.id === id)?.additionalData || {img: ""}).img ?? ""
+        return new etro.layer.Image({
+          startTime: action.start,
+          duration: action.end - action.start,
+          source: img,
+          sourceX: 0, // default: 0
+          sourceY: 0, // default: 0
+          sourceWidth: 19200, // default: null (full width)
+          sourceHeight: 10800, // default: null (full height)
+          x: 0, // default: 0
+          y: 0, // default: 0
+          width: 1920, // default: null (full width)
+          height: 1080, // default: null (full height)
+          opacity: 1 , // default: 1
+      })
+      }
+      )
+
+      mediaStore.addLayers(layers);
+      mediaStore.refresh();
+      movieRef.current = mediaStore.movie;
+
+    }
+
+    const deleteItem = (id: string, rowid:string ) => {
+      setData((prev) => prev.map((rowdata) => {
+        if (rowdata.id === rowid) {
+          return {...rowdata, actions: rowdata.actions.filter(item => item.id !== id)}
+        }
+        return rowdata
+      }))
+    }
+
 
     const handleAddNewAction = (media: { media: Video | string }) => {
         const row = data[0]
@@ -87,7 +147,7 @@ export const VideoEditor: React.FC = () => {
                 end: time + 0.5,
                 effectId: "effect0",
             }
-            setAdditionalData((prev) => [...prev, {id: newAction.id, additionalData: {img: (typeof media === "string" ? media : undefined), video: (typeof media !== "string" ? media : undefined)}}])
+            setAdditionalData((prev) => [...prev, {id: newAction.id, rowid: row.id, additionalData: {img: (typeof media === "string" ? media : undefined), video: (typeof media !== "string" ? media : undefined)}}])
             prev[rowIndex] = {...row, actions: row.actions.concat(newAction)};
             return [...prev];
         })
@@ -179,12 +239,12 @@ export const VideoEditor: React.FC = () => {
             end: start + duration,
             effectId: "effect0",
           }
-          setAdditionalData((prev) => [...prev, {id: newAction.id, additionalData: {img: img}}])
+          setAdditionalData((prev) => [...prev, {id: newAction.id, rowid: "Layer1",additionalData: {img: img}}])
           return newAction
         })
 
         setData([
-          {id: "images", actions: timelineActions, rowHeight: 100},
+          {id: "Layer1", actions: timelineActions, rowHeight: 150},
           {id: "audio", actions: [{
             id: `action${idRef.current++}`,
             start: 0,
@@ -194,14 +254,17 @@ export const VideoEditor: React.FC = () => {
         }
         ]);
         // setEffects(mediaStore.effects);
+
+        reRenderVideo()
+
     }, []);
 
     return ( 
       <>
       <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto">
-        <div className="grid grid-cols-2 h-3/5 border">
+        <div className="grid grid-cols-2 h-2/5 border">
         <div className="border overflow-auto h-full no-scrollbar">
-            <Media handleAddToPlayer={handleAddNewAction}/>
+            <Media handleAddToPlayer={handleAddNewAction} toReplace={selectedToReplace}/>
         </div>
         <div>
 
@@ -239,7 +302,7 @@ export const VideoEditor: React.FC = () => {
                     );
                 })}
             </div>
-            <div className="w-full">
+            <div className="w-full border">
                 <Timeline 
                     editorData={data}
                     effects={effects}
@@ -258,7 +321,11 @@ export const VideoEditor: React.FC = () => {
                           row={row} 
                           data={
                             additionalData.find(({ id }) => action.id === id)?.additionalData || {img: ""}
-                          } />
+                          } 
+                          deleteItem={deleteItem}
+                          setToReplace={setSelectedToReplace}
+                          toReplace={selectedToReplace}
+                          />
                     
                     }}
                     dragLine={true}
