@@ -89,14 +89,7 @@ export const Media: React.FC<{
 
   const MediaElement: React.FC<{ media: string }> = ({ media }) => {
     return (
-      <div
-        onClick={() => {
-          handleSelectMedia(media);
-          setSelectedMedia(media);
-          handleReplaceMedia(media);
-        }}
-        className={`relative flex h-32 transform cursor-pointer flex-col items-center justify-between rounded-lg border border-black p-2 transition duration-700 ease-in-out hover:scale-105 hover:opacity-[80%] ${selectedMedia && selectedMedia == media ? "border-2 border-blue-400" : ""}`}
-      >
+      <div className="flex h-32 transform cursor-pointer flex-col items-center justify-between rounded-lg border border-black p-2 transition duration-700 ease-in-out hover:scale-105">
         {typeof media === "string" ? (
           <img
             src={media}

@@ -42,13 +42,7 @@ export const Editor: React.FC = () => {
   );
 };
 
-export type additionalDataType = { img?: string; video?: Video };
-
 export const VideoEditor: React.FC = () => {
-  const [additionalData, setAdditionalData] = useState<
-    { id: string; rowid: string; additionalData: additionalDataType }[]
-  >([]);
-
   const mediaStore = React.useContext(MediaStoreContext);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -64,16 +58,6 @@ export const VideoEditor: React.FC = () => {
   const [autoScrollWhenPlay, setAutoScrollWhenPlay] = useState(true);
   const idRef = useRef(5);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [selectedToReplace, setSelectedToReplace] = useState<{
-    rowid: string;
-    action: TimelineAction;
-  } | null>(null);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [selectedMedia, setSelectedMedia] = useState<string | Video>();
-
-  const [isExportInProgress, setIsExportInProgress] = useState<boolean>(false);
-  const [isExportedBefore, setIsExportedBefore] = useState<boolean>(false);
 
   const handlePlayPause = () => {
     const time = timelineState.current?.getTime() ?? 0;
@@ -120,165 +104,22 @@ export const VideoEditor: React.FC = () => {
     return true;
   };
 
-  const reRenderVideo = () => {
-    if (!canvasRef.current) return; // If the canvas ref is null,
-    if (!imageRef.current) return; // If the image ref is null,
-    const canvas = canvasRef.current;
-
-    // Create a new movie instance
-    mediaStore.setMovie(
-      new etro.Movie({
-        canvas: canvas,
-        repeat: false,
-        background: etro.parseColor("#FF0000"),
-      }),
-    );
-
-    data.forEach((row) => {
-      if (row.id !== "Audio") {
-        const layers = row.actions.map((action) => {
-          const img =
-            (
-              additionalData.find(({ id }) => action.id === id)
-                ?.additionalData || { img: "" }
-            ).img ?? "";
-          const layer = new etro.layer.Image({
-            startTime: action.start / playbackRate,
-            duration: (action.end - action.start) / playbackRate,
-            source: img,
-            sourceX: 0, // default: 0
-            sourceY: 0, // default: 0
-            sourceWidth: 1920, // default: null (full width)
-            sourceHeight: 1080, // default: null (full height)
-            x: 0, // default: 0
-            y: 0, // default: 0
-            width: 1920, // default: null (full width)
-            height: 1080, // default: null (full height)
-            opacity: 1, // default: 1
-          });
-          mediaStore.set(action.id, layer);
-          return layer;
-        });
-        mediaStore.addLayers(layers);
-      }
-    });
-
-    mediaStore.refresh();
-    movieRef.current = mediaStore.getMovie();
-    console.log(mediaStore._actionLayerMap);
-  };
-
-  const deleteLayer = (rowid: string) => {
-    setData((prev) => prev.filter((item) => item.id !== rowid));
-    reRenderVideo();
-  };
-
-  const deleteItem = (id: string, rowid: string) => {
-    setData((prev) =>
-      prev.map((rowdata) => {
-        if (rowdata.id === rowid) {
-          return {
-            ...rowdata,
-            actions: rowdata.actions.filter((item) => item.id !== id),
-          };
-        }
-        return rowdata;
-      }),
-    );
-    reRenderVideo();
-  };
-
-  const createNewLayer = () => {
-    const newData = data;
-    newData.splice(data.length - 1, 0, {
-      id: `Layer ${idRef.current++}`,
-      actions: [],
-      rowHeight: 150,
-    });
-    setData(newData);
-    reRenderVideo();
-  };
-
-  // replace next selected item or add new item to timeline
   const handleAddNewAction = (
     _: React.MouseEvent<HTMLElement, MouseEvent>,
     param: { row: TimelineRow; time: number },
   ) => {
-    if (!selectedMedia) return;
-    // instead of adding directly to second row, we should add to selected row
-    // instead of adding at current timestamp add at clicked timestamp
+    const { row, time } = param;
     setData((prev) => {
-      const rowIndex = prev.findIndex((item) => item.id === param.row.id);
+      const rowIndex = prev.findIndex((item) => item.id === row.id);
       const newAction: TimelineAction = {
         id: `action${idRef.current++}`,
-        start: param.time,
-        end: param.time + 0.5,
+        start: time,
+        end: time + 0.5,
         effectId: "effect0",
       };
-      setAdditionalData((prev) => [
-        ...prev,
-        {
-          id: newAction.id,
-          rowid: param.row.id,
-          additionalData: {
-            img: typeof selectedMedia === "string" ? selectedMedia : undefined,
-            video:
-              typeof selectedMedia !== "string" ? selectedMedia : undefined,
-          },
-        },
-      ]);
-      prev[rowIndex] = {
-        ...param.row,
-        actions: param.row.actions.concat(newAction),
-      };
+      prev[rowIndex] = { ...row, actions: row.actions.concat(newAction) };
       return [...prev];
     });
-    reRenderVideo();
-  };
-
-  const handleReplaceAction = (media: Video | string) => {
-    if (selectedToReplace) {
-      const { action } = selectedToReplace;
-      const newData = additionalData;
-      const dataIndex = newData.findIndex(({ id }) => id === action.id);
-      newData[dataIndex].additionalData = {
-        img: typeof media === "string" ? media : undefined,
-        video: typeof media !== "string" ? media : undefined,
-      };
-      setAdditionalData(newData);
-      setSelectedToReplace(null);
-      reRenderVideo();
-    }
-  };
-
-  const saveMovieAsMp4 = async () => {
-    await mediaStore
-      .getMovie()
-      ?.record({
-        frameRate: mediaStore.framerate,
-        type: "video/webm;codecs=vp9",
-        // audio: default true,
-        // video: default true,
-        // duration: default end of video
-        // onStart: optional callback
-        onStart: (_: MediaRecorder) => {
-          console.log("recording started");
-          setIsExportedBefore(true);
-          setIsExportInProgress(true);
-        },
-      })
-      .then((blob) => {
-        const newBlob = new Blob([blob], { type: "video/mp4" });
-        const url = URL.createObjectURL(newBlob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "video.mp4";
-        // a.onabort = () => {
-        //   setIsExportInProgress(false);
-        // }
-        a.click();
-        setIsExportInProgress(false);
-      });
   };
 
   useEffect(() => {
@@ -314,7 +155,7 @@ export const VideoEditor: React.FC = () => {
       }),
       new etro.layer.Image({
         startTime: 0,
-        duration: 4,
+        duration: 2,
         source: imageRef.current,
         sourceX: 0, // default: 0
         sourceY: 0, // default: 0
@@ -343,269 +184,71 @@ export const VideoEditor: React.FC = () => {
     ];
 
     mediaStore.addLayers(mocklayers);
+
     mediaStore.refresh();
-    movieRef.current = mediaStore.getMovie();
-
-    // row.actions
-    // row.classNames
-    // row.id
-    // row.rowHeight
-    // row.selected
-
-    // data should only have 2 rows for now, the first row being the images, the second row being the audio
-
-    const dummyData = [
-      { img: "./example.jpg", start: 0.0, duration: 2 },
-      { img: "./example2.jpg", start: 2, duration: 1.6 },
-      { img: "./example3.jpg", start: 4, duration: 0.4 },
-    ];
-
-    const timelineActions: TimelineAction[] = dummyData.map(
-      ({ img, start, duration }) => {
-        const newAction: TimelineAction = {
-          id: `action${idRef.current++}`,
-          start: start,
-          end: start + duration,
-          effectId: "effect0",
-        };
-        setAdditionalData((prev) => [
-          ...prev,
-          { id: newAction.id, rowid: "Layer1", additionalData: { img: img } },
-        ]);
-        return newAction;
-      },
-    );
-
-    setData([
-      { id: "Default", actions: timelineActions, rowHeight: 150 },
-      {
-        id: "Audio",
-        actions: [
-          {
-            id: `action${idRef.current++}`,
-            start: 0,
-            end:
-              dummyData[dummyData.length - 1].start +
-              dummyData[dummyData.length - 1].duration,
-            effectId: "effect0",
-          },
-        ],
-        rowHeight: 60,
-      },
-    ]);
-    // setEffects(mediaStore.effects);
-    reRenderVideo();
+    movieRef.current = mediaStore.movie;
+    setData(mediaStore.data);
+    setEffects(mediaStore.effects);
   }, []);
-
-  const VideoPlayer = (
-    <>
-      <img className="hidden" src="/person.png" alt="" ref={imageRef} />
-      <canvas className="w-full" ref={canvasRef} />
-      <div className="flex w-full flex-row items-center justify-center gap-4">
-        <TimelinePlayer
-          handlePlayPause={handlePlayPause}
-          timelineState={timelineState}
-          autoScrollWhenPlay={autoScrollWhenPlay}
-          handleSetRate={setPlaybackRate}
-        />
-      </div>
-    </>
-  );
-
-  // change to be a svg later
-  const exportWhiteImage: string = "../../public/export-white.png";
-
-  const EditorButtons = (
-    <div className="grid grid-cols-[20fr_5fr]">
-      <div className="col-span-1">
-        <Provider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Button
-                className="my-1"
-                variant={"ghost"}
-                onClick={() => {
-                  // FIX: has a problem with trying to export the mans face if the source is not played at all
-                  mediaStore.seek(0);
-                  console.log("export button clicked");
-                  setTimeout(() => {
-                    console.log("exporting function called");
-                    saveMovieAsMp4();
-                  }, 1000);
-                }}
-              >
-                <img
-                  src={exportWhiteImage}
-                  alt="image"
-                  width={40}
-                  height={40}
-                />
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent className="m-2 rounded-md border border-[#f7f7f8] bg-[#020817] p-2 leading-none text-[#f8fafc]">
-                Export to mp4
-                <TooltipArrow className="fill-[#f7f7f8]" />
-              </TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-        </Provider>
-      </div>
-      <div className="col-span-1 content-evenly">
-        {isExportedBefore ? (
-          isExportInProgress ? (
-            <div className="text-yellow-400"> Exporting... </div>
-          ) : (
-            <div className="text-green-400"> Export Complete </div>
-          )
-        ) : (
-          ""
-        )}
-      </div>
-    </div>
-  );
-  const MediaUtils = (
-    <>
-      <Media
-        handleSelectMedia={setSelectedMedia}
-        handleReplaceMedia={handleReplaceAction}
-      />
-    </>
-  );
-
-  const TimelineTitle = (
-    <div>
-      <h1 className="p-2 text-2xl font-bold">Timeline</h1>
-      <Separator className="-mt-2 mb-5 h-[2px] bg-[#1e293b]" />
-      {/* TODO: for some reason the separator doesnt auto pick up the colour */}
-    </div>
-  );
-
-  const TimelineButtons = "<Timeline Buttons>";
-  const LayerTitles = (
-    <>
-      <div
-        ref={domRef}
-        style={{ overflow: "overlay" }}
-        onScroll={(e) => {
-          const target = e.target as HTMLDivElement;
-          timelineState.current?.setScrollTop(target.scrollTop);
-        }}
-        className=""
-      >
-        <Button className="flex" variant={"outline"} onClick={createNewLayer}>
-          {" "}
-          {/** NO idea why not centred */}
-          Add +
-        </Button>
-        {/* <div
-          className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
-          onClick={createNewLayer}
-        >
-          Add +
-        </div> */}
-      </div>
-      <div className="flex-col">
-        {data.map((item) => {
-          return (
-            <ContextMenu>
-              <ContextMenuTrigger>
-                <div
-                  key={item.id}
-                  className={`w-full flex-col ${
-                    item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
-                    // } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
-                  }  border-spacing-2 justify-between rounded-md border border-[#E5E7EB] p-2`} // TODO: justify between doesnt care to work, figure out why
-                >
-                  {`${item.id} Layer`}
-                </div>
-              </ContextMenuTrigger>
-              <ContextMenuContent>
-                <ContextMenuItem onClick={() => deleteLayer(item.id)}>
-                  Delete Layer
-                </ContextMenuItem>
-                <ContextMenuItem>Rename Layer</ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
-          );
-        })}
-      </div>
-    </>
-  );
-  const timelineStyle: React.CSSProperties = { width: "100%" };
-  const TimelineSection = (
-    <>
-      <Timeline
-        editorData={data}
-        style={timelineStyle}
-        effects={effects}
-        ref={timelineState}
-        onChange={setData}
-        autoReRender={true}
-        autoScroll={true}
-        minScaleCount={movieRef.current?.duration}
-        onCursorDrag={handleCursorSeek}
-        onClickTimeArea={handleProgress}
-        disableDrag={!allowEdit}
-        hideCursor={!showCursor}
-        getActionRender={(action, row) => {
-          setSelectedItem(action.id);
-          return (
-            <TimeFrame
-              action={action}
-              row={row}
-              data={
-                additionalData.find(({ id }) => action.id === id)
-                  ?.additionalData || { img: "" }
-              }
-              deleteItem={deleteItem}
-              setToReplace={setSelectedToReplace}
-              toReplace={selectedToReplace}
-            />
-          );
-        }}
-        dragLine={true}
-        onDoubleClickRow={handleAddNewAction}
-        onScroll={({ scrollTop }) => {
-          if (domRef.current) domRef.current.scrollTop = scrollTop;
-        }}
-      />
-    </>
-  );
-  /* TODO Notes for self:
-   *  -> the while player grid is the canvas (resize the util bar according to aspect ratio)
-   *  -> Remove the 'flex' annotations where it isn't needed => check children nodes if they depend on it!
-   *  -> Add the export state tracker on the top right on the editorbuttons section
-   *
-   * NOTE: using h-dvh and w-dvh for the outermost grid breaks the Timeline
-   */
-
-  // FIX: hardcoded at the moment, will figure out how to make this dynamic
 
   return (
     <>
-      {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
-      <div className="w-dvh grid h-dvh grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
-        {" "}
-        {/* TODO fix the weird clipping*/}
-        {/* <div className="grid grid-cols-2 h-2/5 border"> */}{" "}
-        {/* I wanna get rid of this and just use columns*/}
-        {/* Media Tab */}
-        {/* <div className="border overflow-auto h-full no-scrollbar"> */}
-        <div className="col-span-2 ">{EditorButtons}</div>
-        <div className=" row-span-1 flex overflow-auto ">{MediaUtils}</div>
-        {/* Player Component (Wraps the Canvas and the play/pause bar) */}
-        <div className="row-span-1">{VideoPlayer}</div>
-        {/* Timeline Component, includes the layering logic logic and the buttons  */}
-        <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[2fr_2fr_34fr]">
-          {/* Timeline Title and Separator */}
-          <div className="col-span-2"> {TimelineTitle}</div>
-          {/* Timeline buttons */}
-          <div className="col-span-2"> {TimelineButtons}</div>
-          {/* Layer Titles Component */}
-          <div className="col-span-1"> {LayerTitles}</div>
-          {/* Timeline component */}
-          <div className="col-span-1">{TimelineSection}</div>
+      <div className="flex w-full flex-col items-center justify-center p-4">
+        <img className="hidden" src="/person.png" alt="" ref={imageRef} />
+        <canvas className="w-full" ref={canvasRef} />
+        <div className="flex w-[80%] flex-col">
+          <div className="justify-row flex w-full flex-row items-center gap-4">
+            <Switch checked={allowEdit} onCheckedChange={handleAllowEdit} />
+            <Switch checked={showCursor} onCheckedChange={handleShowCursor} />
+            <Switch
+              checked={autoScrollWhenPlay}
+              onCheckedChange={handleAutoScrollWhenPlay}
+            />
+            <TimelinePlayer
+              handlePlayPause={handlePlayPause}
+              timelineState={timelineState}
+              autoScrollWhenPlay={autoScrollWhenPlay}
+            />
+          </div>
+        </div>
+        <div className="flex">
+          <div
+            ref={domRef}
+            style={{ overflow: "overlay" }}
+            onScroll={(e) => {
+              const target = e.target as HTMLDivElement;
+              timelineState.current?.setScrollTop(target.scrollTop);
+            }}
+            className="w-1/4"
+          >
+            {data.map((item) => {
+              return (
+                <div key={item.id} className="flex w-full p-px">
+                  <div className="w-full bg-teal-950">{`Media Component: ${item.id}`}</div>
+                </div>
+              );
+            })}
+          </div>
+          <Timeline
+            editorData={data}
+            effects={effects}
+            ref={timelineState}
+            onChange={setData}
+            autoScroll={true}
+            minScaleCount={movieRef.current?.duration}
+            onCursorDrag={handleCursorSeek}
+            onClickTimeArea={handleProgress}
+            disableDrag={!allowEdit}
+            hideCursor={!showCursor}
+            getActionRender={(action, row) => {
+              return <TimeFrame action={action} row={row} />;
+            }}
+            dragLine={true}
+            onDoubleClickRow={handleAddNewAction}
+            onScroll={({ scrollTop }) => {
+              if (domRef.current) domRef.current.scrollTop = scrollTop;
+            }}
+          />
         </div>
       </div>
     </>
