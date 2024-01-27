@@ -6,6 +6,9 @@ import { Timeline, TimelineEffect, TimelineRow, TimelineAction, TimelineState } 
 import { Switch } from "../components/ui/switch";
 import { TimeFrame } from "../components/timeline-components/timeFrame";
 import TimelinePlayer from "../components/timeline-components/timelinePlayer";
+import { Media } from "./mediaFiles";
+import { Video } from 'pexels';
+
 
 export const Editor: React.FC = () => {
     const [mediaStore] = useState(new MediaStore())
@@ -16,7 +19,13 @@ export const Editor: React.FC = () => {
     );
 }
 
+
+
+export type additionalDataType = {img?: string, video?: Video}
+
 export const VideoEditor: React.FC = () => {
+    const [additionalData, setAdditionalData] = useState<{id: string, additionalData: additionalDataType}[]>([])
+
     const mediaStore = React.useContext(MediaStoreContext);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -32,6 +41,8 @@ export const VideoEditor: React.FC = () => {
     const [autoScrollWhenPlay, setAutoScrollWhenPlay] = useState(true);
     const idRef = useRef(5);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<string | null>(null)
+
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
@@ -65,8 +76,9 @@ export const VideoEditor: React.FC = () => {
         return true;
     };
 
-    const handleAddNewAction = (_: React.MouseEvent<HTMLElement, MouseEvent>, param: { row: TimelineRow; time: number; }) => {
-        const { row, time } = param;
+    const handleAddNewAction = (media: { media: Video | string }) => {
+        const row = data[0]
+        const time = timelineState.current?.getTime() ?? 0
         setData((prev) => { 
             const rowIndex = prev.findIndex(item => item.id === row.id);
             const newAction: TimelineAction = {
@@ -75,6 +87,7 @@ export const VideoEditor: React.FC = () => {
                 end: time + 0.5,
                 effectId: "effect0",
             }
+            setAdditionalData((prev) => [...prev, {id: newAction.id, additionalData: {img: (typeof media === "string" ? media : undefined), video: (typeof media !== "string" ? media : undefined)}}])
             prev[rowIndex] = {...row, actions: row.actions.concat(newAction)};
             return [...prev];
         })
@@ -113,7 +126,7 @@ export const VideoEditor: React.FC = () => {
             }),
             new etro.layer.Image({
                 startTime: 0,
-                duration: 2,
+                duration: 4,
                 source: imageRef.current,
                 sourceX: 0, // default: 0
                 sourceY: 0, // default: 0
@@ -141,18 +154,61 @@ export const VideoEditor: React.FC = () => {
             })];
 
         mediaStore.addLayers(mocklayers);
-
         mediaStore.refresh();
         movieRef.current = mediaStore.movie;
-        setData(mediaStore.data);
-        setEffects(mediaStore.effects);
+        
+
+        // row.actions
+        // row.classNames
+        // row.id
+        // row.rowHeight
+        // row.selected
+
+        // data should only have 2 rows for now, the first row being the images, the second row being the audio
+
+        const dummyData = [
+            {img: "./example.jpg", start: 0.0, duration: 2.1},
+            {img: "./example2.jpg", start: 2.1, duration: 1.6},
+            {img: "./example3.jpg", start: 4, duration: 0.4},
+        ]
+
+        const timelineActions: TimelineAction[] = dummyData.map(({img, start, duration}) => {
+          const newAction: TimelineAction = {
+            id: `action${idRef.current++}`,
+            start: start,
+            end: start + duration,
+            effectId: "effect0",
+          }
+          setAdditionalData((prev) => [...prev, {id: newAction.id, additionalData: {img: img}}])
+          return newAction
+        })
+
+        setData([
+          {id: "images", actions: timelineActions, rowHeight: 100},
+          {id: "audio", actions: [{
+            id: `action${idRef.current++}`,
+            start: 0,
+            end: dummyData[dummyData.length - 1].start + dummyData[dummyData.length - 1].duration,
+            effectId: "effect0",
+          }]
+        }
+        ]);
+        // setEffects(mediaStore.effects);
     }, []);
 
     return ( 
       <>
-      <div className="w-full p-4 flex flex-col items-center justify-center">
-        <img  className="hidden" src="/person.png" alt="" ref={imageRef} />
-        <canvas className="w-full" ref={canvasRef} />
+      <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto">
+        <div className="grid grid-cols-2 h-3/5 border">
+        <div className="border overflow-auto h-full no-scrollbar">
+            <Media handleAddToPlayer={handleAddNewAction}/>
+        </div>
+        <div>
+
+            <img  className="hidden" src="/person.png" alt="" ref={imageRef} />
+            <canvas className="w-full" ref={canvasRef} />
+        </div>
+        </div>
         <div className="w-[80%] flex flex-col">
             <div className='flex flex-row w-full justify-row items-center gap-4'>
                 <Switch checked={allowEdit} onCheckedChange={handleAllowEdit}/> 
@@ -165,7 +221,7 @@ export const VideoEditor: React.FC = () => {
                 />
             </div>
         </div>
-        <div className="flex">
+        <div className="flex w-full">
             <div
                 ref={domRef}
                 style={{ overflow: 'overlay' }}
@@ -183,25 +239,36 @@ export const VideoEditor: React.FC = () => {
                     );
                 })}
             </div>
-            <Timeline 
-                editorData={data} 
-                effects={effects}
-                ref={timelineState}
-                onChange={setData}
-                autoScroll={true}
-                minScaleCount={movieRef.current?.duration}
-                onCursorDrag={handleCursorSeek}
-                onClickTimeArea={handleProgress}
-                disableDrag={!allowEdit}
-                hideCursor={!showCursor}
-                getActionRender={(action, row) => {return <TimeFrame action={action} row={row} />}}
-                dragLine={true}
-                onDoubleClickRow={handleAddNewAction}
-                onScroll={({ scrollTop }) => {
-                    if (domRef.current)
-                        domRef.current.scrollTop = scrollTop;
-                }}
-            />
+            <div className="w-full">
+                <Timeline 
+                    editorData={data}
+                    effects={effects}
+                    ref={timelineState}
+                    onChange={setData}
+                    autoScroll={true}
+                    minScaleCount={movieRef.current?.duration}
+                    onCursorDrag={handleCursorSeek}
+                    onClickTimeArea={handleProgress}
+                    disableDrag={!allowEdit}
+                    hideCursor={!showCursor}
+                    getActionRender={(action, row) => {
+                        setSelectedItem(action.id)    
+                        return <TimeFrame 
+                          action={action} 
+                          row={row} 
+                          data={
+                            additionalData.find(({ id }) => action.id === id)?.additionalData || {img: ""}
+                          } />
+                    
+                    }}
+                    dragLine={true}
+                    onDoubleClickRow={() => {}}
+                    onScroll={({ scrollTop }) => {
+                        if (domRef.current)
+                            domRef.current.scrollTop = scrollTop;
+                    }}
+                />
+            </div>
         </div>
       </div>
       </>
