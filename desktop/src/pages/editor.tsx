@@ -42,7 +42,7 @@ export const VideoEditor: React.FC = () => {
     const idRef = useRef(5);
     const [isPlaying, setIsPlaying] = useState(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null)
-    const [selectedToReplace, setSelectedToReplace] = useState<TimelineAction | null>(null)
+    const [selectedToReplace, setSelectedToReplace] = useState<{rowid: string, action: TimelineAction} | null>(null)
 
     const handlePlayPause = () => {
       const time = timelineState.current?.getTime() ?? 0
@@ -137,6 +137,14 @@ export const VideoEditor: React.FC = () => {
 
 
     const handleAddNewAction = (media: { media: Video | string }) => {
+      if (selectedToReplace) {
+        const {action} = selectedToReplace;
+        const newData = additionalData
+        const dataIndex = newData.findIndex(({id}) => id === action.id)
+        newData[dataIndex].additionalData =  {img: (typeof media === "string" ? media : undefined), video: (typeof media !== "string" ? media : undefined)}
+        setAdditionalData(newData)
+        setSelectedToReplace(null)
+      } else {
         const row = data[0]
         const time = timelineState.current?.getTime() ?? 0
         setData((prev) => { 
@@ -151,6 +159,7 @@ export const VideoEditor: React.FC = () => {
             prev[rowIndex] = {...row, actions: row.actions.concat(newAction)};
             return [...prev];
         })
+      }
     };
 
     useEffect(() => {
@@ -264,7 +273,7 @@ export const VideoEditor: React.FC = () => {
       <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto">
         <div className="grid grid-cols-2 h-2/5 border">
         <div className="border overflow-auto h-full no-scrollbar">
-            <Media handleAddToPlayer={handleAddNewAction} toReplace={selectedToReplace}/>
+            <Media handleAddToPlayer={handleAddNewAction} />
         </div>
         <div>
 
