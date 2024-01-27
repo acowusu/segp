@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { createClient, Video } from "pexels";
-import { Separator } from "../components/ui/separator";
 
 const pexelsApiKeys = [
   "6MMWrcLkoVjZ8rtjHHeD2YCw9uR2xy6livsQXIZjFrBqoYQDKhpjlTWW",
@@ -25,9 +24,8 @@ import {
 } from "../components/ui/select";
 
 export const Media: React.FC<{
-  handleSelectMedia: (media: Video | string) => void;
-  handleReplaceMedia: (media: Video | string) => void;
-}> = ({ handleSelectMedia, handleReplaceMedia }) => {
+  handleAddToPlayer: (media: Video | string) => void;
+}> = ({ handleAddToPlayer }) => {
   const [selectedQuery, setSelectedQuery] = useState<string>(queries[0]);
   const [mediaMap, setMediaMap] = useState<{
     [key: string]: (Video | string)[];
