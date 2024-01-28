@@ -129,6 +129,10 @@ export const VideoEditor: React.FC = () => {
     movieRef.current = mediaStore.movie;
   };
 
+  const deleteLayer = (rowid: string) => {
+    setData((prev) => prev.filter((item) => item.id !== rowid));
+  };
+
   const deleteItem = (id: string, rowid: string) => {
     setData((prev) =>
       prev.map((rowdata) => {
@@ -143,31 +147,45 @@ export const VideoEditor: React.FC = () => {
     );
   };
 
+  const createNewLayer = () => {};
+
   const handleAddNewAction = (media: { media: Video | string }) => {
-    const row = data[0];
-    const time = timelineState.current?.getTime() ?? 0;
-    setData((prev) => {
-      const rowIndex = prev.findIndex((item) => item.id === row.id);
-      const newAction: TimelineAction = {
-        id: `action${idRef.current++}`,
-        start: time,
-        end: time + 0.5,
-        effectId: "effect0",
+    if (selectedToReplace) {
+      const { action } = selectedToReplace;
+      const newData = additionalData;
+      const dataIndex = newData.findIndex(({ id }) => id === action.id);
+      newData[dataIndex].additionalData = {
+        img: typeof media === "string" ? media : undefined,
+        video: typeof media !== "string" ? media : undefined,
       };
-      setAdditionalData((prev) => [
-        ...prev,
-        {
-          id: newAction.id,
-          rowid: row.id,
-          additionalData: {
-            img: typeof media === "string" ? media : undefined,
-            video: typeof media !== "string" ? media : undefined,
+      setAdditionalData(newData);
+      setSelectedToReplace(null);
+    } else {
+      const row = data[0];
+      const time = timelineState.current?.getTime() ?? 0;
+      setData((prev) => {
+        const rowIndex = prev.findIndex((item) => item.id === row.id);
+        const newAction: TimelineAction = {
+          id: `action${idRef.current++}`,
+          start: time,
+          end: time + 0.5,
+          effectId: "effect0",
+        };
+        setAdditionalData((prev) => [
+          ...prev,
+          {
+            id: newAction.id,
+            rowid: row.id,
+            additionalData: {
+              img: typeof media === "string" ? media : undefined,
+              video: typeof media !== "string" ? media : undefined,
+            },
           },
-        },
-      ]);
-      prev[rowIndex] = { ...row, actions: row.actions.concat(newAction) };
-      return [...prev];
-    });
+        ]);
+        prev[rowIndex] = { ...row, actions: row.actions.concat(newAction) };
+        return [...prev];
+      });
+    }
   };
 
   useEffect(() => {
