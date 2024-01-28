@@ -107,27 +107,30 @@ export const VideoEditor: React.FC = () => {
               background: etro.parseColor("#FF0000"),
           })
       );
-
-      const layers = data[0].actions.map((action) => {
-        const img = (additionalData.find(({ id }) => action.id === id)?.additionalData || {img: ""}).img ?? ""
-        return new etro.layer.Image({
-          startTime: action.start,
-          duration: action.end - action.start,
-          source: img,
-          sourceX: 0, // default: 0
-          sourceY: 0, // default: 0
-          sourceWidth: 19200, // default: null (full width)
-          sourceHeight: 10800, // default: null (full height)
-          x: 0, // default: 0
-          y: 0, // default: 0
-          width: 1920, // default: null (full width)
-          height: 1080, // default: null (full height)
-          opacity: 1 , // default: 1
+      data.forEach((row) => {
+        if (row.id !== "Audio") {
+          const layers = row.actions.map((action) => {
+            const img = (additionalData.find(({ id }) => action.id === id)?.additionalData || {img: ""}).img ?? ""
+            return new etro.layer.Image({
+              startTime: action.start,
+              duration: action.end - action.start,
+              source: img,
+              sourceX: 0, // default: 0
+              sourceY: 0, // default: 0
+              sourceWidth: 19200, // default: null (full width)
+              sourceHeight: 10800, // default: null (full height)
+              x: 0, // default: 0
+              y: 0, // default: 0
+              width: 1920, // default: null (full width)
+              height: 1080, // default: null (full height)
+              opacity: 1 , // default: 1
+            })
+            }
+            )
+          mediaStore.addLayers(layers);
+        }
       })
-      }
-      )
-
-      mediaStore.addLayers(layers);
+      
       mediaStore.refresh();
       movieRef.current = mediaStore.movie;
 
@@ -148,7 +151,13 @@ export const VideoEditor: React.FC = () => {
     }
 
     const createNewLayer = () => {
-      
+      const newData = data
+      newData.splice(data.length - 1, 0, {
+        id: `Layer ${idRef.current++}`,
+        actions: [],
+        rowHeight: 150
+      })
+      setData(newData)
     }
 
 
@@ -161,7 +170,7 @@ export const VideoEditor: React.FC = () => {
         setAdditionalData(newData)
         setSelectedToReplace(null)
       } else {
-        const row = data[0]
+        const row = data[1]
         const time = timelineState.current?.getTime() ?? 0
         setData((prev) => { 
             const rowIndex = prev.findIndex(item => item.id === row.id);
