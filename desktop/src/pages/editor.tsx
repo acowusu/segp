@@ -3,12 +3,19 @@ import { MediaStore } from "../contexts/media/mediaStore";
 import { MediaStoreContext } from "../contexts/media";
 import etro from "etro";
 import { Timeline, TimelineEffect, TimelineRow, TimelineAction, TimelineState } from '@xzdarcy/react-timeline-editor';
-import { Switch } from "../components/ui/switch";
 import { TimeFrame } from "../components/timeline-components/timeFrame";
 import TimelinePlayer from "../components/timeline-components/timelinePlayer";
 import { Media } from "./mediaFiles";
 import { Video } from 'pexels';
-
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "../components/ui/context-menu"
 
 export const Editor: React.FC = () => {
     const [mediaStore] = useState(new MediaStore())
@@ -126,6 +133,11 @@ export const VideoEditor: React.FC = () => {
 
     }
 
+    const deleteLayer = (rowid:string ) => {
+      setData((prev) => prev.filter((item) => item.id !== rowid))
+    }
+
+
     const deleteItem = (id: string, rowid:string ) => {
       setData((prev) => prev.map((rowdata) => {
         if (rowdata.id === rowid) {
@@ -133,6 +145,10 @@ export const VideoEditor: React.FC = () => {
         }
         return rowdata
       }))
+    }
+
+    const createNewLayer = () => {
+      
     }
 
 
@@ -253,18 +269,18 @@ export const VideoEditor: React.FC = () => {
         })
 
         setData([
-          {id: "Layer1", actions: timelineActions, rowHeight: 150},
-          {id: "audio", actions: [{
+          {id: "Default", actions: timelineActions, rowHeight: 150},
+          {id: "Audio", actions: [{
             id: `action${idRef.current++}`,
             start: 0,
             end: dummyData[dummyData.length - 1].start + dummyData[dummyData.length - 1].duration,
             effectId: "effect0",
-          }]
+          }], rowHeight: 60
         }
         ]);
         // setEffects(mediaStore.effects);
 
-        reRenderVideo()
+        // reRenderVideo()
 
     }, []);
 
@@ -272,28 +288,22 @@ export const VideoEditor: React.FC = () => {
       <>
       <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto">
         <div className="grid grid-cols-2 h-2/5 border">
-        <div className="border overflow-auto h-full no-scrollbar">
+          <div className="border overflow-auto h-full no-scrollbar">
             <Media handleAddToPlayer={handleAddNewAction} />
-        </div>
-        <div>
-
+          </div>
+          <div>
             <img  className="hidden" src="/person.png" alt="" ref={imageRef} />
             <canvas className="w-full" ref={canvasRef} />
+          </div>
         </div>
-        </div>
-        <div className="w-[80%] flex flex-col">
-            <div className='flex flex-row w-full justify-row items-center gap-4'>
-                <Switch checked={allowEdit} onCheckedChange={handleAllowEdit}/> 
-                <Switch checked={showCursor} onCheckedChange={handleShowCursor}/> 
-                <Switch checked={autoScrollWhenPlay} onCheckedChange={handleAutoScrollWhenPlay}/> 
-                <TimelinePlayer 
-                    handlePlayPause={handlePlayPause} 
-                    timelineState={timelineState} 
-                    autoScrollWhenPlay={autoScrollWhenPlay} 
-                />
-            </div>
-        </div>
-        <div className="flex w-full">
+          <div className='flex flex-row w-full border items-center justify-center gap-4'>
+              <TimelinePlayer
+                  handlePlayPause={handlePlayPause} 
+                  timelineState={timelineState} 
+                  autoScrollWhenPlay={autoScrollWhenPlay}
+              />
+          </div>
+        <div className="flex w-full bg-[#191b1d]">
             <div
                 ref={domRef}
                 style={{ overflow: 'overlay' }}
@@ -301,17 +311,30 @@ export const VideoEditor: React.FC = () => {
                     const target = e.target as HTMLDivElement;
                     timelineState.current?.setScrollTop(target.scrollTop);
                 }}
-                className="w-1/4"
+                className="w-[10%]"
             >
-                {data.map((item) => {
-                    return (
-                        <div key={item.id} className="p-px flex w-full">
-                            <div className="bg-teal-950 w-full">{`Media Component: ${item.id}`}</div>
-                        </div>
-                    );
-                })}
+              <div className={`flex w-full mt-[3px] border-opacity-40 p-2 items-center justify-center hover:cursor-pointer`}
+              onClick={createNewLayer}
+              >
+                Add +
+              </div>
+              {data.map((item) => {
+                return (
+                  <ContextMenu>
+                    <ContextMenuTrigger>
+                    <div key={item.id} className={`flex w-full ${item.id !== "Audio" ? "h-[150px]" : "h-[60px]"} border border-gray-500 border-opacity-40 p-2 items-center justify-center`}>
+                      {`${item.id} Layer`}
+                    </div>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                        <ContextMenuItem onClick={() => deleteLayer(item.id)}>Delete Layer</ContextMenuItem>
+                        <ContextMenuItem>Rename Layer</ContextMenuItem>
+                    </ContextMenuContent>
+                </ContextMenu>
+                );
+              })}
             </div>
-            <div className="w-full border">
+            <div className="w-full ">
                 <Timeline 
                     editorData={data}
                     effects={effects}

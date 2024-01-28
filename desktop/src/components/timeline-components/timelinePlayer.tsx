@@ -63,7 +63,7 @@ const TimelinePlayer: FC<{
   };
 
   return (
-    <div className='flex w-full'>
+    <div className='flex gap-8 items-center'>
       <Button 
         onClick={handlePlayOrPause}
         className='bg-gray-800 text-white'
