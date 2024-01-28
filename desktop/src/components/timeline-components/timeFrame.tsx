@@ -2,14 +2,8 @@ import { TimelineAction, TimelineRow } from '@xzdarcy/react-timeline-editor';
 import { additionalDataType } from '../../pages/editor';
 import {
     ContextMenu,
-    ContextMenuCheckboxItem,
     ContextMenuContent,
     ContextMenuItem,
-    ContextMenuLabel,
-    ContextMenuRadioGroup,
-    ContextMenuRadioItem,
-    ContextMenuSeparator,
-    ContextMenuShortcut,
     ContextMenuSub,
     ContextMenuSubContent,
     ContextMenuSubTrigger,
@@ -53,6 +47,5 @@ export const TimeFrame: React.FC<TimeFrameProps> = ({action, row, data, deleteIt
                 </ContextMenuSub>
             </ContextMenuContent>
         </ContextMenu>
-        
     );
 };
