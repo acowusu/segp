@@ -38,7 +38,7 @@ export const TimeFrame: React.FC<TimeFrameProps> = ({
       <ContextMenuTrigger>
         <div
           key={row.id}
-          className={`flex cursor-pointer flex-row items-center border ${toReplace && toReplace.id === action.id ? "border-2 border-blue-400" : "border-white"} h-full`}
+          className={`flex cursor-pointer flex-row items-center border ${toReplace && toReplace.action.id === action.id ? "border-2 border-blue-400" : "border-white"} h-full`}
         >
           <img
             src={data.img}
@@ -53,14 +53,16 @@ export const TimeFrame: React.FC<TimeFrameProps> = ({
         </ContextMenuItem>
         <ContextMenuItem
           onClick={() => {
-            if (toReplace && toReplace.id === action.id) {
+            if (toReplace && toReplace.action.id === action.id) {
               setToReplace(null);
             } else {
-              setToReplace(action);
+              setToReplace({ rowid: row.id, action: action });
             }
           }}
         >
-          {toReplace && toReplace.id === action.id ? "Deselect" : "Replace"}
+          {toReplace && toReplace.action.id === action.id
+            ? "Deselect"
+            : "Replace"}
         </ContextMenuItem>
         <ContextMenuItem>Set Animation</ContextMenuItem>
         <ContextMenuSub>
