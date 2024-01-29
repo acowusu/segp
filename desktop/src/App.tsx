@@ -1,6 +1,7 @@
 import "./App.css";
 // import reactLogo from "./assets/react.svg";
 // import viteLogo from "/electron-vite.animate.svg";
+
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/layout";
 import { WelcomeLayout } from "./components/welcome-layout";
@@ -13,7 +14,6 @@ import { SetVoiceover } from "./pages/set-voiceover";
 import { ScriptEditor } from "./pages/script-editor";
 import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
-import {EtroTest} from "./pages/etro-test";
 function App() {
   // const [count, setCount] = useState(0);
 
@@ -30,7 +30,6 @@ function App() {
               <Route path="set-voiceover" element={<SetVoiceover />} />
               <Route path="set-visuals" element={<SetVisuals />} />
               <Route path="script-editor" element={<ScriptEditor />} />
-              <Route path="etro-test" element={<EtroTest />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Route>

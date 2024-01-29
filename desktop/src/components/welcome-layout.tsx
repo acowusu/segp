@@ -13,7 +13,6 @@
 
 //       <code className=" text-center	 text-pink-700 monospace">{location.pathname}</code>
 
-
 //       {/* An <Outlet> renders whatever child route is currently active,
 //           so you can think about this <Outlet> as a placeholder for
 //           the child routes we defined above. */}
@@ -22,12 +21,11 @@
 //   );
 // }
 
-
-
 import { Outlet } from "react-router-dom";
 
 import { Separator } from "../components/ui/separator";
 import { SidebarNav } from "../components/ui/sidebar-nav";
+import { useEffect, useState } from "react";
 
 const sidebarNavItems = [
   {
@@ -50,21 +48,30 @@ const sidebarNavItems = [
     title: "Script",
     href: "/welcome/script-editor",
   },
-  {
-    title: "Edit Video Test",
-    href: "/welcome/etro-test",
-  },
 ];
 
 export function WelcomeLayout() {
+  const [projectName, setProjectName] = useState("");
+
+  useEffect(() => {
+    const fetchProjectName = async () => {
+      try {
+        const projectName = await window.api.getProjectName();
+        setProjectName(projectName);
+      } catch (error) {
+        console.error("Failed to fetch project name:", error);
+      }
+    };
+
+    fetchProjectName();
+  }, []);
   return (
     <>
-
       <div className=" space-y-6 p-10 pb-16 md:block">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
           <p className="text-muted-foreground">
-            Manage your account settings and set e-mail preferences.
+            Manage your account settings for {projectName}
           </p>
         </div>
         <Separator className="my-6" />
