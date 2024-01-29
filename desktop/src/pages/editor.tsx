@@ -9,11 +9,19 @@ import {
   TimelineAction,
   TimelineState,
 } from "@xzdarcy/react-timeline-editor";
-import { Switch } from "../components/ui/switch";
 import { TimeFrame } from "../components/timeline-components/timeFrame";
 import TimelinePlayer from "../components/timeline-components/timelinePlayer";
 import { Media } from "./mediaFiles";
 import { Video } from "pexels";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "../components/ui/context-menu";
 
 export const Editor: React.FC = () => {
   const [mediaStore] = useState(new MediaStore());
@@ -24,9 +32,11 @@ export const Editor: React.FC = () => {
   );
 };
 
+export type additionalDataType = { img?: string; video?: Video };
+
 export const VideoEditor: React.FC = () => {
   const [additionalData, setAdditionalData] = useState<
-    { id: string; additionalData: additionalDataType }[]
+    { id: string; rowid: string; additionalData: additionalDataType }[]
   >([]);
 
   const mediaStore = React.useContext(MediaStoreContext);
@@ -45,12 +55,19 @@ export const VideoEditor: React.FC = () => {
   const idRef = useRef(5);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [selectedToReplace, setSelectedToReplace] =
-    useState<TimelineAction | null>(null);
+  const [selectedToReplace, setSelectedToReplace] = useState<{
+    rowid: string;
+    action: TimelineAction;
+  } | null>(null);
 
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    const time = timelineState.current?.getTime() ?? 0;
+    if (!isPlaying) {
+      reRenderVideo();
+    }
+    movieRef.current?.seek(time);
     isPlaying ? movieRef.current?.pause() : movieRef.current?.play();
+    setIsPlaying(!isPlaying);
   };
 
   const handleAllowEdit = () => {
@@ -67,8 +84,10 @@ export const VideoEditor: React.FC = () => {
 
   const handleCursorSeek = (time: number) => {
     if (movieRef.current) {
+      movieRef.current.pause();
+      setIsPlaying(false);
       movieRef.current.seek(time);
-      isPlaying ? movieRef.current.play() : movieRef.current.refresh();
+      movieRef.current.refresh();
     }
   };
 
@@ -100,31 +119,33 @@ export const VideoEditor: React.FC = () => {
         background: etro.parseColor("#FF0000"),
       }),
     );
-
-    const layers = data[0].actions.map((action) => {
-      const img =
-        (
-          additionalData.find(({ id }) => action.id === id)?.additionalData || {
-            img: "",
-          }
-        ).img ?? "";
-      return new etro.layer.Image({
-        startTime: action.start,
-        duration: action.end - action.start,
-        source: img,
-        sourceX: 0, // default: 0
-        sourceY: 0, // default: 0
-        sourceWidth: 19200, // default: null (full width)
-        sourceHeight: 10800, // default: null (full height)
-        x: 0, // default: 0
-        y: 0, // default: 0
-        width: 1920, // default: null (full width)
-        height: 1080, // default: null (full height)
-        opacity: 1, // default: 1
-      });
+    data.forEach((row) => {
+      if (row.id !== "Audio") {
+        const layers = row.actions.map((action) => {
+          const img =
+            (
+              additionalData.find(({ id }) => action.id === id)
+                ?.additionalData || { img: "" }
+            ).img ?? "";
+          return new etro.layer.Image({
+            startTime: action.start,
+            duration: action.end - action.start,
+            source: img,
+            sourceX: 0, // default: 0
+            sourceY: 0, // default: 0
+            sourceWidth: 19200, // default: null (full width)
+            sourceHeight: 10800, // default: null (full height)
+            x: 0, // default: 0
+            y: 0, // default: 0
+            width: 1920, // default: null (full width)
+            height: 1080, // default: null (full height)
+            opacity: 1, // default: 1
+          });
+        });
+        mediaStore.addLayers(layers);
+      }
     });
 
-    mediaStore.addLayers(layers);
     mediaStore.refresh();
     movieRef.current = mediaStore.movie;
   };
@@ -147,7 +168,15 @@ export const VideoEditor: React.FC = () => {
     );
   };
 
-  const createNewLayer = () => {};
+  const createNewLayer = () => {
+    const newData = data;
+    newData.splice(data.length - 1, 0, {
+      id: `Layer ${idRef.current++}`,
+      actions: [],
+      rowHeight: 150,
+    });
+    setData(newData);
+  };
 
   const handleAddNewAction = (media: { media: Video | string }) => {
     if (selectedToReplace) {
@@ -161,7 +190,7 @@ export const VideoEditor: React.FC = () => {
       setAdditionalData(newData);
       setSelectedToReplace(null);
     } else {
-      const row = data[0];
+      const row = data[1];
       const time = timelineState.current?.getTime() ?? 0;
       setData((prev) => {
         const rowIndex = prev.findIndex((item) => item.id === row.id);
@@ -221,7 +250,7 @@ export const VideoEditor: React.FC = () => {
       }),
       new etro.layer.Image({
         startTime: 0,
-        duration: 2,
+        duration: 4,
         source: imageRef.current,
         sourceX: 0, // default: 0
         sourceY: 0, // default: 0
@@ -277,16 +306,16 @@ export const VideoEditor: React.FC = () => {
         };
         setAdditionalData((prev) => [
           ...prev,
-          { id: newAction.id, additionalData: { img: img } },
+          { id: newAction.id, rowid: "Layer1", additionalData: { img: img } },
         ]);
         return newAction;
       },
     );
 
     setData([
-      { id: "Layer1", actions: timelineActions, rowHeight: 150 },
+      { id: "Default", actions: timelineActions, rowHeight: 150 },
       {
-        id: "audio",
+        id: "Audio",
         actions: [
           {
             id: `action${idRef.current++}`,
@@ -297,11 +326,12 @@ export const VideoEditor: React.FC = () => {
             effectId: "effect0",
           },
         ],
+        rowHeight: 60,
       },
     ]);
     // setEffects(mediaStore.effects);
 
-    reRenderVideo();
+    // reRenderVideo()
   }, []);
 
   return (
@@ -316,22 +346,14 @@ export const VideoEditor: React.FC = () => {
             <canvas className="w-full" ref={canvasRef} />
           </div>
         </div>
-        <div className="flex w-[80%] flex-col">
-          <div className="justify-row flex w-full flex-row items-center gap-4">
-            <Switch checked={allowEdit} onCheckedChange={handleAllowEdit} />
-            <Switch checked={showCursor} onCheckedChange={handleShowCursor} />
-            <Switch
-              checked={autoScrollWhenPlay}
-              onCheckedChange={handleAutoScrollWhenPlay}
-            />
-            <TimelinePlayer
-              handlePlayPause={handlePlayPause}
-              timelineState={timelineState}
-              autoScrollWhenPlay={autoScrollWhenPlay}
-            />
-          </div>
+        <div className="flex w-full flex-row items-center justify-center gap-4 border">
+          <TimelinePlayer
+            handlePlayPause={handlePlayPause}
+            timelineState={timelineState}
+            autoScrollWhenPlay={autoScrollWhenPlay}
+          />
         </div>
-        <div className="flex w-full">
+        <div className="flex w-full bg-[#191b1d]">
           <div
             ref={domRef}
             style={{ overflow: "overlay" }}
@@ -339,17 +361,36 @@ export const VideoEditor: React.FC = () => {
               const target = e.target as HTMLDivElement;
               timelineState.current?.setScrollTop(target.scrollTop);
             }}
-            className="w-1/4"
+            className="w-[10%]"
           >
+            <div
+              className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
+              onClick={createNewLayer}
+            >
+              Add +
+            </div>
             {data.map((item) => {
               return (
-                <div key={item.id} className="flex w-full p-px">
-                  <div className="w-full bg-teal-950">{`Media Component: ${item.id}`}</div>
-                </div>
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <div
+                      key={item.id}
+                      className={`flex w-full ${item.id !== "Audio" ? "h-[150px]" : "h-[60px]"} items-center justify-center border border-gray-500 border-opacity-40 p-2`}
+                    >
+                      {`${item.id} Layer`}
+                    </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem onClick={() => deleteLayer(item.id)}>
+                      Delete Layer
+                    </ContextMenuItem>
+                    <ContextMenuItem>Rename Layer</ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               );
             })}
           </div>
-          <div className="w-full border">
+          <div className="w-full ">
             <Timeline
               editorData={data}
               effects={effects}
