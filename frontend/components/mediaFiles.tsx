@@ -1,77 +1,82 @@
-'use client'
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { createClient, Video } from 'pexels';
+
+const pexelsApiKey = 'J4nKc6oJDyKJeRJTlC0x5EiQQDZkTuvAyJ1uXt6gC98IGwDleAYqI0RR';
+const unsplashAccessKey = 'rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA';
+const queries = ['AI', 'Neural Network', 'Connected', 'City', 'Future'];
 
 const MediaFiles: React.FC = () => {
-
-  // array of promts for images to generate/look-up
-  const searchTerms = ['AI', 'Neural Network', 'Layers', 'Connected', 'Line Graph', 'Future'];
-  const [selectedTerm, setSelectedTerm] = useState(searchTerms[0]);
-  const [termPhotos, setTermPhotos] = useState<{ [key: string]: any[] }>({});
-  const [photos, setPhotos] = useState([]);
-
-  const getPhotos = async () => {
-    try {
-
-      // get 10 photos for each search term
-      const termPhotoMap = searchTerms.map(async (term) => {
-        const response = await fetch(
-          `https://api.unsplash.com/photos/random?query=${term}&count=10&client_id=uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y`
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          return { term, photos: data };
-        } else {
-          console.error(`Failed to fetch photos for term "${term}"`);
-          return null;
-        }
-      });
-
-      const resolvedTermPhotos = await Promise.all(termPhotoMap);
-      const termPhotosMap: { [key: string]: any[] } = {};
-
-      resolvedTermPhotos.forEach(({ term, photos }) => {
-        termPhotosMap[term] = photos;
-      });
-
-      setTermPhotos(termPhotosMap);
-    } catch (error) {
-      console.error('Error fetching photos:', error);
-    }
-  };
-
-  const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedTerm(e.target.value);
-    setPhotos(termPhotos[e.target.value]);
-  };
+  const [selectedQuery, setSelectedQuery] = useState<string>(queries[0]);
+  const [media, setMedia] = useState<(Video | string)[]>([]);
 
   useEffect(() => {
-    getPhotos();
-  }, []);
+    const fetchMedia = async () => {
+      const pexelsClient = createClient(pexelsApiKey);
 
-  const MediaElement = ({ photo }) => {
+      // Fetch Pexels videos
+      const pexelsResponse = await pexelsClient.videos.search({ query: selectedQuery, orientation: 'landscape', per_page: 5 });
+
+      // Fetch Unsplash photos
+      const unsplashEndpoint = `https://api.unsplash.com/search/photos?page=1&query=${selectedQuery}&client_id=${unsplashAccessKey}`;
+      const unsplashResponse = await fetch(unsplashEndpoint);
+      const unsplashData = await unsplashResponse.json();
+
+      const unsplashPhotos = unsplashData.results.map((photo: any) => photo.urls.regular);
+
+      // Combine Pexels videos and Unsplash photos
+      setMedia([...pexelsResponse.videos, ...unsplashPhotos]);
+    };
+
+    fetchMedia();
+  }, [selectedQuery]);
+
+  // Dropdown control
+  const handleQueryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedQuery(event.target.value);
+  };
+
+  const MediaElement: React.FC<{ media: Video | string }> = ({ media }) => {
     return (
-      <div className='border border-black rounded-lg h-32 transform transition duration-700 ease-in-out hover:scale-105 cursor-pointer flex flex-col items-center justify-between p-2'>
-        <img src={photo.urls.small} alt={photo.alt_description || 'Image'} className='w-full h-full object-cover' />
+      <div
+        className='border border-black rounded-lg h-32 transform transition duration-700 ease-in-out hover:scale-105 cursor-pointer flex flex-col items-center justify-between p-2'
+      >
+        {typeof media === 'string' ? (
+          <img
+            src={media}
+            alt="Unsplash Photo"
+            className="h-full w-full object-cover object-center mb-2"
+            style={{ maxHeight: '100%', maxWidth: '100%' }}
+          />
+        ) : (
+          <video
+            width="100%"
+            height="auto"
+            controls
+            style={{ display: 'block', margin: '0 auto', maxHeight: '100%', maxWidth: '100%' }}
+          >
+            <source src={media.video_files[0].link} type="video/mp4" />
+          </video>
+        )}
       </div>
     );
   };
 
   return (
-    <div className="border border-black w-full h-full flex flex-col ">
-      <h1 className='font-bold text-2xl p-2 border-black'>Media Files</h1>
-      <div className='flex p-2'>
-        <label htmlFor='termDropdown' className='mr-2'>Select Term:</label>
-        <select id='termDropdown' onChange={handleTermChange} value={selectedTerm} style={{color: 'black'}}>
-          {searchTerms.map((term, index) => (
-            <option key={index} value={term}>{term}</option>
+    <div className="border border-black w-full h-full flex flex-col">
+      <h1 className='font-bold text-2xl p-2 border-b-2 border-black'>Media Files</h1>
+      <div>
+        <label htmlFor="querySelector">Select a category: </label>
+        <select id="querySelector" value={selectedQuery} onChange={handleQueryChange} style={{ color: 'black' }}>
+          {queries.map(query => (
+            <option key={query} value={query}>
+              {query}
+            </option>
           ))}
         </select>
       </div>
       <div className='grid grid-cols-3 gap-4 overflow-auto no-scrollbar p-2 border-t-2 border-black'>
-        {photos.map((photo, index) => (
-          <MediaElement key={index} photo={photo} />
+        {media.map((item, index) => (
+          <MediaElement key={index} media={item} />
         ))}
       </div>
     </div>

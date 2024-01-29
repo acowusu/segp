@@ -1,12 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "../components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../components/ui/tabs";
-import { synchronized } from "../lib/utils";
 import {
   Card,
   CardContent,
@@ -17,8 +12,13 @@ import {
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { synchronized } from "../lib/utils";
 
 export const Upload: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +64,11 @@ export const Upload: React.FC = () => {
     }
     navigate("/welcome/set-topic");
     setDisabledNext(true);
+  };
+  const handleCancel = () => {
+    if (disabledCancel) return;
+    navigate("/audiogen");
+    setDisabledCancel(false);
   };
   return (
     <div className="flex items-center justify-center h-screen">
@@ -122,7 +127,9 @@ export const Upload: React.FC = () => {
               </form>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline">Cancel</Button>
+              <Button disabled={disabledCancel} onClick={handleCancel}>
+                Cancel
+              </Button>
               <Button disabled={disabledNext} onClick={handleNext}>
                 Next
               </Button>

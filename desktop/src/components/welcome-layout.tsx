@@ -45,8 +45,16 @@ const sidebarNavItems = [
     href: "/welcome/set-visuals",
   },
   {
+    title: "Media",
+    href: "/welcome/media",
+  },
+  {
     title: "Script",
     href: "/welcome/script-editor",
+  },
+  {
+    title: "Video Editor",
+    href: "/welcome/video-editor",
   },
 ];
 

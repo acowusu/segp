@@ -165,8 +165,8 @@ There is an equivalent command for bash/zsh.
 
 ## Testing
 
-TODO: Add testing instructions.
-
+Install jest packages using `npm install --save-dev jest-electron`.
+Use `npm run tests` to run tests. Add any new tests you write to the `__tests__` folder.
 
 ## Contributing
 

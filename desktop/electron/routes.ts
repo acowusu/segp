@@ -9,6 +9,8 @@ import {
   getVisuals,
   setVoiceover,
   getVoiceovers,
+  myWorkerFunction,
+  textToAudio
 } from "./reportProcessing";
 // Import your API methods here
 import {
@@ -37,6 +39,8 @@ const api = {
   openProject,
   getProjectName,
   getProjectPath,
+  myWorkerFunction,
+  textToAudio
   // Add your API methods here
 };
 export default api;
