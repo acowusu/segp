@@ -334,63 +334,110 @@ export const VideoEditor: React.FC = () => {
     // reRenderVideo()
   }, []);
 
+  // Ratios from the figma
+  // return (
+  //   <>
+  //     <div className="bg-red-700">
+  //       <div className="grid-rows-[5fr_60fr_41fr] grid-cols-[31fr_49fr] grid h-screen w-screen pl-5">
+  //         <div className="bg-red-300 col-span-2">Editor Buttons</div>
+  //         <div className="bg-green-200 row-span-1">Utilities</div>
+  //         <div className="bg-yellow-200 row-span-1">
+  //           Player
+  //           <img className="hidden" src="/person.png" alt="" ref={imageRef} />
+  //           <canvas className="w-full" ref={canvasRef} />
+  //         </div>
+  //         <div className=" col-span-2 grid grid-cols-[5fr_89fr] grid-rows-[5fr_35fr]">
+  //           <div className="bg-yellow-700 col-span-2"> Timeline Buttons</div>
+  //           <div className="bg-blue-700 col-span-1"> Layer Titles </div>
+  //           <div className="bg-green-700 col-span-1"> Assets </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </>
+  // );
+
+  /* TODO Notes for self:
+   *  -> the while player grid is the canvas (resize the util bar according to aspect ratio)
+   *  -> Remove the 'flex' annotations where it isn't needed => check children nodes if they depend on it!
+   *
+   */
+
   return (
     <>
-      <div className="flex h-screen w-full flex-col items-center overflow-auto border p-4">
-        <div className="grid h-2/5 grid-cols-2 border">
-          <div className="no-scrollbar h-full overflow-auto border">
-            <Media handleAddToPlayer={handleAddNewAction} />
-          </div>
-          <div>
-            <img className="hidden" src="/person.png" alt="" ref={imageRef} />
-            <canvas className="w-full" ref={canvasRef} />
+      {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
+      <div className="grid h-[720px] w-[1280px] grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
+        {/* <div className="grid grid-cols-2 h-2/5 border"> */}{" "}
+        {/* I wanna get rid of this and just use columns*/}
+        {/* Media Tab */}
+        {/* <div className="border overflow-auto h-full no-scrollbar"> */}
+        <div className="col-span-2 bg-red-300 ">Editor Buttons</div>
+        <div className="row-span-1 flex overflow-auto border">
+          <Media handleAddToPlayer={handleAddNewAction} />
+        </div>
+        {/* Player Component (Wraps the Canvas and the play/pause bar) */}
+        <div className="row-span-1">
+          <img className="hidden" src="/person.png" alt="" ref={imageRef} />
+          <canvas className="w-full" ref={canvasRef} />
+          {/* TODO: Make the canvas and the play bar work with the grid */}
+          <div className="flex w-full flex-row items-center justify-center gap-4 border">
+            <TimelinePlayer
+              handlePlayPause={handlePlayPause}
+              timelineState={timelineState}
+              autoScrollWhenPlay={autoScrollWhenPlay}
+            />
           </div>
         </div>
-        <div className="flex w-full flex-row items-center justify-center gap-4 border">
-          <TimelinePlayer
-            handlePlayPause={handlePlayPause}
-            timelineState={timelineState}
-            autoScrollWhenPlay={autoScrollWhenPlay}
-          />
-        </div>
-        <div className="flex w-full bg-[#191b1d]">
-          <div
-            ref={domRef}
-            style={{ overflow: "overlay" }}
-            onScroll={(e) => {
-              const target = e.target as HTMLDivElement;
-              timelineState.current?.setScrollTop(target.scrollTop);
-            }}
-            className="w-[10%]"
-          >
+        {/* Timeline Component, includes the layering logic logic and the  */}
+        {/* <div className="flex w-full bg-[#191b1d]"> */}
+        <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr] pl-10 pr-10">
+          {/* Placeholder div for Timeline buttons */}
+          <div className="col-span-2 bg-yellow-700"> Timeline Buttons</div>
+          {/* Layer Titles Component */}
+          <div className="col-span-1">
             <div
-              className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
-              onClick={createNewLayer}
+              ref={domRef}
+              style={{ overflow: "overlay" }}
+              onScroll={(e) => {
+                const target = e.target as HTMLDivElement;
+                timelineState.current?.setScrollTop(target.scrollTop);
+              }}
+              className=""
             >
-              Add +
+              <div
+                className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
+                onClick={createNewLayer}
+              >
+                Add +
+              </div>
             </div>
-            {data.map((item) => {
-              return (
-                <ContextMenu>
-                  <ContextMenuTrigger>
-                    <div
-                      key={item.id}
-                      className={`flex w-full ${item.id !== "Audio" ? "h-[150px]" : "h-[60px]"} items-center justify-center border border-gray-500 border-opacity-40 p-2`}
-                    >
-                      {`${item.id} Layer`}
-                    </div>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem onClick={() => deleteLayer(item.id)}>
-                      Delete Layer
-                    </ContextMenuItem>
-                    <ContextMenuItem>Rename Layer</ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              );
-            })}
+            {/* Asset layers Components */}
+            <div className="">
+              {data.map((item) => {
+                return (
+                  <ContextMenu>
+                    <ContextMenuTrigger>
+                      <div
+                        key={item.id}
+                        className={`flex w-full ${
+                          item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
+                        } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
+                      >
+                        {`${item.id} Layer`}
+                      </div>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem onClick={() => deleteLayer(item.id)}>
+                        Delete Layer
+                      </ContextMenuItem>
+                      <ContextMenuItem>Rename Layer</ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                );
+              })}
+            </div>
           </div>
-          <div className="w-full ">
+          {/* Timeline component */}
+          <div className="col-span-1">
             <Timeline
               editorData={data}
               effects={effects}
