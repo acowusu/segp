@@ -1,6 +1,5 @@
 import { Promisified } from "./apiTypes";
 import {
-  extractTextFromPDF,
   getScript,
   getTopics,
   setTopic,
@@ -10,13 +9,20 @@ import {
   getVisuals,
   setVoiceover,
   getVoiceovers,
-  myWorkerFunction,
-  textToAudio
+  textToAudio,
 } from "./reportProcessing";
 // Import your API methods here
+import {
+  getDirectory,
+  getFile,
+  createProject,
+  openProject,
+  loadReport,
+} from "./setup";
+import { getProjectName, getProjectPath } from "./metadata";
 
 const api = {
-  extractTextFromPDF,
+  loadReport,
   getScript,
   getTopics,
   setTopic,
@@ -26,8 +32,13 @@ const api = {
   getVisuals,
   setVoiceover,
   getVoiceovers,
-  myWorkerFunction,
-  textToAudio
+  getDirectory,
+  getFile,
+  createProject,
+  openProject,
+  getProjectName,
+  getProjectPath,
+  textToAudio,
   // Add your API methods here
 };
 export default api;

@@ -1,12 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "../components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../components/ui/tabs";
-
 import {
   Card,
   CardContent,
@@ -17,26 +12,57 @@ import {
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { useNavigate } from "react-router-dom";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { synchronized } from "../lib/utils";
 
 export const Upload: React.FC = () => {
   const navigate = useNavigate();
-  const [filePath, setFilePath] = useState("");
-  const [disableFilePicker, setDisableFilePicker] = useState(false);
-  const [disabledNext, setDisabledNext] = useState(false);
   const [disabledCancel, setDisabledCancel] = useState(false);
+  const [reportFilePath, setReportFilePath] = useState("");
+  const [projectFilePath, setProjectFilePath] = useState("");
+  const [isExistingProject, setIsExistingProject] = useState(false);
+  const lock = useState(false);
+  const [disableFilePicker] = lock;
+  const [disabledNext, setDisabledNext] = useState(false);
+  const [projectName, setProjectName] = useState("");
+  const setReportFile = () =>
+    synchronized(lock, async () => {
+      console.log("setReportFile");
+      const path = await window.api.getFile();
+      setReportFilePath(path);
+    });
+  const setProjectFile = () =>
+    synchronized(lock, async () => {
+      console.log("setProjectFile");
+      const path = await window.api.getDirectory();
+      setProjectFilePath(path);
+    });
 
-  const setFile = async () => {
-    if (disableFilePicker) return;
-    setDisableFilePicker(true);
-    const path = await window.electronAPI.openFile();
-    console.log(path);
-    setFilePath(path);
-    setDisableFilePicker(false);
-  };
-
-  const handleNext = () => {
-    if (disabledNext) return;
+  const handleNext = async () => {
+    if (disabledNext || projectFilePath == "") return;
+    if (isExistingProject) {
+      window.api.openProject(projectFilePath);
+      toast.success(`Loaded settings for ${await window.api.getProjectName()}`);
+    } else {
+      if (reportFilePath === "" || projectFilePath === "") return;
+      await window.api.createProject(
+        projectName,
+        projectFilePath,
+        reportFilePath
+      );
+      toast.promise(window.api.loadReport(), {
+        loading: "Loading report contents...",
+        success: () => {
+          return `${reportFilePath} has been loaded.`;
+        },
+        error: "Error",
+      });
+    }
     navigate("/welcome/set-topic");
     setDisabledNext(true);
   };
@@ -47,10 +73,14 @@ export const Upload: React.FC = () => {
   };
   return (
     <div className="flex items-center justify-center h-screen">
-      <Tabs defaultValue="new" className="w-[400px]" >
+      <Tabs defaultValue="new" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="new">New Project</TabsTrigger>
-          <TabsTrigger value="open">Open Project</TabsTrigger>
+          <TabsTrigger onClick={() => setIsExistingProject(false)} value="new">
+            New Project
+          </TabsTrigger>
+          <TabsTrigger onClick={() => setIsExistingProject(true)} value="open">
+            Open Project
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="new">
           <Card className="w-[400px]">
@@ -65,15 +95,31 @@ export const Upload: React.FC = () => {
                 <div className="grid w-full items-center gap-4">
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="name">Name</Label>
-                    <Input id="name" placeholder="Name of your project" />
+                    <Input
+                      id="name"
+                      value={projectName}
+                      onChange={(e) => setProjectName(e.target.value)}
+                      placeholder="Name of your project"
+                    />
                   </div>
                   <div className="flex flex-col space-y-1.5">
-                    <Label htmlFor="file">Input File</Label>
+                    <Label htmlFor="file">Project Directory</Label>
                     <Input
                       id="file"
-                      onClick={setFile}
+                      onClick={setProjectFile}
+                      placeholder="Select a Directory"
+                      value={projectFilePath}
+                      readOnly
+                      disabled={disableFilePicker}
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="file">Report PDF</Label>
+                    <Input
+                      id="file"
+                      onClick={setReportFile}
                       placeholder="Select a File"
-                      value={filePath}
+                      value={reportFilePath}
                       readOnly
                       disabled={disableFilePicker}
                     />
@@ -82,7 +128,9 @@ export const Upload: React.FC = () => {
               </form>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button disabled={disabledCancel} onClick={handleCancel}>Cancel</Button>
+              <Button disabled={disabledCancel} onClick={handleCancel}>
+                Cancel
+              </Button>
               <Button disabled={disabledNext} onClick={handleNext}>
                 Next
               </Button>
@@ -90,24 +138,21 @@ export const Upload: React.FC = () => {
           </Card>
         </TabsContent>
         <TabsContent value="open">
-        <Card className="w-[400px]">
+          <Card className="w-[400px]">
             <CardHeader>
               <CardTitle>Open project</CardTitle>
-              <CardDescription>
-                Open an existing project.
-              </CardDescription>
+              <CardDescription>Open an existing project.</CardDescription>
             </CardHeader>
             <CardContent>
               <form>
                 <div className="grid w-full items-center gap-4">
-                
-                  <div className="flex flex-col space-y-1.5 mb-16">
-                    <Label htmlFor="file">Select Project Directory</Label>
+                  <div className="flex flex-col space-y-1.5 mb-32">
+                    <Label htmlFor="file">Project Directory</Label>
                     <Input
                       id="file"
-                      onClick={setFile}
-                      placeholder="Select a File"
-                      value={filePath}
+                      onClick={setProjectFile}
+                      placeholder="Select a Directory"
+                      value={projectFilePath}
                       readOnly
                       disabled={disableFilePicker}
                     />
@@ -115,8 +160,8 @@ export const Upload: React.FC = () => {
                 </div>
               </form>
             </CardContent>
-            <CardFooter className="flex justify-between mt-3">
-              <Button disabled={disabledCancel} onClick={handleCancel}>Cancel</Button>
+            <CardFooter className="flex justify-between mt-6">
+              <Button variant="outline">Cancel</Button>
               <Button disabled={disabledNext} onClick={handleNext}>
                 Next
               </Button>

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog  } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog , screen  } from 'electron'
 import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
@@ -30,9 +30,18 @@ async function handleFileOpen () {
   console.log("GOT PATH", path)
   return path
 }
+
+
+
 function createWindow() {
+  // console.log("CREATING WINDOW")
+  // console.log(JSON.stringify(screen.getAllDisplays(), null, 2))
+  const monitor = ( screen.getAllDisplays().find(monitor => monitor.label === "HP 27f")) || screen.getPrimaryDisplay()
+  const { x, y } = monitor.bounds
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    x: x + 50, // Arbitrary offsets to ensure it's on the right display/monitor
+    y: y + 50,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -99,3 +108,4 @@ app.whenReady().then(() => {
     win?.webContents.send('main-process-message', `[database-sqlite] `)
   }, 1000);
 })
+export { win }
