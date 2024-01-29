@@ -22,6 +22,7 @@ import { synchronized } from "../lib/utils";
 
 export const Upload: React.FC = () => {
   const navigate = useNavigate();
+  const [disabledCancel, setDisabledCancel] = useState(false);
   const [reportFilePath, setReportFilePath] = useState("");
   const [projectFilePath, setProjectFilePath] = useState("");
   const [isExistingProject, setIsExistingProject] = useState(false);
