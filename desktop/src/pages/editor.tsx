@@ -358,14 +358,16 @@ export const VideoEditor: React.FC = () => {
 
   /* TODO Notes for self:
    *  -> the while player grid is the canvas (resize the util bar according to aspect ratio)
-   *  ->
+   *  -> Remove the 'flex' annotations where it isn't needed => check children nodes if they depend on it!
    *
    */
 
   return (
     <>
       {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
-      <div className="grid-rows-[5fr_60fr_41fr] grid-cols-[31fr_49fr] grid h-[720px] w-[1280px]">
+      <div className="grid-rows-[5fr_60fr_41fr] grid grid-cols-[31fr_49fr] h-screen w-screen">
+        {" "}
+        {/* TODO fix the weird clipping*/}
         {/* <div className="grid grid-cols-2 h-2/5 border"> */}{" "}
         {/* I wanna get rid of this and just use columns*/}
         {/* Media Tab */}
