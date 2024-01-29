@@ -52,11 +52,11 @@ export const VideoEditor: React.FC = () => {
     const [selectedToReplace, setSelectedToReplace] = useState<{rowid: string, action: TimelineAction} | null>(null)
 
     const handlePlayPause = () => {
-      const time = timelineState.current?.getTime() ?? 0
+      const time = timelineState.current?.getTime() ?? 0;
       if (!isPlaying) {
-        reRenderVideo()
+        reRenderVideo();
       }
-      movieRef.current?.seek(time)
+      movieRef.current?.seek(time);
       isPlaying ? movieRef.current?.pause() : movieRef.current?.play();
       setIsPlaying(!isPlaying);
     };
@@ -74,24 +74,23 @@ export const VideoEditor: React.FC = () => {
     };
 
     const handleCursorSeek = (time: number) => {
-      if (movieRef.current) {
-        movieRef.current.pause()
-        setIsPlaying(false)
-        movieRef.current.seek(time);
-        movieRef.current.refresh();
+      if (mediaStore.hasMovieRef()) {
+        mediaStore.pause();
+        setIsPlaying(false);
+        mediaStore.seek(time);
+        mediaStore.refresh();
       }
     };
 
     const handleProgress = (time: number, _: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      if (movieRef.current) {
-        reRenderVideo()
-        console.log(time)
-        movieRef.current.pause()
+      if (mediaStore.hasMovieRef()) {
+        mediaStore.pause();
         setIsPlaying(false)
-        movieRef.current.seek(time);
-        movieRef.current.refresh();
+        mediaStore.seek(time);
+        mediaStore.refresh();
       }
-        return true;
+
+      return true;
     };
 
     const reRenderVideo = () => {
@@ -107,6 +106,7 @@ export const VideoEditor: React.FC = () => {
               background: etro.parseColor("#FF0000"),
           })
       );
+
       data.forEach((row) => {
         if (row.id !== "Audio") {
           const layers = row.actions.map((action) => {
@@ -117,22 +117,21 @@ export const VideoEditor: React.FC = () => {
               source: img,
               sourceX: 0, // default: 0
               sourceY: 0, // default: 0
-              sourceWidth: 19200, // default: null (full width)
-              sourceHeight: 10800, // default: null (full height)
+              sourceWidth: 1920, // default: null (full width)
+              sourceHeight: 1080, // default: null (full height)
               x: 0, // default: 0
               y: 0, // default: 0
               width: 1920, // default: null (full width)
               height: 1080, // default: null (full height)
               opacity: 1 , // default: 1
             })
-            }
-            )
+          })
           mediaStore.addLayers(layers);
         }
       })
       
       mediaStore.refresh();
-      movieRef.current = mediaStore.movie;
+      movieRef.current = mediaStore.getMovie();
 
     }
 
@@ -186,6 +185,29 @@ export const VideoEditor: React.FC = () => {
         })
       }
     };
+
+    const saveMovieAsMp4 = async () => {
+
+      await mediaStore.getMovie()?.record({
+          frameRate: mediaStore.framerate,
+          type: "video/webm;codecs=vp9",
+          // audio: default true,
+          // video: default true,
+          // duration: default end of video
+          // onStart: optional callback
+          onStart: (_: MediaRecorder) => {
+              console.log("recording started");
+          },
+      })
+      .then((blob) => {
+          const newBlob = new Blob([blob], {type: "video/mp4"})
+          const url = URL.createObjectURL(newBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = "video.mp4";
+          a.click();
+      });
+  }
 
     useEffect(() => {
         // Use the canvas ref to get the canvas element
@@ -249,9 +271,8 @@ export const VideoEditor: React.FC = () => {
 
         mediaStore.addLayers(mocklayers);
         mediaStore.refresh();
-        movieRef.current = mediaStore.movie;
+        movieRef.current = mediaStore.getMovie();
         
-
         // row.actions
         // row.classNames
         // row.id
@@ -288,8 +309,7 @@ export const VideoEditor: React.FC = () => {
         }
         ]);
         // setEffects(mediaStore.effects);
-
-        // reRenderVideo()
+        reRenderVideo()
 
     }, []);
 
@@ -376,6 +396,19 @@ export const VideoEditor: React.FC = () => {
                             domRef.current.scrollTop = scrollTop;
                     }}
                 />
+                <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-1 rounded-lg m-4"
+                onClick={() => {
+                  mediaStore.seek(0);
+                  console.log("export button clicked");
+                  setTimeout(() => {
+                    console.log("exporting function called");
+                    saveMovieAsMp4();
+                  }, 1000);
+                }}
+              >
+                Export Video as MP4
+              </button>
             </div>
         </div>
       </div>
