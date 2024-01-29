@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "test": "vitest",
+    "test:coverage": "vitest run --coverage",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "rebuild2": ".\\node_modules\\.bin\\electron-rebuild.cmd -f -m ./node_modules/better-sqlite3",
     "postinstall": "patch-package && electron-builder install-app-deps",
@@ -78,6 +79,8 @@
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
     "@vitejs/plugin-react": "^4.0.4",
+    "@vitest/coverage-istanbul": "^1.2.2",
+    "@vitest/coverage-v8": "^1.2.2",
     "autoprefixer": "^10.4.16",
     "better-sqlite3": "^8.6.0",
     "electron": "^26.1.0",
