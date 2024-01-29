@@ -6,13 +6,13 @@
   "postinstall": "electron-builder install-app-deps",
   "scripts": {
     "dev": "vite",
+    "test": "vitest",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "rebuild2": ".\\node_modules\\.bin\\electron-rebuild.cmd -f -m ./node_modules/better-sqlite3",
     "postinstall": "patch-package && electron-builder install-app-deps",
     "build": "tsc && vite build && electron-builder",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "test": "jest --passWithNoTests"
+    "preview": "vite preview"
   },
   "overrides": {
     "node-canvas": "npm:dry-uninstall",
@@ -92,7 +92,8 @@
     "typescript": "^5.3.3",
     "vite": "^4.4.9",
     "vite-plugin-electron": "^0.14.0",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vitest": "^1.2.2"
   },
   "main": "dist-electron/main.js"
 }
