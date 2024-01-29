@@ -3,10 +3,6 @@ import { ThemeToggle } from "./ui/theme-toggle";
 import { ScrollArea } from "./ui/scroll-area";
 import { Toaster } from "./ui/sonner";
 
-{
-  /* <Link to="/">Home</Link> */
-}
-
 export function Layout() {
   const location = useLocation();
 
@@ -18,12 +14,8 @@ export function Layout() {
       <code className=" text-center z-50	bg-pink-500/40 p-2 rounded text-pink-700 monospace fixed top-5 right-5 ">
         Path: {location.pathname}
       </code>
-      <ThemeToggle className="  fixed bottom-5 right-5 " />
+      <ThemeToggle className="z-10  fixed bottom-5 right-5 " />
       <Toaster />
-
-      {/* An <Outlet> renders whatever child route is currently active,
-          so you can think about this <Outlet> as a placeholder for
-          the child routes we defined above. */}
       <Outlet />
     </ScrollArea>
   );

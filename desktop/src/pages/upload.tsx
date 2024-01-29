@@ -47,7 +47,7 @@ export const Upload: React.FC = () => {
     if (disabledNext || projectFilePath == "") return;
     if (isExistingProject) {
       window.api.openProject(projectFilePath);
-      toast.success(`Loaded settings for ${projectName}`);
+      toast.success(`Loaded settings for ${await window.api.getProjectName()}`);
     } else {
       if (reportFilePath === "" || projectFilePath === "") return;
       await window.api.createProject(

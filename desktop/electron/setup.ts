@@ -32,6 +32,7 @@ export async function createProject(
 
 export async function openProject(projectPath: string): Promise<void> {
   closeDatabase();
+  createProjectStore(projectPath);
   userStore.set("lastProject", projectPath);
   getDatabase(`${projectPath}${sep}project.db`);
 }
@@ -64,5 +65,4 @@ export async function loadReport(): Promise<void> {
   const text = await extractTextFromPDF(report);
   const reportTextPath = `${getProjectPath()}${sep}report.txt`;
   await writeFile(reportTextPath, text);
-  
 }
