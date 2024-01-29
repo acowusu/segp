@@ -365,7 +365,9 @@ export const VideoEditor: React.FC = () => {
   return (
     <>
       {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
-      <div className="grid h-[720px] w-[1280px] grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
+      <div className="grid h-screen w-screen grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
+        {" "}
+        {/* TODO fix the weird clipping*/}
         {/* <div className="grid grid-cols-2 h-2/5 border"> */}{" "}
         {/* I wanna get rid of this and just use columns*/}
         {/* Media Tab */}
