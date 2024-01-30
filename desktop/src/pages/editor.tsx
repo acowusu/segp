@@ -62,6 +62,7 @@ export const VideoEditor: React.FC = () => {
 
   const handlePlayPause = () => {
     const time = timelineState.current?.getTime() ?? 0;
+
     if (!isPlaying) {
       reRenderVideo();
     }
