@@ -362,7 +362,7 @@ export const VideoEditor: React.FC = () => {
    *
    */
   // FIX: hardcoded at the moment, will figure out how to make this dynamic
-  const timelineStyle: React.CSSProperties = { width: "1200px" };
+  const timelineStyle: React.CSSProperties = { width: "100%" };
   return (
     <>
       {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
