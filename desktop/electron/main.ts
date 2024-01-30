@@ -28,7 +28,7 @@ const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 
 async function handleFileOpen() {
   const { canceled, filePaths } = await dialog.showOpenDialog(
-    win as BrowserWindow
+    win as BrowserWindow,
   );
   let path = "";
   if (!canceled) {
@@ -59,6 +59,19 @@ function createWindow() {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(process.env.DIST, "index.html"));
   }
+
+  win.setResizable(true);
+
+  const logWindowBounds = () => {
+    const bounds = win?.getBounds();
+    console.log("Window Bounds:", bounds);
+  };
+  win.on("ready-to-show", () => {
+    logWindowBounds();
+    win?.on("resize", () => {
+      logWindowBounds();
+    });
+  });
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
