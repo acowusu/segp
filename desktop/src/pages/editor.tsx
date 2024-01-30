@@ -365,7 +365,7 @@ export const VideoEditor: React.FC = () => {
   return (
     <>
       {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
-      <div className="grid h-screen w-screen grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
+      <div className="w-dvh grid h-dvh grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
         {" "}
         {/* TODO fix the weird clipping*/}
         {/* <div className="grid grid-cols-2 h-2/5 border"> */}{" "}
