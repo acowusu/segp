@@ -361,7 +361,8 @@ export const VideoEditor: React.FC = () => {
    *  -> Remove the 'flex' annotations where it isn't needed => check children nodes if they depend on it!
    *
    */
-
+  // FIX: hardcoded at the moment, will figure out how to make this dynamic
+  const timelineStyle: React.CSSProperties = { width: "1200px" };
   return (
     <>
       {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
@@ -442,6 +443,7 @@ export const VideoEditor: React.FC = () => {
           <div className="col-span-1">
             <Timeline
               editorData={data}
+              style={timelineStyle}
               effects={effects}
               ref={timelineState}
               onChange={setData}
