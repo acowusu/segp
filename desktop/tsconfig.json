@@ -19,7 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/importMeta"]
+    "types": ["vitest/importMeta", "vitest/globals"]
   },
   "include": ["src", "electron", "__tests__"],
   "references": [{ "path": "./tsconfig.node.json" }]
