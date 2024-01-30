@@ -24,7 +24,7 @@ async function handleFileOpen () {
   const { canceled, filePaths } = await dialog.showOpenDialog(win as BrowserWindow)
   let path = ""
   if (!canceled) {
-    path = filePaths[0] 
+    path = filePaths[0]
   }
   path = await extractTextFromPDF(path)
   console.log("GOT PATH", path)
