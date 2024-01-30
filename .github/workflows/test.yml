@@ -36,3 +36,9 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           working-directory: desktop
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          working-directory: desktop
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
