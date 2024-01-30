@@ -93,7 +93,7 @@ export const VideoEditor: React.FC = () => {
 
   const handleProgress = (
     time: number,
-    _: React.MouseEvent<HTMLDivElement, MouseEvent>
+    _: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
     if (movieRef.current) {
       reRenderVideo();
@@ -117,7 +117,7 @@ export const VideoEditor: React.FC = () => {
         canvas: canvas,
         repeat: false,
         background: etro.parseColor("#FF0000"),
-      })
+      }),
     );
     data.forEach((row) => {
       if (row.id !== "Audio") {
@@ -164,7 +164,7 @@ export const VideoEditor: React.FC = () => {
           };
         }
         return rowdata;
-      })
+      }),
     );
   };
 
@@ -229,7 +229,7 @@ export const VideoEditor: React.FC = () => {
         canvas: canvas,
         repeat: false,
         background: etro.parseColor("#ccc"),
-      })
+      }),
     );
 
     // Add a video layer to the movie and play it
@@ -309,7 +309,7 @@ export const VideoEditor: React.FC = () => {
           { id: newAction.id, rowid: "Layer1", additionalData: { img: img } },
         ]);
         return newAction;
-      }
+      },
     );
 
     setData([
@@ -365,15 +365,15 @@ export const VideoEditor: React.FC = () => {
   return (
     <>
       {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
-      <div className="grid-rows-[5fr_60fr_41fr] grid grid-cols-[31fr_49fr] h-dvh w-dvh">
+      <div className="w-dvh grid h-dvh grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
         {" "}
         {/* TODO fix the weird clipping*/}
         {/* <div className="grid grid-cols-2 h-2/5 border"> */}{" "}
         {/* I wanna get rid of this and just use columns*/}
         {/* Media Tab */}
         {/* <div className="border overflow-auto h-full no-scrollbar"> */}
-        <div className="bg-red-300 col-span-2 ">Editor Buttons</div>
-        <div className="flex overflow-auto border row-span-1">
+        <div className="col-span-2 bg-red-300 ">Editor Buttons</div>
+        <div className=" row-span-1 flex overflow-auto border">
           <Media handleAddToPlayer={handleAddNewAction} />
         </div>
         {/* Player Component (Wraps the Canvas and the play/pause bar) */}
@@ -381,7 +381,7 @@ export const VideoEditor: React.FC = () => {
           <img className="hidden" src="/person.png" alt="" ref={imageRef} />
           <canvas className="w-full" ref={canvasRef} />
           {/* TODO: Make the canvas and the play bar work with the grid */}
-          <div className="flex flex-row w-full border items-center justify-center gap-4">
+          <div className="flex w-full flex-row items-center justify-center gap-4 border">
             <TimelinePlayer
               handlePlayPause={handlePlayPause}
               timelineState={timelineState}
@@ -391,9 +391,9 @@ export const VideoEditor: React.FC = () => {
         </div>
         {/* Timeline Component, includes the layering logic logic and the  */}
         {/* <div className="flex w-full bg-[#191b1d]"> */}
-        <div className="col-span-2 pr-10 pl-10 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr]">
+        <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr]">
           {/* Placeholder div for Timeline buttons */}
-          <div className="bg-yellow-700 col-span-2"> Timeline Buttons</div>
+          <div className="col-span-2 bg-yellow-700"> Timeline Buttons</div>
           {/* Layer Titles Component */}
           <div className="col-span-1">
             <div
@@ -406,7 +406,7 @@ export const VideoEditor: React.FC = () => {
               className=""
             >
               <div
-                className={`flex w-full mt-[3px] border-opacity-40 p-2 items-center justify-center hover:cursor-pointer`}
+                className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
                 onClick={createNewLayer}
               >
                 Add +
@@ -422,7 +422,7 @@ export const VideoEditor: React.FC = () => {
                         key={item.id}
                         className={`flex w-full ${
                           item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
-                        } border border-gray-500 border-opacity-40 p-2 items-center justify-center`}
+                        } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
                       >
                         {`${item.id} Layer`}
                       </div>
