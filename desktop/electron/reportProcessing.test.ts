@@ -1,4 +1,4 @@
-import { getVisuals, getVoiceovers, getTopics, getAudiences, setVoiceover, setAudience, setVisual } from "./reportProcessing";
+import { getVisuals, getVoiceovers, getTopics, getAudiences, setVoiceover, setAudience, setVisual, setTopic, getScript } from "./reportProcessing";
 import voiceovers from './mockData/voiceovers.json'
 import topics from './mockData/topics.json'
 import audiences from './mockData/audiences.json'
@@ -25,6 +25,10 @@ test("getAudiences should return an array of audiences", async () => {
     expect(result).toEqual(audiences);
 });
 
+test("getScript should return an array of segments", async () => {
+    const result = await getScript();
+    expect(Array.isArray(result)).toBe(true);
+});
 
 
 
@@ -53,3 +57,13 @@ test("setVisual should set the visual", async () => {
   
     expect(consoleSpy).toHaveBeenCalledWith(visual);
 });
+
+test("setTopic should set the topic", async () => {
+    const consoleSpy = vi.spyOn(console, 'log');
+    const topic = topics[0];
+    await setTopic(topic);
+
+
+    expect(consoleSpy).toHaveBeenCalledWith(topic);
+});
+
