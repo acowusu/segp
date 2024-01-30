@@ -62,6 +62,7 @@ export const VideoEditor: React.FC = () => {
 
   const handlePlayPause = () => {
     const time = timelineState.current?.getTime() ?? 0;
+
     if (!isPlaying) {
       reRenderVideo();
     }
@@ -334,35 +335,116 @@ export const VideoEditor: React.FC = () => {
     // reRenderVideo()
   }, []);
 
-  // Ratios from the figma
-  // return (
-  //   <>
-  //     <div className="bg-red-700">
-  //       <div className="grid-rows-[5fr_60fr_41fr] grid-cols-[31fr_49fr] grid h-screen w-screen pl-5">
-  //         <div className="bg-red-300 col-span-2">Editor Buttons</div>
-  //         <div className="bg-green-200 row-span-1">Utilities</div>
-  //         <div className="bg-yellow-200 row-span-1">
-  //           Player
-  //           <img className="hidden" src="/person.png" alt="" ref={imageRef} />
-  //           <canvas className="w-full" ref={canvasRef} />
-  //         </div>
-  //         <div className=" col-span-2 grid grid-cols-[5fr_89fr] grid-rows-[5fr_35fr]">
-  //           <div className="bg-yellow-700 col-span-2"> Timeline Buttons</div>
-  //           <div className="bg-blue-700 col-span-1"> Layer Titles </div>
-  //           <div className="bg-green-700 col-span-1"> Assets </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </>
-  // );
+  const VideoPlayer = (
+    <>
+      <img className="hidden" src="/person.png" alt="" ref={imageRef} />
+      <canvas className="w-full" ref={canvasRef} />
+      <div className="flex w-full flex-row items-center justify-center gap-4 border">
+        <TimelinePlayer
+          handlePlayPause={handlePlayPause}
+          timelineState={timelineState}
+          autoScrollWhenPlay={autoScrollWhenPlay}
+        />
+      </div>
+    </>
+  );
 
+  const EditorButtons = "Editor Buttons";
+  const MediaUtils = <Media handleAddToPlayer={handleAddNewAction} />;
+
+  const TimelineButtons = "Timeline Buttons";
+  const LayerTitles = (
+    <>
+      <div
+        ref={domRef}
+        style={{ overflow: "overlay" }}
+        onScroll={(e) => {
+          const target = e.target as HTMLDivElement;
+          timelineState.current?.setScrollTop(target.scrollTop);
+        }}
+        className=""
+      >
+        <div
+          className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
+          onClick={createNewLayer}
+        >
+          Add +
+        </div>
+      </div>
+      <div className="">
+        {data.map((item) => {
+          return (
+            <ContextMenu>
+              <ContextMenuTrigger>
+                <div
+                  key={item.id}
+                  className={`flex w-full ${
+                    item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
+                  } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
+                >
+                  {`${item.id} Layer`}
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() => deleteLayer(item.id)}>
+                  Delete Layer
+                </ContextMenuItem>
+                <ContextMenuItem>Rename Layer</ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          );
+        })}
+      </div>
+    </>
+  );
+  const timelineStyle: React.CSSProperties = { width: "100%" };
+  const TimelineSection = (
+    <>
+      <Timeline
+        editorData={data}
+        style={timelineStyle}
+        effects={effects}
+        ref={timelineState}
+        onChange={setData}
+        autoScroll={true}
+        minScaleCount={movieRef.current?.duration}
+        onCursorDrag={handleCursorSeek}
+        onClickTimeArea={handleProgress}
+        disableDrag={!allowEdit}
+        hideCursor={!showCursor}
+        getActionRender={(action, row) => {
+          setSelectedItem(action.id);
+          return (
+            <TimeFrame
+              action={action}
+              row={row}
+              data={
+                additionalData.find(({ id }) => action.id === id)
+                  ?.additionalData || { img: "" }
+              }
+              deleteItem={deleteItem}
+              setToReplace={setSelectedToReplace}
+              toReplace={selectedToReplace}
+            />
+          );
+        }}
+        dragLine={true}
+        onDoubleClickRow={() => {}}
+        onScroll={({ scrollTop }) => {
+          if (domRef.current) domRef.current.scrollTop = scrollTop;
+        }}
+      />
+    </>
+  );
   /* TODO Notes for self:
    *  -> the while player grid is the canvas (resize the util bar according to aspect ratio)
    *  -> Remove the 'flex' annotations where it isn't needed => check children nodes if they depend on it!
    *
+   * NOTE: using h-dvh and w-dvh for the outermost grid breaks the Timeline
    */
+
   // FIX: hardcoded at the moment, will figure out how to make this dynamic
-  const timelineStyle: React.CSSProperties = { width: "100%" };
+
   return (
     <>
       {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
@@ -373,109 +455,20 @@ export const VideoEditor: React.FC = () => {
         {/* I wanna get rid of this and just use columns*/}
         {/* Media Tab */}
         {/* <div className="border overflow-auto h-full no-scrollbar"> */}
-        <div className="col-span-2 bg-red-300 ">Editor Buttons</div>
+        <div className="col-span-2 bg-red-300 ">{EditorButtons}</div>
         <div className=" row-span-1 flex overflow-auto border">
-          <Media handleAddToPlayer={handleAddNewAction} />
+          {MediaUtils}
         </div>
         {/* Player Component (Wraps the Canvas and the play/pause bar) */}
-        <div className="row-span-1">
-          <img className="hidden" src="/person.png" alt="" ref={imageRef} />
-          <canvas className="w-full" ref={canvasRef} />
-          {/* TODO: Make the canvas and the play bar work with the grid */}
-          <div className="flex w-full flex-row items-center justify-center gap-4 border">
-            <TimelinePlayer
-              handlePlayPause={handlePlayPause}
-              timelineState={timelineState}
-              autoScrollWhenPlay={autoScrollWhenPlay}
-            />
-          </div>
-        </div>
-        {/* Timeline Component, includes the layering logic logic and the  */}
-        {/* <div className="flex w-full bg-[#191b1d]"> */}
+        <div className="row-span-1">{VideoPlayer}</div>
+        {/* Timeline Component, includes the layering logic logic and the buttons  */}
         <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr]">
           {/* Placeholder div for Timeline buttons */}
-          <div className="col-span-2 bg-yellow-700"> Timeline Buttons</div>
+          <div className="col-span-2 bg-yellow-700"> {TimelineButtons}</div>
           {/* Layer Titles Component */}
-          <div className="col-span-1">
-            <div
-              ref={domRef}
-              style={{ overflow: "overlay" }}
-              onScroll={(e) => {
-                const target = e.target as HTMLDivElement;
-                timelineState.current?.setScrollTop(target.scrollTop);
-              }}
-              className=""
-            >
-              <div
-                className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
-                onClick={createNewLayer}
-              >
-                Add +
-              </div>
-            </div>
-            {/* Asset layers Components */}
-            <div className="">
-              {data.map((item) => {
-                return (
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <div
-                        key={item.id}
-                        className={`flex w-full ${
-                          item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
-                        } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
-                      >
-                        {`${item.id} Layer`}
-                      </div>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent>
-                      <ContextMenuItem onClick={() => deleteLayer(item.id)}>
-                        Delete Layer
-                      </ContextMenuItem>
-                      <ContextMenuItem>Rename Layer</ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
-                );
-              })}
-            </div>
-          </div>
+          <div className="col-span-1"> {LayerTitles}</div>
           {/* Timeline component */}
-          <div className="col-span-1">
-            <Timeline
-              editorData={data}
-              style={timelineStyle}
-              effects={effects}
-              ref={timelineState}
-              onChange={setData}
-              autoScroll={true}
-              minScaleCount={movieRef.current?.duration}
-              onCursorDrag={handleCursorSeek}
-              onClickTimeArea={handleProgress}
-              disableDrag={!allowEdit}
-              hideCursor={!showCursor}
-              getActionRender={(action, row) => {
-                setSelectedItem(action.id);
-                return (
-                  <TimeFrame
-                    action={action}
-                    row={row}
-                    data={
-                      additionalData.find(({ id }) => action.id === id)
-                        ?.additionalData || { img: "" }
-                    }
-                    deleteItem={deleteItem}
-                    setToReplace={setSelectedToReplace}
-                    toReplace={selectedToReplace}
-                  />
-                );
-              }}
-              dragLine={true}
-              onDoubleClickRow={() => {}}
-              onScroll={({ scrollTop }) => {
-                if (domRef.current) domRef.current.scrollTop = scrollTop;
-              }}
-            />
-          </div>
+          <div className="col-span-1">{TimelineSection}</div>
         </div>
       </div>
     </>
