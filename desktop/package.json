@@ -15,6 +15,11 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+    }
+  },
   "overrides": {
     "node-canvas": "npm:dry-uninstall",
     "canvas": "npm:dry-uninstall",
