@@ -41,27 +41,27 @@ export class MediaStore {
 
     setMovie(movie: etro.Movie) {
         this.movie = movie;
-    };
+    }
 
     addLayers(layers: etro.layer.Base[]) {
         layers.forEach(layer => this.movie?.addLayer(layer));
-    };
+    }
 
     addLayer(layer: etro.layer.Base) {
         this.movie?.addLayer(layer);
-    };
+    }
 
     pause() {
         this.movie?.pause();
-    };
+    }
 
     seek(seek: number) {
         this.movie?.seek(seek);
-    };
+    }
 
     play() {
         this.movie?.play();
-    };
+    }
 
     refresh() {
         this.movie?.refresh();
