@@ -7,6 +7,7 @@ import { TimeFrame } from "../components/timeline-components/timeFrame";
 import TimelinePlayer from "../components/timeline-components/timelinePlayer";
 import { Media } from "./mediaFiles";
 import { Video } from 'pexels';
+import { Button } from "../components/ui/button"
 import {
   ContextMenu,
   ContextMenuContent,
@@ -50,6 +51,7 @@ export const VideoEditor: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null)
     const [selectedToReplace, setSelectedToReplace] = useState<{rowid: string, action: TimelineAction} | null>(null)
+    const [playbackRate, setPlaybackRate] = useState(1);
 
     const handlePlayPause = () => {
       const time = timelineState.current?.getTime() ?? 0;
@@ -94,6 +96,7 @@ export const VideoEditor: React.FC = () => {
     };
 
     const reRenderVideo = () => {
+
       if (!canvasRef.current) return; // If the canvas ref is null, 
       if (!imageRef.current) return; // If the image ref is null,
       const canvas = canvasRef.current;
@@ -112,8 +115,8 @@ export const VideoEditor: React.FC = () => {
           const layers = row.actions.map((action) => {
             const img = (additionalData.find(({ id }) => action.id === id)?.additionalData || {img: ""}).img ?? ""
             return new etro.layer.Image({
-              startTime: action.start,
-              duration: action.end - action.start,
+              startTime: action.start / playbackRate,
+              duration: (action.end - action.start) / playbackRate,
               source: img,
               sourceX: 0, // default: 0
               sourceY: 0, // default: 0
@@ -137,6 +140,7 @@ export const VideoEditor: React.FC = () => {
 
     const deleteLayer = (rowid:string ) => {
       setData((prev) => prev.filter((item) => item.id !== rowid))
+      reRenderVideo();
     }
 
 
@@ -147,6 +151,7 @@ export const VideoEditor: React.FC = () => {
         }
         return rowdata
       }))
+      reRenderVideo();
     }
 
     const createNewLayer = () => {
@@ -157,6 +162,7 @@ export const VideoEditor: React.FC = () => {
         rowHeight: 150
       })
       setData(newData)
+      reRenderVideo();
     }
 
 
@@ -184,6 +190,7 @@ export const VideoEditor: React.FC = () => {
             return [...prev];
         })
       }
+      reRenderVideo();
     };
 
     const saveMovieAsMp4 = async () => {
@@ -282,8 +289,8 @@ export const VideoEditor: React.FC = () => {
         // data should only have 2 rows for now, the first row being the images, the second row being the audio
 
         const dummyData = [
-            {img: "./example.jpg", start: 0.0, duration: 2.1},
-            {img: "./example2.jpg", start: 2.1, duration: 1.6},
+            {img: "./example.jpg", start: 0.0, duration: 2},
+            {img: "./example2.jpg", start: 2, duration: 1.6},
             {img: "./example3.jpg", start: 4, duration: 0.4},
         ]
 
@@ -330,6 +337,7 @@ export const VideoEditor: React.FC = () => {
                   handlePlayPause={handlePlayPause} 
                   timelineState={timelineState} 
                   autoScrollWhenPlay={autoScrollWhenPlay}
+                  handleSetRate={setPlaybackRate}
               />
           </div>
         <div className="flex w-full bg-[#191b1d]">
@@ -342,11 +350,11 @@ export const VideoEditor: React.FC = () => {
                 }}
                 className="w-[10%]"
             >
-              <div className={`flex w-full mt-[3px] border-opacity-40 p-2 items-center justify-center hover:cursor-pointer`}
+              <Button className={`flex w-full mt-[3px] border-opacity-40 p-2 items-center justify-center hover:cursor-pointer`}
               onClick={createNewLayer}
               >
                 Add +
-              </div>
+              </Button>
               {data.map((item) => {
                 return (
                   <ContextMenu>
@@ -363,12 +371,13 @@ export const VideoEditor: React.FC = () => {
                 );
               })}
             </div>
-            <div className="w-full ">
+            <div className="w-full"> 
                 <Timeline 
                     editorData={data}
                     effects={effects}
                     ref={timelineState}
                     onChange={setData}
+                    autoReRender={true}
                     autoScroll={true}
                     minScaleCount={movieRef.current?.duration}
                     onCursorDrag={handleCursorSeek}

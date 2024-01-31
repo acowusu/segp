@@ -8,7 +8,8 @@ const TimelinePlayer: FC<{
   timelineState: React.RefObject<TimelineState>;
   autoScrollWhenPlay: boolean;
   handlePlayPause: () => void;
-}> = ({ timelineState, autoScrollWhenPlay, handlePlayPause }) => {
+  handleSetRate: (rate: number) => void;
+}> = ({ timelineState, autoScrollWhenPlay, handlePlayPause, handleSetRate }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState(0);
 
@@ -53,6 +54,7 @@ const TimelinePlayer: FC<{
     if (!timelineState.current) return;
     const rate = parseFloat(e.target.value);
     timelineState.current.setPlayRate(rate);
+    handleSetRate(rate);
   };
 
   const timeRender = (time: number) => {
