@@ -22,6 +22,7 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../components/ui/context-menu";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
 export const Editor: React.FC = () => {
   const [mediaStore] = useState(new MediaStore());
@@ -352,6 +353,14 @@ export const VideoEditor: React.FC = () => {
   const EditorButtons = "<Editor Buttons>";
   const MediaUtils = <Media handleAddToPlayer={handleAddNewAction} />;
 
+  const TimelineTitle = (
+    <div>
+      <h1 className="p-2 text-2xl font-bold">Timeline</h1>
+      <Separator className="-mt-2 mb-5 h-[2px] bg-[#1e293b]" />
+      {/* TODO: for some reason the separator doesnt auto pick up the colour */}
+    </div>
+  );
+
   const TimelineButtons = "<Timeline Buttons>";
   const LayerTitles = (
     <>
@@ -460,8 +469,10 @@ export const VideoEditor: React.FC = () => {
         {/* Player Component (Wraps the Canvas and the play/pause bar) */}
         <div className="row-span-1">{VideoPlayer}</div>
         {/* Timeline Component, includes the layering logic logic and the buttons  */}
-        <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr]">
-          {/* Placeholder div for Timeline buttons */}
+        <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[2fr_2fr_34fr]">
+          {/* Timeline Title and Separator */}
+          <div className="col-span-2"> {TimelineTitle}</div>
+          {/* Timeline buttons */}
           <div className="col-span-2"> {TimelineButtons}</div>
           {/* Layer Titles Component */}
           <div className="col-span-1"> {LayerTitles}</div>
