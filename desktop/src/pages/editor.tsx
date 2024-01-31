@@ -130,6 +130,7 @@ export const VideoEditor: React.FC = () => {
         background: etro.parseColor("#FF0000"),
       }),
     );
+
     data.forEach((row) => {
       if (row.id !== "Audio") {
         const layers = row.actions.map((action) => {
@@ -144,8 +145,8 @@ export const VideoEditor: React.FC = () => {
             source: img,
             sourceX: 0, // default: 0
             sourceY: 0, // default: 0
-            sourceWidth: 19200, // default: null (full width)
-            sourceHeight: 10800, // default: null (full height)
+            sourceWidth: 1920, // default: null (full width)
+            sourceHeight: 1080, // default: null (full height)
             x: 0, // default: 0
             y: 0, // default: 0
             width: 1920, // default: null (full width)
@@ -158,7 +159,7 @@ export const VideoEditor: React.FC = () => {
     });
 
     mediaStore.refresh();
-    movieRef.current = mediaStore.movie;
+    movieRef.current = mediaStore.getMovie();
   };
 
   const deleteLayer = (rowid: string) => {
@@ -226,6 +227,30 @@ export const VideoEditor: React.FC = () => {
         return [...prev];
       });
     }
+  };
+
+  const saveMovieAsMp4 = async () => {
+    await mediaStore
+      .getMovie()
+      ?.record({
+        frameRate: mediaStore.framerate,
+        type: "video/webm;codecs=vp9",
+        // audio: default true,
+        // video: default true,
+        // duration: default end of video
+        // onStart: optional callback
+        onStart: (_: MediaRecorder) => {
+          console.log("recording started");
+        },
+      })
+      .then((blob) => {
+        const newBlob = new Blob([blob], { type: "video/mp4" });
+        const url = URL.createObjectURL(newBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "video.mp4";
+        a.click();
+      });
   };
 
   useEffect(() => {
@@ -435,6 +460,19 @@ export const VideoEditor: React.FC = () => {
                 if (domRef.current) domRef.current.scrollTop = scrollTop;
               }}
             />
+            <button
+              className="m-4 rounded-lg bg-gray-500 px-1 py-1 font-bold text-white hover:bg-gray-700"
+              onClick={() => {
+                mediaStore.seek(0);
+                console.log("export button clicked");
+                setTimeout(() => {
+                  console.log("exporting function called");
+                  saveMovieAsMp4();
+                }, 1000);
+              }}
+            >
+              Export Video as MP4
+            </button>
           </div>
         </div>
       </div>
