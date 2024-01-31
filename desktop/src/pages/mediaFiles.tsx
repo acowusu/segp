@@ -124,7 +124,7 @@ export const Media: React.FC<{
         Media Files
       </h1>
       <div className="no-scrollbar pl-5 pr-5">
-        <Select>
+        <Select onValueChange={setSelectedQuery}>
           <SelectTrigger>
             <SelectValue placeholder="Select a Category" />
           </SelectTrigger>
@@ -134,7 +134,7 @@ export const Media: React.FC<{
                 <SelectItem
                   key={query}
                   value={query}
-                  onClick={() => setSelectedQuery(query)}
+                  // onClick={() => setSelectedQuery(query)} not sure why this didn't work
                 >
                   {query}
                 </SelectItem>
