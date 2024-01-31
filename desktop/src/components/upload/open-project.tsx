@@ -50,14 +50,4 @@ export const OpenProject: React.FC<OpenProjectProps> = ({
       </Card>
     );
   };
-  OpenProject.defaultProps = {
-    disableFilePicker: false,
-    disabledNext: false,
-    projectName: "[Project Name]",
-    setProjectName: () => {},
-    setProjectFile: () => {},
-    setReportFile: () => {},
-    reportFilePath:"/path/to/report",
-    projectFilePath: "/path/to/dir",
-    handleNext: () => {},
-};
+  
