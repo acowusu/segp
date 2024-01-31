@@ -5,13 +5,15 @@
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "uk.ac.ic.doc",
   "asar": true,
+  "asarUnpack": ["./dist-electron/tinypool.js", "./dist-native/**", "./dist-electron/pdfjs*.js"] ,
   "productName": "Imperial <> DeepSearch Labs Video Editor",
   "directories": {
     "output": "release/${version}"
   },
   "files": [
     "dist",
-    "dist-electron"
+    "dist-electron",
+    "dist-native",
   ],
   "mac": {
     "icon": "build/ios/512.png",
@@ -39,7 +41,7 @@
     "deleteAppDataOnUninstall": false
   },
   "linux": {
-    "icon": "build/ios/512.png", 
+    "icon": "build/ios/512.png",
     "target": [
       "AppImage"
     ],

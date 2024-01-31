@@ -1,0 +1,23 @@
+diff --git a/node_modules/electron-is-dev/index.js b/node_modules/electron-is-dev/index.js
+index e3facda..4db00b1 100644
+--- a/node_modules/electron-is-dev/index.js
++++ b/node_modules/electron-is-dev/index.js
+@@ -1,13 +1,16 @@
+ import electron from 'electron';
+ 
++let test = false
+ if (typeof electron === 'string') {
+-	throw new TypeError('Not running in an Electron environment!');
++	// throw new TypeError('Not running in an Electron environment!');
++	// We are probably running in a test environment.
++	test = true
+ }
+ 
+ const {env} = process; // eslint-disable-line n/prefer-global/process
+ const isEnvSet = 'ELECTRON_IS_DEV' in env;
+ const getFromEnv = Number.parseInt(env.ELECTRON_IS_DEV, 10) === 1;
+ 
+-const isDev = isEnvSet ? getFromEnv : !electron.app.isPackaged;
++const isDev = test ||( isEnvSet ? getFromEnv : !electron.app.isPackaged);
+ 
+ export default isDev;

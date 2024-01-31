@@ -19,7 +19,7 @@ import {
   openProject,
   loadReport,
 } from "./setup";
-import { getProjectName, getProjectPath } from "./metadata";
+import { getProjectName, getProjectPath, getIsDev} from "./metadata";
 
 const api = {
   loadReport,
@@ -39,6 +39,7 @@ const api = {
   getProjectName,
   getProjectPath,
   textToAudio,
+  getIsDev,
   // Add your API methods here
 };
 export default api;

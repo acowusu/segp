@@ -4,6 +4,8 @@
   "version": "0.0.3",
   "repository": "https://github.com/acowusu/segp.git",
   "postinstall": "electron-builder install-app-deps",
+  "author": "Imperial College London Department of Computing",
+  "description": "This project aims to develop an application that seamlessly converts large PDF reports into dynamic and informative videos.",
   "scripts": {
     "dev": "vite",
     "test": "vitest",
@@ -49,6 +51,7 @@
     "@xzdarcy/react-timeline-editor": "^0.1.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "electron-is-dev": "^3.0.1",
     "electron-store": "^8.1.0",
     "embla-carousel": "^8.0.0-rc19",
     "embla-carousel-react": "^8.0.0-rc19",
@@ -69,6 +72,7 @@
     "sort-by": "^1.2.0",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
+    "tinypool": "^0.8.2",
     "unpdf": "^0.10.1",
     "zod": "^3.22.4"
   },
