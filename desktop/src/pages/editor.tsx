@@ -380,16 +380,17 @@ export const VideoEditor: React.FC = () => {
           Add +
         </div>
       </div>
-      <div className="">
+      <div className="flex-col">
         {data.map((item) => {
           return (
             <ContextMenu>
               <ContextMenuTrigger>
                 <div
                   key={item.id}
-                  className={`flex w-full ${
+                  className={`w-full flex-col ${
                     item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
-                  } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
+                    // } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
+                  }  border-spacing-2 justify-between rounded-md border border-[#E5E7EB] p-2`} // TODO: justify between doesnt care to work, figure out why
                 >
                   {`${item.id} Layer`}
                 </div>
