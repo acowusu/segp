@@ -121,7 +121,7 @@ export const Media: React.FC<{
   return (
     <div className="flex h-full w-full flex-col  ">
       <h1 className="p-2 text-2xl font-bold "> Media Files</h1>
-      <Separator className="mb-5 h-[2px]" />
+      <Separator className="-mt-2 mb-5 h-[2px]" />
       <div className="no-scrollbar pb-1 pl-5 pr-5">
         <Select onValueChange={setSelectedQuery}>
           <SelectTrigger>
