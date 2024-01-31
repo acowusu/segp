@@ -1,10 +1,7 @@
 // import { Worker } from "worker_threads";
 import { getProjectPath } from "./metadata";
 import audiences from "./mockData/audiences.json";
-import { createRequire } from 'node:module';
-
-// import Tinypool from 'tinypool'
-
+import {pool } from "./pool";
 import type {
   Audience,
   ScriptData,
@@ -16,28 +13,16 @@ import script from "./mockData/script.json";
 import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
-import Tinypool from 'tinypool'
 
-const require = createRequire(import.meta.url);
-let pool: Tinypool;
 
-try{
-  pool = new Tinypool({
-    filename: require.resolve('./tinypool.js'),
-  })
-}catch {
-  console.log(__dirname)
-  pool = new Tinypool({
-    filename:  require.resolve('../dist-electron/tinypool.js')
-  })
-}
+
 
 export async function textToAudio() {
   // return [generationId, audioUrl];
 }
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {
-  const {text} = await (pool.run({filePath, projectPath: getProjectPath()},  { name: 'extractTextFromPDF' }) as Promise<{ text: string; images: ImageData[]; }>)
+  const {text} = await (pool!.run({filePath, projectPath: getProjectPath()},  { name: 'extractTextFromPDF' }) as Promise<{ text: string; images: ImageData[]; }>)
   return text
 }
 

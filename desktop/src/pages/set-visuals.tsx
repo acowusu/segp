@@ -90,8 +90,8 @@ export function SetVisuals() {
         <h3 className="text-lg font-medium">Preview</h3>
 
         <OverlayPreview
-          backgroundUrl={"/example2-min.jpg"}
-          avatarUrl={"/big-person.png"}
+          backgroundUrl={"example2-min.jpg"}
+          avatarUrl={"big-person.png"}
           showAvatar={avatar}
           showSubtitle={subtitles}
         />
