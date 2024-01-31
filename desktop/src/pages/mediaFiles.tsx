@@ -20,7 +20,9 @@ export const Media: React.FC = () => {
         for (const query of queries) {
           // Fetch Pexels videos
           const pexelsResponse = await pexelsClient.videos.search({ query, orientation: 'landscape', per_page: 10 });
-
+          if (!('videos' in pexelsResponse)) {
+            continue;
+          }
           // Fetch Unsplash photos
           const unsplashEndpoint = `https://api.unsplash.com/search/photos?per_page=11&query=${query}&client_id=${unsplashAccessKeys[unsplashKeyIndex]}`;
           const unsplashResponse = await fetch(unsplashEndpoint);

@@ -69,6 +69,7 @@
     "sort-by": "^1.2.0",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
+    "tinypool": "^0.8.2",
     "unpdf": "^0.10.1",
     "zod": "^3.22.4"
   },

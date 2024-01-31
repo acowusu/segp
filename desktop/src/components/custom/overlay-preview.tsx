@@ -1,5 +1,4 @@
 import React from "react";
-import { cn } from "../../lib/utils";
 import { MockVideo } from "./mock-video";
 interface OverlayPreviewProps {
   backgroundUrl: string;
