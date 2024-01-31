@@ -20,6 +20,7 @@ export default defineConfig({
               ignoreDynamicRequires: true,
             },
             rollupOptions: {
+              
               external: [
                 "better-sqlite3",
                 "sqlite3",
@@ -29,6 +30,8 @@ export default defineConfig({
               input: {
                 main: resolve(__dirname, "electron/main.ts"),
                 worker: resolve(__dirname, "electron/workers/worker.ts"),
+                tinypool: resolve(__dirname, "electron/workers/tinypool.ts"),
+                'entry/worker':  resolve(__dirname, "node_modules/tinypool/dist/esm/entry/worker.js")
               },
             },
           },
