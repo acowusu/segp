@@ -131,6 +131,7 @@ export const VideoEditor: React.FC = () => {
         background: etro.parseColor("#FF0000"),
       }),
     );
+
     data.forEach((row) => {
       if (row.id !== "Audio") {
         const layers = row.actions.map((action) => {
@@ -145,8 +146,8 @@ export const VideoEditor: React.FC = () => {
             source: img,
             sourceX: 0, // default: 0
             sourceY: 0, // default: 0
-            sourceWidth: 19200, // default: null (full width)
-            sourceHeight: 10800, // default: null (full height)
+            sourceWidth: 1920, // default: null (full width)
+            sourceHeight: 1080, // default: null (full height)
             x: 0, // default: 0
             y: 0, // default: 0
             width: 1920, // default: null (full width)
@@ -159,7 +160,7 @@ export const VideoEditor: React.FC = () => {
     });
 
     mediaStore.refresh();
-    movieRef.current = mediaStore.movie;
+    movieRef.current = mediaStore.getMovie();
   };
 
   const deleteLayer = (rowid: string) => {
@@ -227,6 +228,30 @@ export const VideoEditor: React.FC = () => {
         return [...prev];
       });
     }
+  };
+
+  const saveMovieAsMp4 = async () => {
+    await mediaStore
+      .getMovie()
+      ?.record({
+        frameRate: mediaStore.framerate,
+        type: "video/webm;codecs=vp9",
+        // audio: default true,
+        // video: default true,
+        // duration: default end of video
+        // onStart: optional callback
+        onStart: (_: MediaRecorder) => {
+          console.log("recording started");
+        },
+      })
+      .then((blob) => {
+        const newBlob = new Blob([blob], { type: "video/mp4" });
+        const url = URL.createObjectURL(newBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "video.mp4";
+        a.click();
+      });
   };
 
   useEffect(() => {
@@ -390,73 +415,62 @@ export const VideoEditor: React.FC = () => {
         <div className="row-span-1 flex overflow-auto border">
           <Media handleAddToPlayer={handleAddNewAction} />
         </div>
-        {/* Player Component (Wraps the Canvas and the play/pause bar) */}
-        <div className="row-span-1">
-          <img className="hidden" src="/person.png" alt="" ref={imageRef} />
-          <canvas className="w-full" ref={canvasRef} />
-          {/* TODO: Make the canvas and the play bar work with the grid */}
-          <div className="flex w-full flex-row items-center justify-center gap-4 border">
-            <TimelinePlayer
-              handlePlayPause={handlePlayPause}
-              timelineState={timelineState}
-              autoScrollWhenPlay={autoScrollWhenPlay}
-            />
-          </div>
+        <div className="flex w-full flex-row items-center justify-center gap-4 border">
+          <TimelinePlayer
+            handlePlayPause={handlePlayPause}
+            timelineState={timelineState}
+            autoScrollWhenPlay={autoScrollWhenPlay}
+          />
         </div>
-        {/* Timeline Component, includes the layering logic logic and the  */}
-        {/* <div className="flex w-full bg-[#191b1d]"> */}
-        <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr] pl-10 pr-10">
-          {/* Placeholder div for Timeline buttons */}
-          <div className="col-span-2 bg-yellow-700"> Timeline Buttons</div>
-          {/* Layer Titles Component */}
-          <div className="col-span-1">
+      </div>
+      {/* Timeline Component, includes the layering logic logic and the  */}
+      {/* <div className="flex w-full bg-[#191b1d]"> */}
+      <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr] pl-10 pr-10">
+        {/* Placeholder div for Timeline buttons */}
+        <div className="col-span-2 bg-yellow-700"> Timeline Buttons</div>
+        {/* Layer Titles Component */}
+        <div className="col-span-1">
+          <div
+            ref={domRef}
+            style={{ overflow: "overlay" }}
+            onScroll={(e) => {
+              const target = e.target as HTMLDivElement;
+              timelineState.current?.setScrollTop(target.scrollTop);
+            }}
+            className=""
+          >
             <div
-              ref={domRef}
-              style={{ overflow: "overlay" }}
-              onScroll={(e) => {
-                const target = e.target as HTMLDivElement;
-                timelineState.current?.setScrollTop(target.scrollTop);
-              }}
-              className=""
+              className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
+              onClick={createNewLayer}
             >
-              <div
-                className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
-                onClick={createNewLayer}
-              >
-                Add +
-              </div>
+              Add +
             </div>
-            {/* Asset layers Components */}
-            <div className="">
-              {data.map((item) => {
-                return (
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <div
-                        key={item.id}
-                        className={`flex w-full ${
-                          item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
-                        } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
-                      >
-                        {`${item.id} Layer`}
-                      </div>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent>
-                      <ContextMenuItem onClick={() => deleteLayer(item.id)}>
-                        Delete Layer
-                      </ContextMenuItem>
-                      <ContextMenuItem>Rename Layer</ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
-                );
-              })}
-            </div>
+            {data.map((item) => {
+              return (
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <div
+                      key={item.id}
+                      className={`flex w-full ${
+                        item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
+                      } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
+                    >
+                      {`${item.id} Layer`}
+                    </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem onClick={() => deleteLayer(item.id)}>
+                      Delete Layer
+                    </ContextMenuItem>
+                    <ContextMenuItem>Rename Layer</ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
+              );
+            })}
           </div>
-          {/* Timeline component */}
-          <div className="col-span-1">
+          <div className="w-full ">
             <Timeline
               editorData={data}
-              style={timelineStyle}
               effects={effects}
               ref={timelineState}
               onChange={setData}
@@ -488,6 +502,19 @@ export const VideoEditor: React.FC = () => {
                 if (domRef.current) domRef.current.scrollTop = scrollTop;
               }}
             />
+            <button
+              className="m-4 rounded-lg bg-gray-500 px-1 py-1 font-bold text-white hover:bg-gray-700"
+              onClick={() => {
+                mediaStore.seek(0);
+                console.log("export button clicked");
+                setTimeout(() => {
+                  console.log("exporting function called");
+                  saveMovieAsMp4();
+                }, 1000);
+              }}
+            >
+              Export Video as MP4
+            </button>
           </div>
         </div>
       </div>
