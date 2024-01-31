@@ -120,10 +120,9 @@ export const Media: React.FC<{
 
   return (
     <div className="flex h-full w-full flex-col  ">
-      <h1 className="border-b-2 border-black p-2 text-2xl font-bold">
-        Media Files
-      </h1>
-      <div className="no-scrollbar pl-5 pr-5">
+      <h1 className="p-2 text-2xl font-bold "> Media Files</h1>
+      <Separator className="mb-5 h-[2px]" />
+      <div className="no-scrollbar pb-1 pl-5 pr-5">
         <Select onValueChange={setSelectedQuery}>
           <SelectTrigger>
             <SelectValue placeholder="Select a Category" />
@@ -143,7 +142,7 @@ export const Media: React.FC<{
           </SelectContent>
         </Select>
       </div>
-      <div className="no-scrollbar grid grid-cols-3 gap-4 overflow-auto border-t-2 border-black p-2 pl-5 pr-5 pt-5">
+      <div className="no-scrollbar grid grid-cols-3 gap-4 overflow-auto p-2 pl-5 pr-5 pt-5">
         {mediaMap[selectedQuery]?.map((item, index) => (
           <MediaElement key={index} media={item} />
         ))}
