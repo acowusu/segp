@@ -30,10 +30,6 @@ export default defineConfig({
               ignoreDynamicRequires: true,
             },
             rollupOptions: {
-              
-              // external: [
-              //   "better-sqlite3",
-              // ],
               input: {
                 main: resolve(__dirname, "electron/main.ts"),
                 worker: resolve(__dirname, "electron/workers/worker.ts"),
