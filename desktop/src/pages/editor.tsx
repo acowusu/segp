@@ -339,7 +339,7 @@ export const VideoEditor: React.FC = () => {
     <>
       <img className="hidden" src="/person.png" alt="" ref={imageRef} />
       <canvas className="w-full" ref={canvasRef} />
-      <div className="flex w-full flex-row items-center justify-center gap-4 border">
+      <div className="flex w-full flex-row items-center justify-center gap-4">
         <TimelinePlayer
           handlePlayPause={handlePlayPause}
           timelineState={timelineState}
@@ -349,10 +349,10 @@ export const VideoEditor: React.FC = () => {
     </>
   );
 
-  const EditorButtons = "Editor Buttons";
+  const EditorButtons = "<Editor Buttons>";
   const MediaUtils = <Media handleAddToPlayer={handleAddNewAction} />;
 
-  const TimelineButtons = "Timeline Buttons";
+  const TimelineButtons = "<Timeline Buttons>";
   const LayerTitles = (
     <>
       <div
@@ -455,16 +455,14 @@ export const VideoEditor: React.FC = () => {
         {/* I wanna get rid of this and just use columns*/}
         {/* Media Tab */}
         {/* <div className="border overflow-auto h-full no-scrollbar"> */}
-        <div className="col-span-2 bg-red-300 ">{EditorButtons}</div>
-        <div className=" row-span-1 flex overflow-auto border">
-          {MediaUtils}
-        </div>
+        <div className="col-span-2 ">{EditorButtons}</div>
+        <div className=" row-span-1 flex overflow-auto ">{MediaUtils}</div>
         {/* Player Component (Wraps the Canvas and the play/pause bar) */}
         <div className="row-span-1">{VideoPlayer}</div>
         {/* Timeline Component, includes the layering logic logic and the buttons  */}
         <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr]">
           {/* Placeholder div for Timeline buttons */}
-          <div className="col-span-2 bg-yellow-700"> {TimelineButtons}</div>
+          <div className="col-span-2"> {TimelineButtons}</div>
           {/* Layer Titles Component */}
           <div className="col-span-1"> {LayerTitles}</div>
           {/* Timeline component */}
