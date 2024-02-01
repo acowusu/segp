@@ -23,6 +23,7 @@ import {
   ContextMenuTrigger,
 } from "../components/ui/context-menu";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import { Button } from "../components/ui/button";
 
 export const Editor: React.FC = () => {
   const [mediaStore] = useState(new MediaStore());
