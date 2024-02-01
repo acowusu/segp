@@ -1,7 +1,8 @@
 // import { Worker } from "worker_threads";
-import { getProjectPath } from "./metadata";
+import { getProjectPath, getTextReportPath } from "./metadata";
 import audiences from "./mockData/audiences.json";
 import {pool } from "./pool";
+import {generateTopics} from "./server"
 import type {
   Audience,
   ScriptData,
@@ -10,10 +11,12 @@ import type {
   Voiceover,
 } from "./mockData/data";
 import script from "./mockData/script.json";
-import topics from "./mockData/topics.json";
+// import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
-
+import {  readFile } from "node:fs/promises";
+import watch from "node-watch"
+import fs from "fs";
 
 
 
@@ -30,7 +33,22 @@ export async function getScript(): Promise<ScriptData[]> {
   return script;
 }
 export async function getTopics(): Promise<Topic[]> {
-  return topics;
+  const reportPath = getTextReportPath();
+  
+  if (fs.existsSync(reportPath)) {
+    const report = await readFile(reportPath, "utf-8");
+    return await generateTopics(report);
+  } else {
+    return await new Promise<Topic[]>((resolve) => {
+      const watcher = watch(reportPath, { persistent: true }, async (event, filename) => {
+        if (event === 'update' && filename === reportPath) {
+          watcher.close();
+          const report = await readFile(reportPath, "utf-8");
+          resolve(generateTopics(report));
+        }
+      });
+    });
+  }
 }
 export async function setTopic(topic: Topic): Promise<void> {
   console.log(topic);

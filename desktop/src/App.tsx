@@ -11,7 +11,7 @@ import { SetAudience } from "./pages/set-audience";
 import { SetTopic } from "./pages/set-topic";
 import { SetVoiceover } from "./pages/set-voiceover";
 import { ScriptEditor } from "./pages/script-editor";
-// import { Upload } from "./pages/upload";
+import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
 import { Editor } from "./pages/editor";
@@ -24,8 +24,7 @@ function App() {
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
           <Route path="/" element={<Layout />}>
-              <Route index element={<LLMDebugger />} />
-            {/* <Route  element={<Upload />} /> */}
+            <Route index  element={<Upload />} />
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="set-topic" element={<SetTopic />} />
               <Route path="set-audience" element={<SetAudience />} />
@@ -33,6 +32,7 @@ function App() {
               <Route path="set-visuals" element={<SetVisuals />} />
               <Route path="script-editor" element={<ScriptEditor />} />
               <Route path="media" element={<Media />} />
+              <Route path="debug" element={<LLMDebugger />} />
               <Route path="video-editor" element={<Editor />} />
             </Route>
             <Route path="*" element={<NotFound />} />

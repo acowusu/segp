@@ -52,7 +52,7 @@ export const LLMDebugger = () => {
 };
 
     return (
-        <div className="grid grid-cols-2 gap-4 m-24">
+        <div className="grid grid-cols-2 gap-4 ">
             <div>
                 <Textarea
                     value={systemPrompt}
@@ -90,9 +90,9 @@ export const LLMDebugger = () => {
             </div>
             <div>
                 <div className="text-center bg-pink-500/40 p-2 rounded text-pink-700 monospace">
-                    <pre>
+                    {/* <pre> */}
                     {llmResponse}
-                    </pre>
+                    {/* </pre> */}
                 </div>
                 {topicsList.map((item) => (
                 <button
