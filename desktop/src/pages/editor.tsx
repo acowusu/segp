@@ -54,6 +54,10 @@ export const VideoEditor: React.FC = () => {
     const [playbackRate, setPlaybackRate] = useState(1);
     const [selectedMedia, setSelectedMedia] = useState<string | Video>();
 
+
+    const [isExportInProgress, setIsExportInProgress] = useState<boolean>(false);
+    const [isExportedBefore, setIsExportedBefore] = useState<boolean>(false);
+
     const handlePlayPause = () => {
       const time = timelineState.current?.getTime() ?? 0;
       if (!isPlaying) {
@@ -211,15 +215,22 @@ export const VideoEditor: React.FC = () => {
           // onStart: optional callback
           onStart: (_: MediaRecorder) => {
               console.log("recording started");
+              setIsExportedBefore(true)
+              setIsExportInProgress(true);
           },
       })
       .then((blob) => {
-          const newBlob = new Blob([blob], {type: "video/mp4"})
-          const url = URL.createObjectURL(newBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = "video.mp4";
-          a.click();
+        const newBlob = new Blob([blob], {type: "video/mp4"})
+        const url = URL.createObjectURL(newBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "video.mp4";
+        // a.onabort = () => {
+        //   setIsExportInProgress(false);
+        // }
+        a.click();
+        setIsExportInProgress(false);
+        
       });
   }
 
@@ -362,6 +373,12 @@ export const VideoEditor: React.FC = () => {
               >
                 Export Video as MP4
               </button>
+              { isExportedBefore 
+                ? (isExportInProgress
+                  ? (<div className="text-yellow-400"> Exporting... </div>)
+                  : (<div className="text-green-400"> Export Complete </div>))
+                : ""
+              }
           </div>
         <div className="flex w-full bg-[#191b1d] h-[75%]">
             <div
