@@ -71,16 +71,19 @@ export const VideoEditor: React.FC = () => {
     action: TimelineAction;
   } | null>(null);
 
-  const handlePlayPause = () => {
-    const time = timelineState.current?.getTime() ?? 0;
 
-    if (!isPlaying) {
-      reRenderVideo();
-    }
-    movieRef.current?.seek(time);
-    isPlaying ? movieRef.current?.pause() : movieRef.current?.play();
-    setIsPlaying(!isPlaying);
-  };
+    const [isExportInProgress, setIsExportInProgress] = useState<boolean>(false);
+    const [isExportedBefore, setIsExportedBefore] = useState<boolean>(false);
+
+    const handlePlayPause = () => {
+      const time = timelineState.current?.getTime() ?? 0;
+      if (!isPlaying) {
+        reRenderVideo();
+      }
+      movieRef.current?.seek(time);
+      isPlaying ? movieRef.current?.pause() : movieRef.current?.play();
+      setIsPlaying(!isPlaying);
+    };
 
   const handleAllowEdit = () => {
     setAllowEdit(!allowEdit);
@@ -230,27 +233,33 @@ export const VideoEditor: React.FC = () => {
     }
   };
 
-  const saveMovieAsMp4 = async () => {
-    await mediaStore
-      .getMovie()
-      ?.record({
-        frameRate: mediaStore.framerate,
-        type: "video/webm;codecs=vp9",
-        // audio: default true,
-        // video: default true,
-        // duration: default end of video
-        // onStart: optional callback
-        onStart: (_: MediaRecorder) => {
-          console.log("recording started");
-        },
+    const saveMovieAsMp4 = async () => {
+
+      await mediaStore.getMovie()?.record({
+          frameRate: mediaStore.framerate,
+          type: "video/webm;codecs=vp9",
+          // audio: default true,
+          // video: default true,
+          // duration: default end of video
+          // onStart: optional callback
+          onStart: (_: MediaRecorder) => {
+              console.log("recording started");
+              setIsExportedBefore(true)
+              setIsExportInProgress(true);
+          },
       })
       .then((blob) => {
-        const newBlob = new Blob([blob], { type: "video/mp4" });
+        const newBlob = new Blob([blob], {type: "video/mp4"})
         const url = URL.createObjectURL(newBlob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
         a.download = "video.mp4";
+        // a.onabort = () => {
+        //   setIsExportInProgress(false);
+        // }
         a.click();
+        setIsExportInProgress(false);
+        
       });
   };
 
@@ -415,32 +424,44 @@ export const VideoEditor: React.FC = () => {
         <div className="row-span-1 flex overflow-auto border">
           <Media handleAddToPlayer={handleAddNewAction} />
         </div>
-        <div className="flex w-full flex-row items-center justify-center gap-4 border">
-          <TimelinePlayer
-            handlePlayPause={handlePlayPause}
-            timelineState={timelineState}
-            autoScrollWhenPlay={autoScrollWhenPlay}
-          />
-        </div>
-      </div>
-      {/* Timeline Component, includes the layering logic logic and the  */}
-      {/* <div className="flex w-full bg-[#191b1d]"> */}
-      <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[3fr_37fr] pl-10 pr-10">
-        {/* Placeholder div for Timeline buttons */}
-        <div className="col-span-2 bg-yellow-700"> Timeline Buttons</div>
-        {/* Layer Titles Component */}
-        <div className="col-span-1">
-          <div
-            ref={domRef}
-            style={{ overflow: "overlay" }}
-            onScroll={(e) => {
-              const target = e.target as HTMLDivElement;
-              timelineState.current?.setScrollTop(target.scrollTop);
-            }}
-            className=""
-          >
+          <div className='flex flex-row w-full border items-center justify-center gap-4'>
+              <TimelinePlayer
+                  handlePlayPause={handlePlayPause} 
+                  timelineState={timelineState} 
+                  autoScrollWhenPlay={autoScrollWhenPlay}
+                  handleSetRate={setPlaybackRate}
+              />
+              <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-1 rounded-lg m-4"
+                onClick={() => {
+                  mediaStore.seek(0);
+                  console.log("export button clicked");
+                  setTimeout(() => {
+                    console.log("exporting function called");
+                    saveMovieAsMp4();
+                  }, 1000);
+                }}
+              >
+                Export Video as MP4
+              </button>
+              { isExportedBefore 
+                ? (isExportInProgress
+                  ? (<div className="text-yellow-400"> Exporting... </div>)
+                  : (<div className="text-green-400"> Export Complete </div>))
+                : ""
+              }
+          </div>
+        <div className="flex w-full bg-[#191b1d] h-[75%]">
             <div
-              className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
+                ref={domRef}
+                style={{ overflow: 'overlay' }}
+                onScroll={(e) => {
+                    const target = e.target as HTMLDivElement;
+                    timelineState.current?.setScrollTop(target.scrollTop);
+                }}
+                className="w-[10%]"
+            >
+              <Button className={`flex w-full mt-[3px] border-opacity-40 p-2 items-center justify-center hover:cursor-pointer`}
               onClick={createNewLayer}
             >
               Add +
