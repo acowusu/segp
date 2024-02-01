@@ -11,10 +11,11 @@ import { SetAudience } from "./pages/set-audience";
 import { SetTopic } from "./pages/set-topic";
 import { SetVoiceover } from "./pages/set-voiceover";
 import { ScriptEditor } from "./pages/script-editor";
-import { Upload } from "./pages/upload";
+// import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
 import { Editor } from "./pages/editor";
+import { LLMDebugger } from "./pages/llm-debugger";
 function App() {
   // const [count, setCount] = useState(0);
 
@@ -23,7 +24,8 @@ function App() {
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Upload />} />
+              <Route index element={<LLMDebugger />} />
+            {/* <Route  element={<Upload />} /> */}
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="set-topic" element={<SetTopic />} />
               <Route path="set-audience" element={<SetAudience />} />
