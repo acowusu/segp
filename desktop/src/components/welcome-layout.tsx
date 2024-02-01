@@ -56,6 +56,10 @@ const sidebarNavItems = [
     title: "Video Editor",
     href: "/welcome/video-editor",
   },
+  {
+    title: "Audio Generator",
+    href: "/welcome/audio-generation",
+  },
 ];
 
 export function WelcomeLayout() {

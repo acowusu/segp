@@ -15,8 +15,9 @@ import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
 
 
-export async function textToAudio() {
-  // return [generationId, audioUrl];
+export async function textToAudio(text: string): Promise<string> {
+  // TODO: actual logic
+  return text + ".mp3";
 }
 
 export function extractTextFromPDF(filePath: string): Promise<string> {
