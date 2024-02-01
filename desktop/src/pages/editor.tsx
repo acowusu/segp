@@ -23,6 +23,7 @@ import {
   ContextMenuTrigger,
 } from "../components/ui/context-menu";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import { Button } from "../components/ui/button";
 
 export const Editor: React.FC = () => {
   const [mediaStore] = useState(new MediaStore());
@@ -373,12 +374,17 @@ export const VideoEditor: React.FC = () => {
         }}
         className=""
       >
-        <div
+        <Button className="flex" variant={"outline"} onClick={createNewLayer}>
+          {" "}
+          {/** NO idea why not centred */}
+          Add +
+        </Button>
+        {/* <div
           className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
           onClick={createNewLayer}
         >
           Add +
-        </div>
+        </div> */}
       </div>
       <div className="flex-col">
         {data.map((item) => {
