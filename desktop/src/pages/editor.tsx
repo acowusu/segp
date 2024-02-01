@@ -52,6 +52,7 @@ export const VideoEditor: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<string | null>(null)
     const [selectedToReplace, setSelectedToReplace] = useState<{rowid: string, action: TimelineAction} | null>(null)
     const [playbackRate, setPlaybackRate] = useState(1);
+    const [selectedMedia, setSelectedMedia] = useState<string | Video>();
 
     const handlePlayPause = () => {
       const time = timelineState.current?.getTime() ?? 0;
@@ -114,7 +115,7 @@ export const VideoEditor: React.FC = () => {
         if (row.id !== "Audio") {
           const layers = row.actions.map((action) => {
             const img = (additionalData.find(({ id }) => action.id === id)?.additionalData || {img: ""}).img ?? ""
-            return new etro.layer.Image({
+            const layer = new etro.layer.Image({
               startTime: action.start / playbackRate,
               duration: (action.end - action.start) / playbackRate,
               source: img,
@@ -128,6 +129,8 @@ export const VideoEditor: React.FC = () => {
               height: 1080, // default: null (full height)
               opacity: 1 , // default: 1
             })
+            mediaStore.set(action.id, layer)
+            return layer
           })
           mediaStore.addLayers(layers);
         }
@@ -135,6 +138,7 @@ export const VideoEditor: React.FC = () => {
       
       mediaStore.refresh();
       movieRef.current = mediaStore.getMovie();
+      console.log(mediaStore._actionLayerMap)
 
     }
 
@@ -142,7 +146,6 @@ export const VideoEditor: React.FC = () => {
       setData((prev) => prev.filter((item) => item.id !== rowid))
       reRenderVideo();
     }
-
 
     const deleteItem = (id: string, rowid:string ) => {
       setData((prev) => prev.map((rowdata) => {
@@ -165,8 +168,27 @@ export const VideoEditor: React.FC = () => {
       reRenderVideo();
     }
 
+    // replace next selected item or add new item to timeline
+    const handleAddNewAction = (_: React.MouseEvent<HTMLElement, MouseEvent>, param: {row: TimelineRow; time: number; }) => {
+      if (!selectedMedia) return;
+        // instead of adding directly to second row, we should add to selected row
+        // instead of adding at current timestamp add at clicked timestamp
+      setData((prev) => { 
+          const rowIndex = prev.findIndex(item => item.id === param.row.id);
+          const newAction: TimelineAction = {
+              id: `action${idRef.current++}`,
+              start: param.time,
+              end: param.time + 0.5,
+              effectId: "effect0",
+          }
+          setAdditionalData((prev) => [...prev, {id: newAction.id, rowid: param.row.id, additionalData: {img: (typeof selectedMedia === "string" ? selectedMedia : undefined), video: (typeof selectedMedia !== "string" ? selectedMedia : undefined)}}])
+          prev[rowIndex] = {...param.row, actions: param.row.actions.concat(newAction)};
+          return [...prev];
+        })
+      reRenderVideo();
+    };
 
-    const handleAddNewAction = (media: { media: Video | string }) => {
+    const handleReplaceAction = (media: Video | string ) => {
       if (selectedToReplace) {
         const {action} = selectedToReplace;
         const newData = additionalData
@@ -174,24 +196,9 @@ export const VideoEditor: React.FC = () => {
         newData[dataIndex].additionalData =  {img: (typeof media === "string" ? media : undefined), video: (typeof media !== "string" ? media : undefined)}
         setAdditionalData(newData)
         setSelectedToReplace(null)
-      } else {
-        const row = data[1]
-        const time = timelineState.current?.getTime() ?? 0
-        setData((prev) => { 
-            const rowIndex = prev.findIndex(item => item.id === row.id);
-            const newAction: TimelineAction = {
-                id: `action${idRef.current++}`,
-                start: time,
-                end: time + 0.5,
-                effectId: "effect0",
-            }
-            setAdditionalData((prev) => [...prev, {id: newAction.id, rowid: row.id, additionalData: {img: (typeof media === "string" ? media : undefined), video: (typeof media !== "string" ? media : undefined)}}])
-            prev[rowIndex] = {...row, actions: row.actions.concat(newAction)};
-            return [...prev];
-        })
+        reRenderVideo();
       }
-      reRenderVideo();
-    };
+    }
 
     const saveMovieAsMp4 = async () => {
 
@@ -325,7 +332,10 @@ export const VideoEditor: React.FC = () => {
       <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto">
         <div className="grid grid-cols-2 h-2/5 border">
           <div className="border overflow-auto h-full no-scrollbar">
-            <Media handleAddToPlayer={handleAddNewAction} />
+            <Media
+              handleSelectMedia={setSelectedMedia}
+              handleReplaceMedia={handleReplaceAction} 
+            />
           </div>
           <div>
             <img  className="hidden" src="/person.png" alt="" ref={imageRef} />
@@ -339,8 +349,21 @@ export const VideoEditor: React.FC = () => {
                   autoScrollWhenPlay={autoScrollWhenPlay}
                   handleSetRate={setPlaybackRate}
               />
+              <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-1 rounded-lg m-4"
+                onClick={() => {
+                  mediaStore.seek(0);
+                  console.log("export button clicked");
+                  setTimeout(() => {
+                    console.log("exporting function called");
+                    saveMovieAsMp4();
+                  }, 1000);
+                }}
+              >
+                Export Video as MP4
+              </button>
           </div>
-        <div className="flex w-full bg-[#191b1d]">
+        <div className="flex w-full bg-[#191b1d] h-[75%]">
             <div
                 ref={domRef}
                 style={{ overflow: 'overlay' }}
@@ -399,25 +422,12 @@ export const VideoEditor: React.FC = () => {
                     
                     }}
                     dragLine={true}
-                    onDoubleClickRow={() => {}}
+                    onDoubleClickRow={handleAddNewAction}
                     onScroll={({ scrollTop }) => {
                         if (domRef.current)
                             domRef.current.scrollTop = scrollTop;
                     }}
                 />
-                <button
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-1 rounded-lg m-4"
-                onClick={() => {
-                  mediaStore.seek(0);
-                  console.log("export button clicked");
-                  setTimeout(() => {
-                    console.log("exporting function called");
-                    saveMovieAsMp4();
-                  }, 1000);
-                }}
-              >
-                Export Video as MP4
-              </button>
             </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { TimelineState } from '@xzdarcy/react-timeline-editor';
 import React, { FC, useEffect, useState } from 'react';
 import { Button } from '../ui/button';
+import { PlayIcon, PauseIcon } from "@radix-ui/react-icons"
 
 export const Rates = [0.2, 0.5, 1.0, 1.5, 2.0];
 
@@ -70,7 +71,7 @@ const TimelinePlayer: FC<{
         onClick={handlePlayOrPause}
         className='bg-gray-800 text-white'
         >
-        {isPlaying ? "Pause" : "Play"}
+        {isPlaying ? <PauseIcon/> : <PlayIcon/>}
       </Button>
       <div >{timeRender(time)}</div>
       <div >

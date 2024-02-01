@@ -7,6 +7,7 @@ export class MediaStore {
     framerate: number;
     data: TimelineRow[];                     // timeline data
     effects: Record<string, TimelineEffect>; // video, audio, image controls.
+    _actionLayerMap: Map<string, etro.layer.Base>
   
     constructor() {
         this._movie = null;
@@ -37,6 +38,8 @@ export class MediaStore {
                 name: 'effect1',
             },
         }
+
+        this._actionLayerMap = new Map<string, etro.layer.Base>()
     }
 
     setMovie(movie: etro.Movie) {
@@ -73,5 +76,17 @@ export class MediaStore {
 
     refresh() {
         this._movie?.refresh();
+    }
+
+    set(id: string, layer: etro.layer.Base) {
+        this._actionLayerMap.set(id, layer);
+    }
+
+    get(id: string) {
+        return this._actionLayerMap.get(id);
+    }
+
+    getActionMapValues() { 
+        return this._actionLayerMap.values();
     }
 }
