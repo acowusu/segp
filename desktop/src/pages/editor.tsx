@@ -468,12 +468,13 @@ export const VideoEditor: React.FC = () => {
               );
             })}
           </div>
-          <div className="w-full ">
+          <div className="w-full">
             <Timeline
               editorData={data}
               effects={effects}
               ref={timelineState}
               onChange={setData}
+              autoReRender={true}
               autoScroll={true}
               minScaleCount={movieRef.current?.duration}
               onCursorDrag={handleCursorSeek}
