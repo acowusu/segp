@@ -22,8 +22,17 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../components/ui/context-menu";
-import { Separator } from "@radix-ui/react-dropdown-menu";
+import { Portal, Separator } from "@radix-ui/react-dropdown-menu";
 import { Button } from "../components/ui/button";
+import {
+  Tooltip,
+  Provider,
+  Root,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+  TooltipArrow,
+} from "@radix-ui/react-tooltip";
 
 export const Editor: React.FC = () => {
   const [mediaStore] = useState(new MediaStore());
@@ -351,7 +360,32 @@ export const VideoEditor: React.FC = () => {
     </>
   );
 
-  const EditorButtons = "<Editor Buttons>";
+  // change to be a svg later
+  const exportWhiteImage: string = "../../public/export-white.png";
+
+  const EditorButtons = (
+    <Provider>
+      <Tooltip>
+        <TooltipTrigger>
+          <Button
+            className="my-1"
+            variant={"ghost"}
+            onClick={() => {
+              console.log("button");
+            }}
+          >
+            <img src={exportWhiteImage} alt="image" width={40} height={40} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent className="m-2 rounded-md border border-[#f7f7f8] bg-[#020817] p-2 leading-none text-[#f8fafc]">
+            Export to mp4
+            <TooltipArrow className="fill-[#f7f7f8]" />
+          </TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
+    </Provider>
+  );
   const MediaUtils = <Media handleAddToPlayer={handleAddNewAction} />;
 
   const TimelineTitle = (
