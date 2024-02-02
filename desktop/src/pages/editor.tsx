@@ -22,8 +22,17 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../components/ui/context-menu";
-import { Separator } from "@radix-ui/react-dropdown-menu";
+import { Portal, Separator } from "@radix-ui/react-dropdown-menu";
 import { Button } from "../components/ui/button";
+import {
+  Tooltip,
+  Provider,
+  Root,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+  TooltipArrow,
+} from "@radix-ui/react-tooltip";
 
 export const Editor: React.FC = () => {
   const [mediaStore] = useState(new MediaStore());
