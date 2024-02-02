@@ -489,6 +489,7 @@ export const VideoEditor: React.FC = () => {
   /* TODO Notes for self:
    *  -> the while player grid is the canvas (resize the util bar according to aspect ratio)
    *  -> Remove the 'flex' annotations where it isn't needed => check children nodes if they depend on it!
+   *  -> Add the export state tracker on the top right on the editorbuttons section
    *
    * NOTE: using h-dvh and w-dvh for the outermost grid breaks the Timeline
    */
