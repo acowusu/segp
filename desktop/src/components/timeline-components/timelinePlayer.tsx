@@ -78,6 +78,7 @@ const TimelinePlayer: FC<{
         <select 
             onChange={handleRateChange}
             className='bg-gray-800 text-white'
+            defaultValue={1.0}
         >
           {Rates.map((rate) => (
             <option key={rate} value={rate}>{`${rate.toFixed(1)} speed`}</option>
