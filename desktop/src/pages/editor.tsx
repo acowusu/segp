@@ -22,12 +22,10 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../components/ui/context-menu";
-import { Portal, Separator } from "@radix-ui/react-dropdown-menu";
-import { Button } from "../components/ui/button";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 import {
   Tooltip,
   Provider,
-  Root,
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
