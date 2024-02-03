@@ -417,8 +417,12 @@ export const VideoEditor: React.FC = () => {
               }
     </>
   );
-  const MediaUtils = <Media handleSelectMedia={setSelectedMedia}
-  handleReplaceMedia={handleReplaceAction} />;
+  const MediaUtils = <>
+    <Media 
+      handleSelectMedia={setSelectedMedia}
+      handleReplaceMedia={handleReplaceAction} 
+    />
+  </>;
 
   const TimelineTitle = (
     <div>
@@ -439,7 +443,7 @@ export const VideoEditor: React.FC = () => {
           timelineState.current?.setScrollTop(target.scrollTop);
         }}
         className=""
-      >
+      > 
         <Button className="flex" variant={"outline"} onClick={createNewLayer}>
           {" "}
           {/** NO idea why not centred */}
@@ -488,6 +492,7 @@ export const VideoEditor: React.FC = () => {
         effects={effects}
         ref={timelineState}
         onChange={setData}
+        autoReRender={true}
         autoScroll={true}
         minScaleCount={movieRef.current?.duration}
         onCursorDrag={handleCursorSeek}
@@ -511,7 +516,7 @@ export const VideoEditor: React.FC = () => {
           );
         }}
         dragLine={true}
-        onDoubleClickRow={() => {}}
+        onDoubleClickRow={handleAddNewAction}
         onScroll={({ scrollTop }) => {
           if (domRef.current) domRef.current.scrollTop = scrollTop;
         }}
