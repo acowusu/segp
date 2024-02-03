@@ -448,94 +448,148 @@ export const VideoEditor: React.FC = () => {
                   : (<div className="text-green-400"> Export Complete </div>))
                 : ""
               }
-          </div>
-        <div className="flex w-full bg-[#191b1d] h-[75%]">
-            <div
-                ref={domRef}
-                style={{ overflow: 'overlay' }}
-                onScroll={(e) => {
-                    const target = e.target as HTMLDivElement;
-                    timelineState.current?.setScrollTop(target.scrollTop);
-                }}
-                className="w-[10%]"
-            >
-              <Button className={`flex w-full mt-[3px] border-opacity-40 p-2 items-center justify-center hover:cursor-pointer`}
-              onClick={createNewLayer}
-            >
-              Add +
-            </div>
-            {data.map((item) => {
-              return (
-                <ContextMenu>
-                  <ContextMenuTrigger>
-                    <div
-                      key={item.id}
-                      className={`flex w-full ${
-                        item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
-                      } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
-                    >
-                      {`${item.id} Layer`}
-                    </div>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem onClick={() => deleteLayer(item.id)}>
-                      Delete Layer
-                    </ContextMenuItem>
-                    <ContextMenuItem>Rename Layer</ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              );
-            })}
-          </div>
-          <div className="w-full">
-            <Timeline
-              editorData={data}
-              effects={effects}
-              ref={timelineState}
-              onChange={setData}
-              autoReRender={true}
-              autoScroll={true}
-              minScaleCount={movieRef.current?.duration}
-              onCursorDrag={handleCursorSeek}
-              onClickTimeArea={handleProgress}
-              disableDrag={!allowEdit}
-              hideCursor={!showCursor}
-              getActionRender={(action, row) => {
-                setSelectedItem(action.id);
-                return (
-                  <TimeFrame
-                    action={action}
-                    row={row}
-                    data={
-                      additionalData.find(({ id }) => action.id === id)
-                        ?.additionalData || { img: "" }
-                    }
-                    deleteItem={deleteItem}
-                    setToReplace={setSelectedToReplace}
-                    toReplace={selectedToReplace}
-                  />
-                );
-              }}
-              dragLine={true}
-              onDoubleClickRow={() => {}}
-              onScroll={({ scrollTop }) => {
-                if (domRef.current) domRef.current.scrollTop = scrollTop;
-              }}
+    </>
+  );
+  const MediaUtils = <>
+    <Media 
+      handleSelectMedia={setSelectedMedia}
+      handleReplaceMedia={handleReplaceAction} 
+    />
+  </>;
+
+  const TimelineTitle = (
+    <div>
+      <h1 className="p-2 text-2xl font-bold">Timeline</h1>
+      <Separator className="-mt-2 mb-5 h-[2px] bg-[#1e293b]" />
+      {/* TODO: for some reason the separator doesnt auto pick up the colour */}
+    </div>
+  );
+
+  const TimelineButtons = "<Timeline Buttons>";
+  const LayerTitles = (
+    <>
+      <div
+        ref={domRef}
+        style={{ overflow: "overlay" }}
+        onScroll={(e) => {
+          const target = e.target as HTMLDivElement;
+          timelineState.current?.setScrollTop(target.scrollTop);
+        }}
+        className=""
+      > 
+        <Button className="flex" variant={"outline"} onClick={createNewLayer}>
+          {" "}
+          {/** NO idea why not centred */}
+          Add +
+        </Button>
+        {/* <div
+          className={`mt-[3px] flex w-full items-center justify-center border-opacity-40 p-2 hover:cursor-pointer`}
+          onClick={createNewLayer}
+        >
+          Add +
+        </div> */}
+      </div>
+      <div className="flex-col">
+        {data.map((item) => {
+          return (
+            <ContextMenu>
+              <ContextMenuTrigger>
+                <div
+                  key={item.id}
+                  className={`w-full flex-col ${
+                    item.id !== "Audio" ? "h-[150px]" : "h-[60px]"
+                    // } items-center justify-center border border-gray-500 border-opacity-40 p-2`}
+                  }  border-spacing-2 justify-between rounded-md border border-[#E5E7EB] p-2`} // TODO: justify between doesnt care to work, figure out why
+                >
+                  {`${item.id} Layer`}
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() => deleteLayer(item.id)}>
+                  Delete Layer
+                </ContextMenuItem>
+                <ContextMenuItem>Rename Layer</ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          );
+        })}
+      </div>
+    </>
+  );
+  const timelineStyle: React.CSSProperties = { width: "100%" };
+  const TimelineSection = (
+    <>
+      <Timeline
+        editorData={data}
+        style={timelineStyle}
+        effects={effects}
+        ref={timelineState}
+        onChange={setData}
+        autoReRender={true}
+        autoScroll={true}
+        minScaleCount={movieRef.current?.duration}
+        onCursorDrag={handleCursorSeek}
+        onClickTimeArea={handleProgress}
+        disableDrag={!allowEdit}
+        hideCursor={!showCursor}
+        getActionRender={(action, row) => {
+          setSelectedItem(action.id);
+          return (
+            <TimeFrame
+              action={action}
+              row={row}
+              data={
+                additionalData.find(({ id }) => action.id === id)
+                  ?.additionalData || { img: "" }
+              }
+              deleteItem={deleteItem}
+              setToReplace={setSelectedToReplace}
+              toReplace={selectedToReplace}
             />
-            <button
-              className="m-4 rounded-lg bg-gray-500 px-1 py-1 font-bold text-white hover:bg-gray-700"
-              onClick={() => {
-                mediaStore.seek(0);
-                console.log("export button clicked");
-                setTimeout(() => {
-                  console.log("exporting function called");
-                  saveMovieAsMp4();
-                }, 1000);
-              }}
-            >
-              Export Video as MP4
-            </button>
-          </div>
+          );
+        }}
+        dragLine={true}
+        onDoubleClickRow={handleAddNewAction}
+        onScroll={({ scrollTop }) => {
+          if (domRef.current) domRef.current.scrollTop = scrollTop;
+        }}
+      />
+    </>
+  );
+  /* TODO Notes for self:
+   *  -> the while player grid is the canvas (resize the util bar according to aspect ratio)
+   *  -> Remove the 'flex' annotations where it isn't needed => check children nodes if they depend on it!
+   *  -> Add the export state tracker on the top right on the editorbuttons section
+   *
+   * NOTE: using h-dvh and w-dvh for the outermost grid breaks the Timeline
+   */
+
+  // FIX: hardcoded at the moment, will figure out how to make this dynamic
+
+  return (
+    <>
+      {/* <div className="w-full h-screen p-4 flex flex-col items-center border overflow-auto"> */}
+      <div className="w-dvh grid h-dvh grid-cols-[31fr_49fr] grid-rows-[5fr_60fr_41fr]">
+        {" "}
+        {/* TODO fix the weird clipping*/}
+        {/* <div className="grid grid-cols-2 h-2/5 border"> */}{" "}
+        {/* I wanna get rid of this and just use columns*/}
+        {/* Media Tab */}
+        {/* <div className="border overflow-auto h-full no-scrollbar"> */}
+        <div className="col-span-2 ">{EditorButtons}</div>
+        <div className=" row-span-1 flex overflow-auto ">{MediaUtils}</div>
+        {/* Player Component (Wraps the Canvas and the play/pause bar) */}
+        <div className="row-span-1">{VideoPlayer}</div>
+        {/* Timeline Component, includes the layering logic logic and the buttons  */}
+        <div className="col-span-2 grid grid-cols-[6fr_84fr] grid-rows-[2fr_2fr_34fr]">
+          {/* Timeline Title and Separator */}
+          <div className="col-span-2"> {TimelineTitle}</div>
+          {/* Timeline buttons */}
+          <div className="col-span-2"> {TimelineButtons}</div>
+          {/* Layer Titles Component */}
+          <div className="col-span-1"> {LayerTitles}</div>
+          {/* Timeline component */}
+          <div className="col-span-1">{TimelineSection}</div>
         </div>
       </div>
     </>
