@@ -3,14 +3,15 @@ import { TimelineEffect, TimelineRow } from '@xzdarcy/react-timeline-editor';
 
 export class MediaStore {
  
-    movie: etro.Movie | null;        
+    _movie: etro.Movie | null;        
     framerate: number;
     data: TimelineRow[];                     // timeline data
     effects: Record<string, TimelineEffect>; // video, audio, image controls.
+    _actionLayerMap: Map<string, etro.layer.Base>
   
     constructor() {
-        this.movie = null;
-        this.framerate = 60;
+        this._movie = null;
+        this.framerate = 30;
         
         this.data = [{
             id: '0',
@@ -37,33 +38,55 @@ export class MediaStore {
                 name: 'effect1',
             },
         }
+
+        this._actionLayerMap = new Map<string, etro.layer.Base>()
     }
 
     setMovie(movie: etro.Movie) {
-        this.movie = movie;
+        this._movie = movie;
     };
 
+    getMovie() {
+        return this._movie;
+    };
+
+    hasMovieRef() {
+        return this._movie;
+    }
+
     addLayers(layers: etro.layer.Base[]) {
-        layers.forEach(layer => this.movie?.addLayer(layer));
+        layers.forEach(layer => this._movie?.addLayer(layer));
     };
 
     addLayer(layer: etro.layer.Base) {
-        this.movie?.addLayer(layer);
+        this._movie?.addLayer(layer);
     };
 
     pause() {
-        this.movie?.pause();
+        this._movie?.pause();
     };
 
     seek(seek: number) {
-        this.movie?.seek(seek);
+        this._movie?.seek(seek);
     };
 
     play() {
-        this.movie?.play();
+        this._movie?.play();
     };
 
     refresh() {
-        this.movie?.refresh();
+        this._movie?.refresh();
+    }
+
+    set(id: string, layer: etro.layer.Base) {
+        this._actionLayerMap.set(id, layer);
+    }
+
+    get(id: string) {
+        return this._actionLayerMap.get(id);
+    }
+
+    getActionMapValues() { 
+        return this._actionLayerMap.values();
     }
 }

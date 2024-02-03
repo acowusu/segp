@@ -1,5 +1,8 @@
+import React from "react"
 import { TimelineAction, TimelineRow } from '@xzdarcy/react-timeline-editor';
 import { additionalDataType } from '../../pages/editor';
+import { Slider } from "../ui/slider"
+import { MediaStoreContext } from "../../contexts/media";
 import {
     ContextMenu,
     ContextMenuContent,
@@ -20,11 +23,19 @@ interface TimeFrameProps {
     toReplace: {rowid: string, action: TimelineAction} | null
 }
 
-export const TimeFrame: React.FC<TimeFrameProps> = ({action, row, data, deleteItem, setToReplace, toReplace}) => {
+export const TimeFrame: React.FC<TimeFrameProps> = ({action, row, data ,deleteItem, setToReplace, toReplace}) => {
+    const mediaStore = React.useContext(MediaStoreContext)
+    const [brightness, setBrightness] = React.useState([0]);
+
+    const handleBrightnessChange = (brightness: number[]) => {
+        setBrightness(brightness);
+        console.log(mediaStore.get(action.id))
+    }
+
     return ( 
         <ContextMenu>
             <ContextMenuTrigger>
-            <div key={row.id} className={`flex flex-row items-center cursor-pointer border ${toReplace && toReplace.action.id === action.id ? "border-blue-400 border-2" : "border-white"} h-full`}>
+            <div key={row.id} className={`flex flex-row items-center cursor-pointer border ${toReplace && toReplace.action.id === action.id ? "border-blue-400 border-2" : "border-white"} h-full hover:opacity-[80%]`}>
                 <img src={data.img} alt={action.id} className="object-cover object-center w-full h-full" />
             </div>
             </ContextMenuTrigger>
@@ -42,6 +53,25 @@ export const TimeFrame: React.FC<TimeFrameProps> = ({action, row, data, deleteIt
                 <ContextMenuSubTrigger>Move Layers</ContextMenuSubTrigger>
                 <ContextMenuSubContent className="w-48">
                     <ContextMenuItem>Layer 1</ContextMenuItem>
+                    <ContextMenuItem>Layer 2</ContextMenuItem>
+                </ContextMenuSubContent>
+                </ContextMenuSub>
+                <ContextMenuSub>
+                <ContextMenuSubTrigger>Add Effects</ContextMenuSubTrigger>
+                <ContextMenuSubContent className="w-48">
+                    <ContextMenuSub>
+                    <ContextMenuSubTrigger>Brightness</ContextMenuSubTrigger>
+                    <ContextMenuSubContent className="w-48">
+                        <ContextMenuItem>
+                            <Slider 
+                                value={brightness}
+                                min={-255}
+                                max={255}
+                                step={1}
+                                onValueChange={handleBrightnessChange}/>
+                        </ContextMenuItem>
+                    </ContextMenuSubContent>
+                    </ContextMenuSub>
                     <ContextMenuItem>Layer 2</ContextMenuItem>
                 </ContextMenuSubContent>
                 </ContextMenuSub>

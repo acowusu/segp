@@ -24,15 +24,14 @@ import {
   SelectValue,
 } from "../components/ui/select";
 
-export const Media: React.FC<{
-  handleAddToPlayer: (media: Video | string) => void;
-}> = ({ handleAddToPlayer }) => {
+export const Media: React.FC<{handleSelectMedia: (media: Video | string) => void; handleReplaceMedia: (media: Video | string) => void}> = ({handleSelectMedia, handleReplaceMedia}) => {
   const [selectedQuery, setSelectedQuery] = useState<string>(queries[0]);
   const [mediaMap, setMediaMap] = useState<{
     [key: string]: (Video | string)[];
   }>({});
   const [pexelsKeyIndex, setPexelsKeyIndex] = useState<number>(0);
   const [unsplashKeyIndex, setUnsplashKeyIndex] = useState<number>(0);
+  const [selectedMedia, setSelectedMedia] = useState<Video | string | null>(null);
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -85,14 +84,11 @@ export const Media: React.FC<{
 
   const MediaElement: React.FC<{ media: Video | string }> = ({ media }) => {
     return (
-      <div className="relative flex h-32 transform flex-col items-center justify-between rounded-lg border border-white p-2 transition duration-700 ease-in-out hover:scale-105">
-        {typeof media === "string" ? (
-          <img
-            src={media}
-            alt="Unsplash Photo"
-            className="mb-2 h-full w-full object-cover object-center"
-            style={{ maxHeight: "100%", maxWidth: "100%" }}
-          />
+      <div 
+        onClick={() => {handleSelectMedia(media); setSelectedMedia(media); handleReplaceMedia(media);}}
+        className={`relative border border-black rounded-lg h-32 transform transition duration-700 ease-in-out hover:scale-105 flex flex-col items-center justify-between p-2 cursor-pointer hover:opacity-[80%] ${selectedMedia && selectedMedia == media ? "border-blue-400 border-2" : ""}`}>
+        {typeof media === 'string' ? (
+          <img src={media} alt="Unsplash Photo" className="h-full w-full object-cover object-center mb-2" style={{ maxHeight: '100%', maxWidth: '100%' }} />
         ) : (
           <video
             width="100%"
@@ -108,12 +104,9 @@ export const Media: React.FC<{
             <source src={media.video_files[0].link} type="video/mp4" />
           </video>
         )}
-        <div
-          onClick={() => handleAddToPlayer(media)}
-          className="absolute bottom-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded border bg-green-400"
-        >
+        {/* <div onClick={() => handleAddToPlayer(media)} className='bg-green-400 border rounded w-8 h-8 flex items-center justify-center absolute right-4 bottom-4 cursor-pointer'>
           +
-        </div>
+        </div> */}
       </div>
     );
   };

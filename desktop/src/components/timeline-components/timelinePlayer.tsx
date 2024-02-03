@@ -1,6 +1,7 @@
 import { TimelineState } from '@xzdarcy/react-timeline-editor';
 import React, { FC, useEffect, useState } from 'react';
 import { Button } from '../ui/button';
+import { PlayIcon, PauseIcon } from "@radix-ui/react-icons"
 
 export const Rates = [0.2, 0.5, 1.0, 1.5, 2.0];
 
@@ -8,7 +9,8 @@ const TimelinePlayer: FC<{
   timelineState: React.RefObject<TimelineState>;
   autoScrollWhenPlay: boolean;
   handlePlayPause: () => void;
-}> = ({ timelineState, autoScrollWhenPlay, handlePlayPause }) => {
+  handleSetRate: (rate: number) => void;
+}> = ({ timelineState, autoScrollWhenPlay, handlePlayPause, handleSetRate }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState(0);
 
@@ -53,6 +55,7 @@ const TimelinePlayer: FC<{
     if (!timelineState.current) return;
     const rate = parseFloat(e.target.value);
     timelineState.current.setPlayRate(rate);
+    handleSetRate(rate);
   };
 
   const timeRender = (time: number) => {
@@ -68,13 +71,14 @@ const TimelinePlayer: FC<{
         onClick={handlePlayOrPause}
         className='bg-gray-800 text-white'
         >
-        {isPlaying ? "Pause" : "Play"}
+        {isPlaying ? <PauseIcon/> : <PlayIcon/>}
       </Button>
       <div >{timeRender(time)}</div>
       <div >
         <select 
             onChange={handleRateChange}
             className='bg-gray-800 text-white'
+            defaultValue={1.0}
         >
           {Rates.map((rate) => (
             <option key={rate} value={rate}>{`${rate.toFixed(1)} speed`}</option>
