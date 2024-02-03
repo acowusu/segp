@@ -415,57 +415,55 @@ export const VideoEditor: React.FC = () => {
   // change to be a svg later
   const exportWhiteImage: string = "../../public/export-white.png";
 
-  const EditorButtons = () => {
-    return (
-      <div className="grid grid-cols-[20fr_5fr]">
-        <div className="col-span-1">
-          <Provider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  className="my-1"
-                  variant={"ghost"}
-                  onClick={() => {
-                    // FIX: has a problem with trying to export the mans face if the source is not played at all
-                    mediaStore.seek(0);
-                    console.log("export button clicked");
-                    setTimeout(() => {
-                      console.log("exporting function called");
-                      saveMovieAsMp4();
-                    }, 1000);
-                  }}
-                >
-                  <img
-                    src={exportWhiteImage}
-                    alt="image"
-                    width={40}
-                    height={40}
-                  />
-                </Button>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent className="m-2 rounded-md border border-[#f7f7f8] bg-[#020817] p-2 leading-none text-[#f8fafc]">
-                  Export to mp4
-                  <TooltipArrow className="fill-[#f7f7f8]" />
-                </TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
-          </Provider>
-        </div>
-        <div className="col-span-1 content-evenly">
-          {isExportedBefore ? (
-            isExportInProgress ? (
-              <div className="text-yellow-400"> Exporting... </div>
-            ) : (
-              <div className="text-green-400"> Export Complete </div>
-            )
-          ) : (
-            ""
-          )}
-        </div>
+  const EditorButtons = (
+    <div className="grid grid-cols-[20fr_5fr]">
+      <div className="col-span-1">
+        <Provider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                className="my-1"
+                variant={"ghost"}
+                onClick={() => {
+                  // FIX: has a problem with trying to export the mans face if the source is not played at all
+                  mediaStore.seek(0);
+                  console.log("export button clicked");
+                  setTimeout(() => {
+                    console.log("exporting function called");
+                    saveMovieAsMp4();
+                  }, 1000);
+                }}
+              >
+                <img
+                  src={exportWhiteImage}
+                  alt="image"
+                  width={40}
+                  height={40}
+                />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent className="m-2 rounded-md border border-[#f7f7f8] bg-[#020817] p-2 leading-none text-[#f8fafc]">
+                Export to mp4
+                <TooltipArrow className="fill-[#f7f7f8]" />
+              </TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+        </Provider>
       </div>
-    );
-  };
+      <div className="col-span-1 content-evenly">
+        {isExportedBefore ? (
+          isExportInProgress ? (
+            <div className="text-yellow-400"> Exporting... </div>
+          ) : (
+            <div className="text-green-400"> Export Complete </div>
+          )
+        ) : (
+          ""
+        )}
+      </div>
+    </div>
+  );
   const MediaUtils = (
     <>
       <Media
@@ -594,9 +592,7 @@ export const VideoEditor: React.FC = () => {
         {/* I wanna get rid of this and just use columns*/}
         {/* Media Tab */}
         {/* <div className="border overflow-auto h-full no-scrollbar"> */}
-        <div className="col-span-2 ">
-          <EditorButtons />
-        </div>
+        <div className="col-span-2 ">{EditorButtons}</div>
         <div className=" row-span-1 flex overflow-auto ">{MediaUtils}</div>
         {/* Player Component (Wraps the Canvas and the play/pause bar) */}
         <div className="row-span-1">{VideoPlayer}</div>
