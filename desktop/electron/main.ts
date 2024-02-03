@@ -62,16 +62,16 @@ function createWindow() {
 
   win.setResizable(true);
 
-  const logWindowBounds = () => {
-    const bounds = win?.getBounds();
-    console.log("Window Bounds:", bounds);
-  };
-  win.on("ready-to-show", () => {
-    logWindowBounds();
-    win?.on("resize", () => {
-      logWindowBounds();
-    });
-  });
+  // const logWindowBounds = () => {
+  //   const bounds = win?.getBounds();
+  //   console.log("Window Bounds:", bounds);
+  // };
+  // win.on("ready-to-show", () => {
+  //   logWindowBounds();
+  //   win?.on("resize", () => {
+  //     logWindowBounds();
+  //   });
+  // });
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
