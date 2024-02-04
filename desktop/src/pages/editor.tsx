@@ -33,6 +33,9 @@ import {
   TooltipArrow,
 } from "@radix-ui/react-tooltip";
 
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
+
 export const Editor: React.FC = () => {
   const [mediaStore] = useState(new MediaStore());
   return (
@@ -251,6 +254,62 @@ export const VideoEditor: React.FC = () => {
     }
   };
 
+  function downloadMp4(data: Uint8Array, filename: string): void {
+    const blob = new Blob([data], { type: "video/mp4" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+  }
+  const ffmpegBaseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+
+  async function decodeAsMp4(blob: Blob): Promise<Uint8Array> {
+    const ffmpeg = new FFmpeg();
+    console.log("before load");
+
+    await ffmpeg.load({
+      coreURL: await toBlobURL(
+        `${ffmpegBaseURL}/ffmpeg-core.js`,
+        "text/javascript",
+      ),
+      wasmURL: await toBlobURL(
+        `${ffmpegBaseURL}/ffmpeg-core.wasm`,
+        "application/wasm",
+      ),
+    }); //Promise<boolean>
+    console.log("after load");
+
+    const inputFile: string = "input.webm";
+    //write to input
+    ffmpeg.writeFile(inputFile, await fetchFile(blob));
+
+    const outputFile: string = "video.mp4";
+
+    // actual decode
+    await ffmpeg.exec([
+      "-i",
+      inputFile,
+      "c:a",
+      "aac",
+      "-strict",
+      "experimental",
+      "-c:v",
+      "h264",
+      outputFile,
+    ]);
+
+    const data = (await ffmpeg.readFile(outputFile)) as Uint8Array;
+
+    ffmpeg.deleteFile(inputFile);
+    ffmpeg.deleteFile(outputFile);
+
+    ffmpeg.terminate(); // must be loaded again
+
+    console.log("got data decodeAsMp4");
+    return data;
+  }
+
   const saveMovieAsMp4 = async () => {
     await mediaStore
       .getMovie()
@@ -261,6 +320,7 @@ export const VideoEditor: React.FC = () => {
         // video: default true,
         // duration: default end of video
         // onStart: optional callback
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onStart: (_: MediaRecorder) => {
           console.log("recording started");
           setIsExportedBefore(true);
@@ -268,17 +328,15 @@ export const VideoEditor: React.FC = () => {
         },
       })
       .then((blob) => {
-        const newBlob = new Blob([blob], { type: "video/mp4" });
-        const url = URL.createObjectURL(newBlob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "video.mp4";
-        // a.onabort = () => {
-        //   setIsExportInProgress(false);
-        // }
-        a.click();
-        setIsExportInProgress(false);
+        // got the recorded bytes off the canvas
+        console.log("starting decode/transcode");
+
+        decodeAsMp4(blob).then((data: Uint8Array) => {
+          console.log("starting downlaod");
+          downloadMp4(data, "video.mp4");
+        });
       });
+    setIsExportInProgress(false);
   };
 
   useEffect(() => {
