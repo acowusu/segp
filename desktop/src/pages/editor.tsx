@@ -413,7 +413,7 @@ export const VideoEditor: React.FC = () => {
   );
 
   // change to be a svg later
-  const exportWhiteImage: string = "../../public/export-white.png";
+  const exportWhiteImage: string = "../../export-white.png";
 
   const EditorButtons = (
     <div className="grid grid-cols-[20fr_5fr]">
