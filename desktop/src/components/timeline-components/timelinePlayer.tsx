@@ -67,7 +67,7 @@ const TimelinePlayer: FC<{
 
   return (
     <div className='flex gap-8 items-center'>
-      <Button 
+      <Button
         onClick={handlePlayOrPause}
         className='bg-gray-800 text-white'
         >
@@ -75,7 +75,7 @@ const TimelinePlayer: FC<{
       </Button>
       <div >{timeRender(time)}</div>
       <div >
-        <select 
+        <select
             onChange={handleRateChange}
             className='bg-gray-800 text-white'
             defaultValue={1.0}

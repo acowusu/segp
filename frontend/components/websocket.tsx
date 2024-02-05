@@ -349,8 +349,8 @@ vi+1 := 0.9 · vi − 0.0005 ·  · wi −  ·
 
 ∂L
 ∂w
-
-
+
+
 wi
 
 Di
@@ -358,8 +358,8 @@ wi+1 := wi + vi+1
 where i is the iteration index, v is the momentum variable,  is the learning rate, and D
 ∂L
 ∂w
-
-
+
+
 wi
 E
 Di
@@ -469,4 +469,3 @@ obvious in static images.
 Here is a report, can you give me a list of interesting topics within this report which you could make a video on as well as a topic which describes this report as a whole? Return it as a list of jsons, in the form of:
 [ {name, 1 line summary} ]
 `
-
