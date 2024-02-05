@@ -7,11 +7,11 @@ from bentoml.io import JSON, Text
 from openllm import LLM
 
 # llm = LLM("HuggingFaceH4/zephyr-7b-alpha", backend="vllm")
-llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm"  )
+# llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm"  )
 # stable_diffusion = bentoml.diffusers_simple.stable_diffusion.create_runner("CompVis/stable-diffusion-v1-4")
 
 # mistralai/Mistral-7B-Instruct-v0.2
-#  LLM(model="TheBloke/Mistral-7B-Instruct-v0.1-AWQ",2)
+ LLM(model="mistralai/Mixtral-8x7B-Instruct-v0.1",2)
 svc = Service("tinyllm", runners=[llm.runner])
 
 
@@ -34,6 +34,7 @@ class GenerateInput(TypedDict):
 )
 async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], str]:
     n = request["sampling_params"].pop("n", 1)
+    request_id = f"tinyllm-{uuid.uuid4().hex}"
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * n
 
