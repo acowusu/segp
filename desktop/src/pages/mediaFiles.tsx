@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createClient, Video } from "pexels";
 import { TimelineAction } from "@xzdarcy/react-timeline-editor";
-
+import { Separator } from "@radix-ui/react-menu";
 const pexelsApiKeys = [
   "6MMWrcLkoVjZ8rtjHHeD2YCw9uR2xy6livsQXIZjFrBqoYQDKhpjlTWW",
   "J4nKc6oJDyKJeRJTlC0x5EiQQDZkTuvAyJ1uXt6gC98IGwDleAYqI0RR",
@@ -41,7 +41,6 @@ export const Media: React.FC<{
   useEffect(() => {
     const fetchMedia = async () => {
       try {
-        const pexelsClient = createClient(pexelsApiKeys[pexelsKeyIndex]);
         const pexelsClient = createClient(pexelsApiKeys[pexelsKeyIndex]);
         const mediaData: { [key: string]: string[] } = {};
 
