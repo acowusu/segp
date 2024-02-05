@@ -41,7 +41,7 @@ export const Media: React.FC<{
   useEffect(() => {
     const fetchMedia = async () => {
       try {
-        // const pexelsClient = createClient(pexelsApiKeys[pexelsKeyIndex]);
+        const pexelsClient = createClient(pexelsApiKeys[pexelsKeyIndex]);
         const mediaData: { [key: string]: string[] } = {};
 
         for (const query of queries) {
