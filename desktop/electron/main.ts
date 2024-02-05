@@ -1,5 +1,5 @@
-import { app, BrowserWindow, ipcMain, dialog , screen  } from 'electron'
-import path from 'node:path'
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import path from "node:path";
 // import { getDatabase } from './database'
 import api, { IAPI } from "./routes";
 import {
@@ -17,9 +17,10 @@ import {
 // │ │ ├── main.js
 // │ │ └── preload.js
 // │
-process.env.DIST = path.join(__dirname, '../dist')
-process.env.VITE_PUBLIC = app?.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public')
-
+process.env.DIST = path.join(__dirname, "../dist");
+process.env.VITE_PUBLIC = app.isPackaged
+  ? process.env.DIST
+  : path.join(process.env.DIST, "../public");
 
 let win: BrowserWindow | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
@@ -31,24 +32,22 @@ async function handleFileOpen() {
   );
   let path = "";
   if (!canceled) {
-    path = filePaths[0]
+    path = filePaths[0];
   }
   path = await extractTextFromPDF(path);
   console.log("GOT PATH", path);
   return path;
 }
 
-
-
 function createWindow() {
   // console.log("CREATING WINDOW")
   // console.log(JSON.stringify(screen.getAllDisplays(), null, 2))
-  const monitor = ( screen.getAllDisplays().find(monitor => monitor.label === "HP 27f")) || screen.getPrimaryDisplay()
-  const { x, y } = monitor.bounds
+  const monitor =
+    screen.getAllDisplays().find((monitor) => monitor.label === "HP 27f") ||
+    screen.getPrimaryDisplay();
+  const { x, y } = monitor.bounds;
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
-    x: x + 50, // Arbitrary offsets to ensure it's on the right display/monitor
-    y: y + 50,
+    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -85,14 +84,14 @@ function createWindow() {
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app && app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-    win = null
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+    win = null;
   }
 });
 
-app && app.on('activate', () => {
+app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
@@ -100,14 +99,14 @@ app && app.on('activate', () => {
   }
 });
 
-app && app.whenReady().then(() => {
-  ipcMain.handle('dialog:openFile', handleFileOpen)
-  ipcMain.handle('dialog:getTopics', getTopics)
-  ipcMain.handle('dialog:getScript', getScript)
-  ipcMain.handle('dialog:setTopic', (_, args) => setTopic(args))
-  ipcMain.handle('api:generic', (_, { property, args }) => {
-    console.log(property)
-    const methodName = property as keyof IAPI
+app.whenReady().then(() => {
+  ipcMain.handle("dialog:openFile", handleFileOpen);
+  ipcMain.handle("dialog:getTopics", getTopics);
+  ipcMain.handle("dialog:getScript", getScript);
+  ipcMain.handle("dialog:setTopic", (_, args) => setTopic(args));
+  ipcMain.handle("api:generic", (_, { property, args }) => {
+    console.log(property);
+    const methodName = property as keyof IAPI;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const method = api[methodName] as (...items: any[]) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -130,5 +129,4 @@ app && app.whenReady().then(() => {
     // const db = getDatabase()
     win?.webContents.send("main-process-message", `[database-sqlite] `);
   }, 1000);
-})
-export { win }
+});

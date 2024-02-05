@@ -23,6 +23,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+const pexelsApiKeys = [
+  "6MMWrcLkoVjZ8rtjHHeD2YCw9uR2xy6livsQXIZjFrBqoYQDKhpjlTWW",
+  "J4nKc6oJDyKJeRJTlC0x5EiQQDZkTuvAyJ1uXt6gC98IGwDleAYqI0RR",
+  "nNKofGGjX3XW9Je67z7AdJkla5dUExm1cmx3hsILW0u7ekRm3WWoH5Us",
+];
+const unsplashAccessKeys = [
+  "rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA",
+  "uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y",
+  "F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k",
+  "oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI",
+];
+const queries = ["AI", "Neural Network", "Connected", "City", "Future"];
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 export const Media: React.FC<{
   handleSelectMedia: (media: Video | string) => void;
@@ -89,14 +110,7 @@ export const Media: React.FC<{
 
   const MediaElement: React.FC<{ media: string }> = ({ media }) => {
     return (
-      <div
-        onClick={() => {
-          handleSelectMedia(media);
-          setSelectedMedia(media);
-          handleReplaceMedia(media);
-        }}
-        className={`relative flex h-32 transform cursor-pointer flex-col items-center justify-between rounded-lg border border-black p-2 transition duration-700 ease-in-out hover:scale-105 hover:opacity-[80%] ${selectedMedia && selectedMedia == media ? "border-2 border-blue-400" : ""}`}
-      >
+      <div className="flex h-32 transform cursor-pointer flex-col items-center justify-between rounded-lg border border-black p-2 transition duration-700 ease-in-out hover:scale-105">
         {typeof media === "string" ? (
           <img
             src={media}
