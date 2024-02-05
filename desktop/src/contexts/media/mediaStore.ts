@@ -44,33 +44,55 @@ export class MediaStore {
         name: "effect1",
       },
     };
+
+    this._actionLayerMap = new Map<string, etro.layer.Base>();
   }
 
   setMovie(movie: etro.Movie) {
-    this.movie = movie;
+    this._movie = movie;
+  }
+
+  getMovie() {
+    return this._movie;
+  }
+
+  hasMovieRef() {
+    return this._movie;
   }
 
   addLayers(layers: etro.layer.Base[]) {
-    layers.forEach((layer) => this.movie?.addLayer(layer));
+    layers.forEach((layer) => this._movie?.addLayer(layer));
   }
 
   addLayer(layer: etro.layer.Base) {
-    this.movie?.addLayer(layer);
+    this._movie?.addLayer(layer);
   }
 
   pause() {
-    this.movie?.pause();
+    this._movie?.pause();
   }
 
   seek(seek: number) {
-    this.movie?.seek(seek);
+    this._movie?.seek(seek);
   }
 
   play() {
-    this.movie?.play();
+    this._movie?.play();
   }
 
   refresh() {
-    this.movie?.refresh();
+    this._movie?.refresh();
+  }
+
+  set(id: string, layer: etro.layer.Base) {
+    this._actionLayerMap.set(id, layer);
+  }
+
+  get(id: string) {
+    return this._actionLayerMap.get(id);
+  }
+
+  getActionMapValues() {
+    return this._actionLayerMap.values();
   }
 }

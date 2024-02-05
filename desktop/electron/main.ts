@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, screen } from "electron";
 import path from "node:path";
 // import { getDatabase } from './database'
 import api, { IAPI } from "./routes";
@@ -84,49 +84,54 @@ function createWindow() {
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-    win = null;
-  }
-});
-
-app.on("activate", () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-});
-
-app.whenReady().then(() => {
-  ipcMain.handle("dialog:openFile", handleFileOpen);
-  ipcMain.handle("dialog:getTopics", getTopics);
-  ipcMain.handle("dialog:getScript", getScript);
-  ipcMain.handle("dialog:setTopic", (_, args) => setTopic(args));
-  ipcMain.handle("api:generic", (_, { property, args }) => {
-    console.log(property);
-    const methodName = property as keyof IAPI;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const method = api[methodName] as (...items: any[]) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const methodArgs = args as any[]; //(Parameters < IAPI[typeof methodName] > )
-    if (typeof method === "function") {
-      return method(...methodArgs) as unknown as Promise<
-        ReturnType<IAPI[typeof methodName]>
-      >;
-    } else {
-      return {
-        error: `api.${property} is not a function`,
-        hint: `have you defined ${property} in ./electron/routes.ts?`,
-      };
+app &&
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit();
+      win = null;
     }
   });
 
-  createWindow();
+app &&
+  app.on("activate", () => {
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
 
-  setTimeout(() => {
-    // const db = getDatabase()
-    win?.webContents.send("main-process-message", `[database-sqlite] `);
-  }, 1000);
-});
+app &&
+  app.whenReady().then(() => {
+    ipcMain.handle("dialog:openFile", handleFileOpen);
+    ipcMain.handle("dialog:getTopics", getTopics);
+    ipcMain.handle("dialog:getScript", getScript);
+    ipcMain.handle("dialog:setTopic", (_, args) => setTopic(args));
+    ipcMain.handle("api:generic", (_, { property, args }) => {
+      console.log(property);
+      const methodName = property as keyof IAPI;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const method = api[methodName] as (...items: any[]) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const methodArgs = args as any[]; //(Parameters < IAPI[typeof methodName] > )
+      if (typeof method === "function") {
+        return method(...methodArgs) as unknown as Promise<
+          ReturnType<IAPI[typeof methodName]>
+        >;
+      } else {
+        return {
+          error: `api.${property} is not a function`,
+          hint: `have you defined ${property} in ./electron/routes.ts?`,
+        };
+      }
+    });
+
+    createWindow();
+
+    setTimeout(() => {
+      // const db = getDatabase()
+      win?.webContents.send("main-process-message", `[database-sqlite] `);
+    }, 1000);
+  });
+
+export { win };

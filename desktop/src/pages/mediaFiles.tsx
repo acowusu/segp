@@ -23,27 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-const pexelsApiKeys = [
-  "6MMWrcLkoVjZ8rtjHHeD2YCw9uR2xy6livsQXIZjFrBqoYQDKhpjlTWW",
-  "J4nKc6oJDyKJeRJTlC0x5EiQQDZkTuvAyJ1uXt6gC98IGwDleAYqI0RR",
-  "nNKofGGjX3XW9Je67z7AdJkla5dUExm1cmx3hsILW0u7ekRm3WWoH5Us",
-];
-const unsplashAccessKeys = [
-  "rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA",
-  "uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y",
-  "F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k",
-  "oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI",
-];
-const queries = ["AI", "Neural Network", "Connected", "City", "Future"];
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
 
 export const Media: React.FC<{
   handleSelectMedia: (media: Video | string) => void;
@@ -62,7 +41,7 @@ export const Media: React.FC<{
   useEffect(() => {
     const fetchMedia = async () => {
       try {
-        // const pexelsClient = createClient(pexelsApiKeys[pexelsKeyIndex]);
+        const pexelsClient = createClient(pexelsApiKeys[pexelsKeyIndex]);
         const mediaData: { [key: string]: string[] } = {};
 
         for (const query of queries) {
