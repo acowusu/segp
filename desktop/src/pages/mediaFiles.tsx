@@ -151,19 +151,3 @@ export const Media: React.FC<{
     </div>
   );
 };
-
-{
-  /* <label htmlFor="querySelector">Select a category: </label>
-        <select
-          id="querySelector"
-          value={selectedQuery}
-          onChange={handleQueryChange}
-          style={{ color: "black" }}
-        >
-          {queries.map((query) => (
-            <option key={query} value={query}>
-              {query}
-            </option>
-          ))}
-        </select> */
-}
