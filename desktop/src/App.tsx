@@ -17,12 +17,19 @@ import { LLMDebugger } from "./pages/llm-debugger";
 function App() {
   // const [count, setCount] = useState(0);
 
+  type ChosenImage = {
+    imgSrc: string;
+    duration: number;
+    text?: string;
+  };
+
+  const dummyImages: ChosenImage[] = [];
   return (
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index  element={<Upload />} />
+            <Route index element={<Upload />} />
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="set-topic" element={<SetTopic />} />
               <Route path="set-visuals" element={<SetVisuals />} />
