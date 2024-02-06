@@ -32,6 +32,8 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
   const movieRef = useRef<etro.Movie | null>();
   const [videoURL, setVideoURL] = useState<string>();
   const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
+  const [isGenerateClicked, setIsGenerateClicked] = useState<boolean>(false);
+
   useEffect(() => {
     if (!canvasRef.current) return; //null canvas ref
     const canvas = canvasRef.current;
@@ -114,6 +116,7 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
           <canvas className="w-full" ref={canvasRef}></canvas>
           <Button
             onClick={() => {
+              setIsGenerateClicked(true);
               console.log("video creation started");
               setTimeout(() => {
                 console.log("expo");
@@ -123,6 +126,11 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
           >
             create video
           </Button>
+          {isGenerateClicked ? (
+            <p className="text-yellow-400"> Generating...</p>
+          ) : (
+            ""
+          )}
         </div>
       )}
     </div>
