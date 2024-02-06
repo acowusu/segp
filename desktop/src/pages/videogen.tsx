@@ -14,19 +14,24 @@ type ChosenImage = {
   duration: number;
   text?: string;
 };
-const dummy: ChosenImage[] = [{ imgSrc: "video.mp4", duration: 10 }];
 
-export const VideoGeneratorDummy: React.FC<ChosenImage[]> = () => {
-  return <VideoGenerator chosenImgages={dummy} />;
+const dummy: ChosenImage[] = [
+  { imgSrc: "./example-min.jpg", duration: 2 },
+  { imgSrc: "./example2-min.jpg", duration: 2 },
+  { imgSrc: "./example3-min.jpg", duration: 2 },
+];
+
+export const VideoGeneratorDummy: React.FC = () => {
+  return <VideoGenerator chosenImages={dummy} />;
 };
 // might need a media store
-export const VideoGenerator: React.FC<ChosenImage[]> = (
-  chosenImages: ChosenImage[],
-) => {
+export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
+  chosenImages,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
-  const [isVideoReady, setIsVideoReady] = useState(false);
-
+  const [videoURL, setVideoURL] = useState<string>();
+  const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
   useEffect(() => {
     if (!canvasRef.current) return; //null canvas ref
     const canvas = canvasRef.current;
@@ -43,7 +48,9 @@ export const VideoGenerator: React.FC<ChosenImage[]> = (
     // TODO: add other types of layer, audio etc, take as param to component
     let start = 0;
 
-    chosenImages.map((img: ChosenImage) => {
+    console.log(chosenImages);
+
+    chosenImages?.map((img: ChosenImage) => {
       const layer = new etro.layer.Image({
         startTime: start,
         duration: img.duration,
@@ -62,6 +69,7 @@ export const VideoGenerator: React.FC<ChosenImage[]> = (
       start += img.duration;
 
       movie.addLayer(layer);
+      movieRef.current = movie;
     });
 
     // for (const layer of imgLayers) {
@@ -69,9 +77,9 @@ export const VideoGenerator: React.FC<ChosenImage[]> = (
     // }
   }, []);
 
-  const downloadPath: string = "./public/video.webm";
+  const downloadPath: string = "./video.webm";
 
-  const saveMovieAsMp4 = async () => {
+  const generateVideo = async () => {
     await movieRef.current
       ?.record({
         frameRate: 30,
@@ -88,19 +96,20 @@ export const VideoGenerator: React.FC<ChosenImage[]> = (
       .then((blob) => {
         const newBlob = new Blob([blob], { type: "video/mp4" });
         const url = URL.createObjectURL(newBlob);
-        const a = document.createElement("a");
-        a.href = url;
-
-        a.download = downloadPath;
-        a.style.display = "none";
-        a.click();
+        setVideoURL(url);
       });
+    console.log("saved as mp4");
     setIsVideoReady(true);
   };
+
   return (
     <div>
       <h1> Video Generation </h1>
       {isVideoReady ? (
+        <video width="640" height="360" controls>
+          <source src={videoURL} type="video/webm" />
+        </video>
+      ) : (
         <div>
           <canvas className="w-full" ref={canvasRef}></canvas>
           <Button
@@ -108,17 +117,13 @@ export const VideoGenerator: React.FC<ChosenImage[]> = (
               console.log("video creation started");
               setTimeout(() => {
                 console.log("expo");
-                saveMovieAsMp4();
+                generateVideo();
               }, 1000);
             }}
           >
             create video
           </Button>
         </div>
-      ) : (
-        <video width="640" height="360" controls>
-          <source src={downloadPath} type="video/webm" />
-        </video>
       )}
     </div>
   );
