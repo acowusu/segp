@@ -1,7 +1,3 @@
-/**
- *  @prettier
- */
-
 import React, { useEffect, useRef, useState } from "react";
 // import { MediaStore } from "../contexts/media/mediaStore";
 import etro from "etro";
@@ -21,13 +17,19 @@ const dummy: ChosenImage[] = [
   { imgSrc: "./example3-min.jpg", duration: 2 },
 ];
 
+// Dummy generator before the types are hashed out
 export const VideoGeneratorDummy: React.FC = () => {
   return <VideoGenerator chosenImages={dummy} />;
 };
-// might need a media store
-export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
-  chosenImages,
-}) => {
+
+/** TODOs:
+ * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
+ * -> support other layers, audio
+ * -> overlaiying of visual layers for subtitles on top of the visuals
+ */
+export const VideoGenerator: React.FC<{
+  chosenImages: ChosenImage[] /* settings: ? */;
+}> = ({ chosenImages }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
   const [videoURL, setVideoURL] = useState<string>();
@@ -38,6 +40,7 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
     if (!canvasRef.current) return; //null canvas ref
     const canvas = canvasRef.current;
 
+    // Create the movie
     const movie = new etro.Movie({
       canvas: canvas,
       repeat: false,
@@ -47,12 +50,9 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
     canvas.width = 1920;
     canvas.height = 1080;
 
-    // TODO: add other types of layer, audio etc, take as param to component
-    let start = 0;
+    let start = 0; // primitive: next image starts when one before ends
 
-    console.log(chosenImages);
-
-    chosenImages?.map((img: ChosenImage) => {
+    chosenImages.map((img: ChosenImage) => {
       const layer = new etro.layer.Image({
         startTime: start,
         duration: img.duration,
@@ -73,13 +73,7 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
       movie.addLayer(layer);
       movieRef.current = movie;
     });
-
-    // for (const layer of imgLayers) {
-    //   movie.addLayer(layer);
-    // }
   }, []);
-
-  const downloadPath: string = "./video.webm";
 
   const generateVideo = async () => {
     await movieRef.current
@@ -98,10 +92,10 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
       .then((blob) => {
         const newBlob = new Blob([blob], { type: "video/mp4" });
         const url = URL.createObjectURL(newBlob);
-        setVideoURL(url);
+        setVideoURL(url); // set the url so we can play
       });
-    console.log("saved as mp4");
-    setIsVideoReady(true);
+    console.log("recording complete");
+    setIsVideoReady(true); // change the display
   };
 
   return (
@@ -119,7 +113,7 @@ export const VideoGenerator: React.FC<{ chosenImages: ChosenImage[] }> = ({
               setIsGenerateClicked(true);
               console.log("video creation started");
               setTimeout(() => {
-                console.log("expo");
+                console.log("generating");
                 generateVideo();
               }, 1000);
             }}
