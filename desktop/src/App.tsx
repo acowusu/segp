@@ -15,22 +15,14 @@ import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
 import { Editor } from "./pages/editor";
-import { VideoGenerator } from "./pages/videogen";
 function App() {
   // const [count, setCount] = useState(0);
 
-  type ChosenImage = {
-    imgSrc: string;
-    duration: number;
-    text?: string;
-  };
-
-  const dummyImages: ChosenImage[] = [];
   return (
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
-          <Route path="/" element={<VideoGenerator />}>
+          <Route path="/" element={<Layout />}>
             <Route index element={<Upload />} />
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="set-topic" element={<SetTopic />} />
