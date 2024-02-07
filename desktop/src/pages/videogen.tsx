@@ -5,21 +5,24 @@ import { imageOptimizer } from "next/dist/server/image-optimizer";
 import { Button } from "../components/ui/button";
 import { log } from "console";
 
-type ChosenImage = {
-  imgSrc: string;
+type ChosenAsset = {
+  src: string;
   duration: number;
   text?: string;
 };
 
-const dummy: ChosenImage[] = [
-  { imgSrc: "./example-min.jpg", duration: 2 },
-  { imgSrc: "./example2-min.jpg", duration: 2 },
-  { imgSrc: "./example3-min.jpg", duration: 2 },
+const dummyImages: ChosenAsset[] = [
+  { src: "./example-min.jpg", duration: 5 },
+  { src: "./example2-min.jpg", duration: 5 },
+  { src: "./example3-min.jpg", duration: 7 },
 ];
+
+const dummyAudio: ChosenAsset[] = [{src: "./daniel1.mp3", duration: 17}] 
+
 
 // Dummy generator before the types are hashed out
 export const VideoGeneratorDummy: React.FC = () => {
-  return <VideoGenerator chosenImages={dummy} />;
+  return <VideoGenerator chosenImages={dummyImages} chosenAudio={dummyAudio} />;
 };
 
 /** TODOs:
@@ -28,8 +31,8 @@ export const VideoGeneratorDummy: React.FC = () => {
  * -> overlaiying of visual layers for subtitles on top of the visuals
  */
 export const VideoGenerator: React.FC<{
-  chosenImages: ChosenImage[] /* settings: ? */;
-}> = ({ chosenImages }) => {
+  chosenImages: ChosenAsset[], chosenAudio: ChosenAsset[] /* settings: ? */;
+}> = ({ chosenImages, chosenAudio }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
   const [videoURL, setVideoURL] = useState<string>();
@@ -52,11 +55,12 @@ export const VideoGenerator: React.FC<{
 
     let start = 0; // primitive: next image starts when one before ends
 
-    chosenImages.map((img: ChosenImage) => {
+    // Add the Video layers
+    chosenImages.map((img: ChosenAsset) => {
       const layer = new etro.layer.Image({
         startTime: start,
         duration: img.duration,
-        source: img.imgSrc,
+        source: img.src,
         sourceX: 0, // default: 0
         sourceY: 0, // default: 0
         sourceWidth: 19200, // default: null (full width)
@@ -71,17 +75,34 @@ export const VideoGenerator: React.FC<{
       start += img.duration;
 
       movie.addLayer(layer);
-      movieRef.current = movie;
     });
-  }, []);
+    
+    start = 0;
 
+    // Add the Audio layers
+    chosenAudio.map((aud: ChosenAsset) => {
+      const layer = new etro.layer.Audio({
+        startTime: start,
+        duration: aud.duration,
+        source: aud.src,
+        sourceStartTime: 0, // default: 0
+        muted: false, // default: false
+        volume: 1, // default: 1
+        playbackRate: 1, //default: 1
+      });
+      start += aud.duration;
+      movie.addLayer(layer);
+    })
+    movieRef.current = movie;
+  }, []);
+  
   const generateVideo = async () => {
     await movieRef.current
-      ?.record({
-        frameRate: 30,
-        type: "video/webm;codecs=vp9",
-        // audio: default true,
-        // video: default true,
+    ?.record({
+      frameRate: 30,
+      type: "video/webm;codecs=vp9",
+      // audio: default true,
+      // video: default true,
         // duration: default end of video
         // onStart: optional callback
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
