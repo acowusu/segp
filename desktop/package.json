@@ -82,7 +82,7 @@
     "@vitest/coverage-v8": "^1.2.2",
     "autoprefixer": "^10.4.16",
     "better-sqlite3": "^8.6.0",
-    "electron": "^26.1.0",
+    "electron": "^26.6.9",
     "electron-builder": "^24.6.4",
     "electron-rebuild": "^3.2.9",
     "eslint": "^8.48.0",

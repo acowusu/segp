@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 export const AudioGenerator: React.FC = () => {
   const [audioUrl, setAudioUrl] = useState<string>('');
-  const text = "testing"
+  const text = "Script text will go here once generated."
 
   const generateAudio = async (text: string) => {
     // Assuming window.api.textToAudio returns a promise with the audio URL

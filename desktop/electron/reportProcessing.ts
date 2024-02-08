@@ -16,9 +16,27 @@ import voiceovers from "./mockData/voiceovers.json";
 
 
 export async function textToAudio(text: string): Promise<string> {
-  // TODO: actual logic
-  return text + ".mp3";
+
+    const postData = new FormData();
+    postData.append('script', text);
+
+    const response = await fetch('http://0.0.0.0:8888/tts/', {
+        method: 'POST',
+        body: postData,
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const audioBlob = await response.blob();
+
+    // Create a URL for the blob
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    return audioUrl;
 }
+
 
 export function extractTextFromPDF(filePath: string): Promise<string> {
   const worker = new Worker(path.resolve(__dirname, "./worker.js"), {});
