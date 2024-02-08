@@ -1,6 +1,8 @@
 import { Promisified } from "./apiTypes";
 import {
   getScript,
+  generateMoreScripts,
+  getScripts,
   getTopics,
   setTopic,
   setAudience,
@@ -23,7 +25,9 @@ import { getProjectName, getProjectPath, getIsDev} from "./metadata";
 
 const api = {
   loadReport,
+  generateMoreScripts,
   getScript,
+  getScripts,
   getTopics,
   setTopic,
   getAudiences,

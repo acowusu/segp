@@ -8,6 +8,11 @@ export interface ScriptData {
   script2: string;
 }
 
+export interface TopicScript{
+  section: string;
+  scripts: string[]
+}
+
 export interface Audience {
   name: string;
   description: string;
