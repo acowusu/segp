@@ -1,8 +1,18 @@
 import Database from "better-sqlite3";
 import { Database as DatabaseType } from "better-sqlite3";
+import isDev from "electron-is-dev";
 let database: DatabaseType | undefined;
+import { resolve } from "path";
 
 export function getDatabase(filename: string) {
+  if (!isDev || !database) {
+    return new Database(filename, {
+      nativeBinding:resolve(
+        __dirname,
+        "../../app.asar.unpacked/dist-native/better_sqlite3.node"
+      ),
+    });
+  }
   return (database ??= new Database(filename));
 }
 
