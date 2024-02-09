@@ -1,0 +1,16 @@
+1
+00:00:00,000 --> 00:00:05,296
+The sun was setting behind the distant mountains, casting a warm glow over the tranquil valley below.
+
+2
+00:00:05,296 --> 00:00:09,237
+Birds chirped softly in the trees, and a gentle breeze rustled the leaves.
+
+3
+00:00:09,237 --> 00:00:15,728
+As the evening descended, the sky turned into a canvas of vibrant colors, painting the horizon with shades of orange, pink, and purple.
+
+4
+00:00:15,728 --> 00:00:19,670
+It was a peaceful scene, a moment of serenity amidst the chaos of the world.
+

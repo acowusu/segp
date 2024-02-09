@@ -1,0 +1,24 @@
+1
+00:00:00,000 --> 00:00:02,000
+The sun was setting behind the distant mountains,
+
+2
+00:00:02,000 --> 00:00:05,000
+casting a warm glow over the tranquil valley below.
+
+3
+00:00:05,000 --> 00:00:09,000
+Birds chirp softly in the trees, and a gentle breeze rust-tilted the leaves.
+
+4
+00:00:09,000 --> 00:00:13,000
+As the evening descended, the sky turned into a canvass of vibrant colors,
+
+5
+00:00:13,000 --> 00:00:16,000
+painting the horizon with shades of orange, pink and purple.
+
+6
+00:00:16,000 --> 00:00:20,000
+It was a peaceful scene, a moment of serenity amidst the chaos of the world.
+
