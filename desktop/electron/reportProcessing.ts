@@ -1,7 +1,7 @@
-import path from "path";
-import { Worker } from "worker_threads";
+// import { Worker } from "worker_threads";
 import { getProjectPath } from "./metadata";
 import audiences from "./mockData/audiences.json";
+import {pool } from "./pool";
 import type {
   Audience,
   ScriptData,
@@ -51,24 +51,9 @@ export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
     return audioInfoArray;
 }
 
-
-export function extractTextFromPDF(filePath: string): Promise<string> {
-  const worker = new Worker(path.resolve(__dirname, "./worker.js"), {});
-  worker.postMessage({ rpc: "setup", data: { path: getProjectPath() } });
-  worker.postMessage({ rpc: "extractTextFromPDF", data: { filePath } });
-
-  return new Promise((resolve, reject) => {
-    worker.on("message", ({ rpc, result }) => {
-      if (rpc === "extractTextFromPDF") {
-        resolve(result);
-      }
-    });
-    worker.on("error", reject);
-    worker.on("exit", (code) => {
-      if (code !== 0)
-        reject(new Error(`Worker stopped with exit code ${code}`));
-    });
-  });
+export async function extractTextFromPDF(filePath: string): Promise<string> {
+  const {text} = await (pool!.run({filePath, projectPath: getProjectPath()},  { name: 'extractTextFromPDF' }) as Promise<{ text: string; images: ImageData[]; }>)
+  return text
 }
 
 export async function getScript(): Promise<ScriptData[]> {

@@ -1,4 +1,5 @@
 import { userStore, getProjectStore } from "./store";
+import isDev from "electron-is-dev";
 import { sep } from "path";
 
 export function getProjectName(): string {
@@ -23,4 +24,8 @@ export function getLastProject(): string {
 
 export function getTextReportPath(): string {
   return `${getProjectPath()}${sep}report.txt`;
+}
+
+export function getIsDev(): boolean {
+  return isDev
 }

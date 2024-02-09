@@ -6,7 +6,6 @@ import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/layout";
 import { WelcomeLayout } from "./components/welcome-layout";
 import { SetVisuals } from "./pages/set-visuals";
-import { About } from "./pages/about";
 import { NotFound } from "./pages/not-found";
 import { SetAudience } from "./pages/set-audience";
 import { SetTopic } from "./pages/set-topic";
@@ -28,7 +27,6 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Upload />} />
             <Route path="welcome/" element={<WelcomeLayout />}>
-              <Route path="about" element={<About />} />
               <Route path="set-topic" element={<SetTopic />} />
               <Route path="set-audience" element={<SetAudience />} />
               <Route path="set-voiceover" element={<SetVoiceover />} />

@@ -6,11 +6,12 @@ export default defineWorkspace([
     // add "extends" to merge two configs together
     extends: "./vitest.config.ts",
     test: {
-    globals: true,
-      setupFiles: ['./src/lib/test-setup.ts'],
+      globals: true,
+      setupFiles: ["./src/lib/test-setup.ts"],
       include: ["src/**/*.test.{ts,tsx}"],
       name: "jsdom",
       environment: "jsdom",
+
     },
   },
   {
