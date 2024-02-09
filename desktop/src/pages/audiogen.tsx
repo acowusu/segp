@@ -6,6 +6,8 @@ interface AudioInfo {
   text: string;
 }
 
+// AudioGenerator passes an array of a script and returns an array of AudioInfo
+
 export const AudioGenerator: React.FC = () => {
   const [audioInfoList, setAudioInfoList] = useState<AudioInfo[]>([]);
   // const script = ["Good Morning I hope you have a lovely day.", "My name is John Cena - you can't see me.", "That's all, good bye world."]

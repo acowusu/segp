@@ -20,6 +20,7 @@ interface AudioInfo {
   text: string;
 }
 
+// Takes in an array of strings and returns an array of AudioInfo
 export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
 
     const audioInfoArray: AudioInfo[] = [];
@@ -37,6 +38,7 @@ export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
           throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
+      // Get audio link
       const responseData = await response.json();
       const audioLink: string = responseData.audio_link;
       const fullAudioLink: string = 'http://localhost:8888' + audioLink;
@@ -47,7 +49,7 @@ export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
       audioInfoArray.push({ audioUrl: fullAudioLink, duration, text});
     }
 
-    console.log(audioInfoArray);
+    // console.log(audioInfoArray);
     return audioInfoArray;
 }
 
