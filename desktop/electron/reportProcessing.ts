@@ -14,27 +14,41 @@ import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
 
+interface AudioInfo {
+  audioUrl: string;
+  duration: number;
+  text: string;
+}
 
-export async function textToAudio(text: string): Promise<string> {
+export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
 
-    const postData = new FormData();
-    postData.append('script', text);
+    const audioInfoArray: AudioInfo[] = [];
 
-    const response = await fetch('http://0.0.0.0:8888/tts/', {
-        method: 'POST',
-        body: postData,
-    });
+    for (const text of textArray) {
+      const postData = new FormData();
+      postData.append('script', text);
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      const response = await fetch('http://0.0.0.0:8888/tts/', {
+          method: 'POST',
+          body: postData,
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      const audioLink: string = responseData.audio_link;
+      const fullAudioLink: string = 'http://localhost:8888' + audioLink;
+
+      // Get audio duration 
+      const duration = responseData.duration;
+
+      audioInfoArray.push({ audioUrl: fullAudioLink, duration, text});
     }
 
-    const audioBlob = await response.blob();
-
-    // Create a URL for the blob
-    const audioUrl = URL.createObjectURL(audioBlob);
-
-    return audioUrl;
+    console.log(audioInfoArray);
+    return audioInfoArray;
 }
 
 

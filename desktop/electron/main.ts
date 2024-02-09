@@ -103,8 +103,8 @@ app && app.whenReady().then(() => {
 
   // handler for textToAudio function
   ipcMain.handle('textToAudio', async (_, text) => {
-    const audioUrl = await textToAudio(text);
-    return audioUrl;
+    const audioInfo = await textToAudio(text);
+    return audioInfo;
   });
 
   createWindow()
