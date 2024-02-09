@@ -169,8 +169,15 @@ There is an equivalent command for bash/zsh.
 
 ## Testing
 
-Install jest packages using `npm install --save-dev jest-electron`.
-Use `npm run tests` to run tests. Add any new tests you write to the `__tests__` folder.
+Tests are provided by vitest
+Run all the tests
+```npm run test````
+
+**Get coverage report**
+```npm run test:coverage```
+
+## Architecture
+![image](https://github.com/acowusu/segp/assets/22852862/7f4cf95d-f819-44c1-a985-2b3a535928e8)
 
 ## Contributing
 
