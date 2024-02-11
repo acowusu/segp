@@ -11,6 +11,7 @@ import {
   getVoiceovers,
   textToAudio,
 } from "./reportProcessing";
+import { generateAvatar } from "./avatarGeneration";
 // Import your API methods here
 import {
   getDirectory,
@@ -40,6 +41,7 @@ const api = {
   getProjectPath,
   textToAudio,
   getIsDev,
+  generateAvatar,
   // Add your API methods here
 };
 export default api;

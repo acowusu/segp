@@ -3,6 +3,7 @@ export interface IElectronAPI {
   setTopic(Topic): Promise<void>;
   openFile: () => Promise<string>,
   getScript(): Promise<ScriptData[]>;
+  generateAvatar(avatar: {id: string, imagePath: string}, audioPath: string): Promise<string>;
 }
 
 import { IAPI } from "./routes";

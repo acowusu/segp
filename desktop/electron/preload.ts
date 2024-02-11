@@ -10,8 +10,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setAudiences: (audience: Audience) => ipcRenderer.invoke('dialog:setAudience', audience),
   setVoiceovers: (voiceover: Voiceover) => ipcRenderer.invoke('dialog:setVoiceover', voiceover),
   setVisuals: (visuals: Visual) => ipcRenderer.invoke('dialog:setVisuals', visuals),
-  getScript: () => ipcRenderer.invoke('dialog:getScript')
-
+  getScript: () => ipcRenderer.invoke('dialog:getScript'),
+  generateAvatar: (avatar: {id: string, imagePath: string}, audioPath: string) => ipcRenderer.invoke('generateAvatar', avatar, audioPath),
 })
 
 
