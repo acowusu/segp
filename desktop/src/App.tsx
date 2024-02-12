@@ -16,10 +16,17 @@ import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
 import { Editor } from "./pages/editor";
 import { Button } from "./components/ui/button";
+import { Topic } from "../../electron/mockData/data";
 
 function DummyButton() {
+  // const topic: Topic = {topic: "topic", summary: "summary"};
   return (<>
-  <Button onClick={() => window.api.convertWebmToMp4("in-path", "out-path")}> Hello </Button>
+  <Button onClick={() => {
+      // window.api.setTopic(topic);
+      window.api.convertWebmToMp4("in-path", "out-path");
+
+    }
+  }> Hello </Button>
   </>)
 }
 

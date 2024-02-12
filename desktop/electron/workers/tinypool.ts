@@ -12,14 +12,22 @@ export const multiply =  ({ a, b }: { a: number, b: number }) => {
     return a * b
 }
 
-
+import { worker_convertWebmToMp4 } from "./worker";
 
 export interface ImageData {
   data: Uint8ClampedArray;
   width: number;
   height: number;
 }
+export const convertWebmToMp4 = async ({input, output}: {input: string | PathLike, output: string | PathLike}): Promise<void> => {
+  console.log(`input in worker:${input}`);
+  console.log(`output in worker: ${output}`);
+  console.log(`calling worker`);
+  await worker_convertWebmToMp4({input: input, output: output});
 
+  
+  return;
+};
 
 export const extractTextFromPDF = async ({
   filePath,projectPath
