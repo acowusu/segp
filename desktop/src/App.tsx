@@ -21,7 +21,7 @@ function App() {
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<DummyButton />}>
             <Route index element={<Upload />} />
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="set-topic" element={<SetTopic />} />

@@ -22,9 +22,9 @@ export function getPlatform() {
 
 export function getBinsPath() {
   const IS_PROD = process.env.NODE_ENV === "production";
-  const {isPackaged } = app;
+  // const {isPackaged } = app;
   
-  const binsPath = IS_PROD && isPackaged 
+  const binsPath = IS_PROD && app?.isPackaged
     ? path.join(process.resourcesPath, "./bin")
     : path.join(app.getAppPath(), "build/resources", getPlatform()!);
 
