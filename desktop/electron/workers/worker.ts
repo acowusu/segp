@@ -9,30 +9,13 @@ import Tinypool from "tinypool";
 export const worker_convertWebmToMp4 = async ({input, output}: {input: string | PathLike, output: string | PathLike}): Promise<void> => {
   console.log(`input in worker:${input}`);
   console.log(`output in worker: ${output}`);
-  // const child = spawn(ffmpegPath, ["-version"]);
 
-  spawn(ffmpegPath, ["-version"], {stdio: "pipe"});
-  // exec(`/build/resources/linux/ffmpeg -version`, (error, stdout, stderr) => {
-  //   if (error) {
-  //     console.error(`exec error: ${error}`);
-  //     return;
-  //   }
-  //   console.log(`stdout: ${stdout}`);
-  //   console.error(`stderr: ${stderr}`);});
+  ////kills the system, app is undefined?
+  // spawn(ffmpegPath, ["-version"], {stdio: ["pipe", 1, 2]});
 
-  // const child = spawn("echo", ["1"], {stdio: 'ignore'})
-  // .on('error', function(error) {
-  //   console.log("ERROR: DETAILS: " + error);
-  // })
-  // .on('close', function(code) {
-  //   console.log("SUCCESS: CODE: " + code);
-  // })
-  // .on('exit', function(code) {
-  //   console.log("EXIT: CODE: " + code);
-  // });
-  // console.log(child);
-  // console.log("hello")
-  // child.stderr.pipe(process.stderr);
-  // child.stdout.pipe(process.stdout);
-
+  //// This seems to launch the process fine, 
+  ////(im suspecting this might be running ont he main thread, but will fix that later)
+  // spawn("./build/resources/linux/ffmpeg", ["-version"], {stdio: ["pipe", 1, 2]});
+  console.log("worker: done");
+  return;
 }
