@@ -2,9 +2,12 @@ import { resolve } from "path";
 import fs from 'node:fs'
 import path from "node:path";
 import { defineConfig, Plugin, normalizePath } from "vite";
+import { platform, EOL } from "os";
 import electron from "vite-plugin-electron/simple";
 import react from "@vitejs/plugin-react";
 import pkg from './package.json'
+import decompress from "decompress";
+
 const sourcemap = !!process.env.VSCODE_DEBUG
 
 // https://vitejs.dev/config/
@@ -50,6 +53,7 @@ export default defineConfig({
       renderer: {},
     }),
     bindingSqlite3(),
+    bindingFFmpeg(),
   ],
   server: process.env.VSCODE_DEBUG && (() => {
     const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
@@ -96,6 +100,78 @@ function bindingSqlite3(options: {
       fs.writeFileSync(path.join(resolvedRoot, '.env'), `VITE_BETTER_SQLITE3_BINDING=${BETTER_SQLITE3_BINDING}`)
 
       console.log(TAG, `binding to ${BETTER_SQLITE3_BINDING}`)
+    },
+  }
+}
+
+function getPlatform() {
+  switch (platform()) {
+    case 'aix':
+    case 'freebsd':
+    case 'linux':
+    case 'openbsd':
+    case 'android':
+      return 'linux';
+    case "darwin":
+    case "sunos":
+      return "mac"
+    case "win32": // set to win32 even on 64 bit could use process.arch to check whether 64 bit?
+      return "win64"
+    default:
+      return null;
+  }
+}
+
+function bindingFFmpeg(options: {
+  output?: string;
+  binName?: string;
+  command?: string;
+} = {}): Plugin {
+  const TAG = '[vite-plugin-ffmpeg-binary]'
+  options.output ??= "dist-native"
+  const isPosixEnvironment = process.platform === "linux" || process.platform === "darwin";
+
+  options.binName ??= isPosixEnvironment ? "ffmpeg" : "ffmpeg.exe"
+
+
+  const resolver = isPosixEnvironment? path.posix : path.win32
+  return {
+    name: "vite-plugin-ffmpeg", 
+    config(config) {
+      const resolvedRoot = normalizePath(config.root ?path.resolve(config.root) : process.cwd())
+      const output = resolver.resolve(resolvedRoot,options.output) // this is the dist-native dir that will be asarunpacked
+      const osPath = getPlatform()
+      let ffmpegPath = resolver.resolve("build", "resources", osPath) 
+      if (isPosixEnvironment) {
+        ffmpegPath = resolver.join(ffmpegPath, "ffmpeg")
+      } else { // windows then it is a zip
+        ffmpegPath = resolver.join(ffmpegPath, "ffmpeg-win-64.zip")
+      }
+
+      if (!fs.existsSync(ffmpegPath)) {
+        throw new Error(`${TAG} Cannot find file "${ffmpegPath}".`)
+      }
+      // Make dist-native if it doesn't exist
+      if (!fs.existsSync(output)) {
+        fs.mkdirSync(output, { recursive: true })
+      }
+
+      if (isPosixEnvironment) {
+        fs.copyFileSync(ffmpegPath, resolver.join(output, options.binName)) 
+        // copy for posix
+      } else { // unzip to location for windows
+        decompress(ffmpegPath, output)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .then((_) => {console.log(`${TAG} Done unzipping the Win executable`)})
+        .catch((error) => {
+          console.log(`${TAG} Error unzipping the windows zip: ${error}`)
+        })
+      }
+      const ffmpegBin = path.join(output, options.binName)
+      fs.writeFileSync(path.join(resolvedRoot, '.env'), `${EOL} ffmpegPath=${ffmpegBin}`, {flag: "a"})
+      console.log(TAG, `binding to ${ffmpegBin}`)
+
+
     },
   }
 }
