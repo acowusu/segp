@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Form
+
 from openllm import LLM
 from typing import Any, AsyncGenerator, Dict, TypedDict, Union
 
@@ -7,15 +8,17 @@ import uuid
 
 import uvicorn
 import json
+
 # llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm"  )
-# llm = LLM("TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ", backend="vllm"  )
-llm = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq', dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
+# llm = LLM("TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ", backend="vllm" )
+llm = LLM("TheBloke/Llama-2-70B-Chat-GPTQ", backend="vllm", max_model_len = 4096, torch_dtype='float16' )
+
+# llm = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq', dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
 app = FastAPI(root_path="/v1")
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
 
 @app.post("/login/")
 async def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
@@ -25,9 +28,13 @@ async def login(username: Annotated[str, Form()], password: Annotated[str, Form(
 async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float, Form()]):
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * 1
-
+    print(prompt)
+    print(temperature)
+    # generator = llm.generate_iterator(
+    #     "what is an llm", request_id=request_id, n=1, temperature=0.6
+    # )
     generator = llm.generate_iterator(
-        prompt, request_id=request_id, n=1, temperature=temperature
+        prompt, request_id=request_id, n=1, temperature=temperature, max_new_tokens = 4096
     )
     async def streamer() -> AsyncGenerator[str, None]:
         async for request_output in generator:
@@ -36,7 +43,6 @@ async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float,
                 previous_texts[i].append(output.text)
                 yield output.text
 
-  
     async for _ in streamer():
         pass
     return "".join(previous_texts[0])
@@ -45,7 +51,7 @@ async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float,
     # return response_json
 
 @app.post("/instruct")
-async def generate(instructions: Annotated[str, Form()],prompt: Annotated[str, Form()], temperature: Annotated[float, Form()]):
+async def generate_instruct(instructions: Annotated[str, Form()],prompt: Annotated[str, Form()], temperature: Annotated[float, Form()]):
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * 1
     prompt= f"[INST] <<SYS>>{instructions}<</SYS>>{prompt}[/INST]"
@@ -58,7 +64,6 @@ async def generate(instructions: Annotated[str, Form()],prompt: Annotated[str, F
                 i = output.index
                 previous_texts[i].append(output.text)
                 yield output.text
-
   
     async for _ in streamer():
         pass

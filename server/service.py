@@ -8,6 +8,9 @@ from openllm import LLM
 
 # llm = LLM("HuggingFaceH4/zephyr-7b-alpha", backend="vllm")
 llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm"  )
+# llm = LLM("mistralai/Mistral-7B-v0.1", backend="vllm", dtype='half')
+# llm = LLM("TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ", backend="vllm", dtype='half')
+# llm = LLM("mistralai/Mixtral-8x7B-Instruct-v0.1", backend="vllm", dtype='half')
 # stable_diffusion = bentoml.diffusers_simple.stable_diffusion.create_runner("CompVis/stable-diffusion-v1-4")
 
 # mistralai/Mistral-7B-Instruct-v0.2
@@ -36,14 +39,17 @@ async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], s
     n = request["sampling_params"].pop("n", 1)
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * n
+    
+    print(request_id)
 
     generator = llm.generate_iterator(
         request["prompt"], request_id=request_id, n=n, **request["sampling_params"]
     )
-
+    # print(generator.outputs[0].text)
     async def streamer() -> AsyncGenerator[str, None]:
         async for request_output in generator:
             for output in request_output.outputs:
+                print(output.text)
                 i = output.index
                 previous_texts[i].append(output.text)
                 yield output.text
