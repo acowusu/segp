@@ -39,4 +39,4 @@ function getPath() {
   return "../../app.asar.unpacked/dist-native";
 }
 
-export const ffmpegPath = path.resolve(getPath(), "ffmpeg");
+export const ffmpegPath = path.resolve(getPath(), "ffmpeg"); // seems to work with windows as well (without the .exe)
