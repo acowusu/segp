@@ -15,8 +15,6 @@ import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
 import { TopicScripts } from "../src/pages/script-editor";
-import scripts from "./mockData/scripts.json"
-
 
 
 
@@ -42,6 +40,19 @@ export async function getTopics(): Promise<Topic[]> {
 }
 
 export async function getScripts(): Promise<TopicScripts> {
+
+  const BASE_URL = "http://tapir.alexo.uk/polar_bears_script1.json" // TODO set up in .env file 
+
+  var scripts: TopicScripts = []
+
+  try {
+    const response = await await fetch(BASE_URL)
+    if (response.status === 200) {
+      scripts = await response.json() as TopicScripts
+    }
+  } catch (error) {
+    console.error("Failed to fetch script data:", error);
+  }
   return scripts;
 }
 
