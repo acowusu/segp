@@ -21,7 +21,6 @@ export const ScriptEditor: React.FC = () => {
   const navigate = useNavigate();
   const [sectionIndex, setSectionIndex] = useState(0);
   const[sectionScriptChoice, setSectionScriptChoice] = useState<number[]>([]);
-  const [sectionOrder, setSectionOrder] = useState<number[]>([])
   const [allScripts, setAllScripts] = useState<TopicScripts>([])
 
 
@@ -60,7 +59,6 @@ export const ScriptEditor: React.FC = () => {
   useEffect(() => {
     if (sectionScriptChoice.length == 0) {
       setSectionScriptChoice(Array(allScripts.length).fill(0))
-      setSectionOrder(Array.from(Array(10).keys()))
     }
     const initialLayout = allScripts.map((_, index) => ({
       i: index.toString(),

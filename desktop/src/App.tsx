@@ -23,8 +23,7 @@ function App() {
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<ScriptEditor />} />
-            {/* <Route index element={<Upload />} /> */}
+            <Route index element={<Upload />} />
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="set-topic" element={<SetTopic />} />
               <Route path="set-audience" element={<SetAudience />} />

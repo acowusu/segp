@@ -27,7 +27,7 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
   return text
 }
 
-export async function generateMoreScripts({section, scripts}: TopicScript): Promise<string> {
+export async function generateMoreScripts({section}: TopicScript): Promise<string> {
   console.log(section)
   return "TODO get the llm to create new scripts based on topic name and data in pdf";
 }
