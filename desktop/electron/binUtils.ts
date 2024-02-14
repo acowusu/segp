@@ -1,6 +1,7 @@
 import { app } from "electron";
 import { platform } from "os";
 import path from "path";
+import isDev from "electron-is-dev";
 
 export function getPlatform() {
   switch (platform()) {
@@ -31,4 +32,11 @@ export function getBinsPath() {
     return binsPath
 }
 
-export const ffmpegPath = path.resolve(path.join(getBinsPath(), "ffmpeg"));
+function getPath() {
+  if (isDev) {
+    return "./dist-native";
+  }
+  return "../../app.asar.unpacked/dist-native";
+}
+
+export const ffmpegPath = path.resolve(getPath(), "ffmpeg");
