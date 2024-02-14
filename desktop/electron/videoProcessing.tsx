@@ -1,7 +1,7 @@
 import { PathLike } from "node:fs";
 import { pool } from "./pool";
-import { spawn } from "child_process";
-import { ffmpegPath } from "./binUtils";
+// import { spawn } from "child_process";
+// import { ffmpegPath } from "./binUtils";
 
 export async function convertWebmToMp4(inPath: string | PathLike, outPath: string | PathLike): Promise<void> {
   console.log(`input: ${inPath}`);
