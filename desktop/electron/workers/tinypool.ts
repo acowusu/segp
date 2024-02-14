@@ -3,7 +3,8 @@ import { mkdir, readFile } from "node:fs/promises";
 import { sep } from "path";
 import { PNG } from "pngjs";
 import { extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
-
+import { spawn  } from "node:child_process";
+import { PathLike } from "node:fs";
 
 export const add =  ({ a, b }: { a: number, b: number }) => {
     return a + b
@@ -12,7 +13,7 @@ export const multiply =  ({ a, b }: { a: number, b: number }) => {
     return a * b
 }
 
-import { worker_convertWebmToMp4 } from "./worker";
+// import { worker_convertWebmToMp4 } from "./worker";
 
 export interface ImageData {
   data: Uint8ClampedArray;
@@ -22,9 +23,8 @@ export interface ImageData {
 export const convertWebmToMp4 = async ({input, output}: {input: string | PathLike, output: string | PathLike}): Promise<void> => {
   console.log(`input in worker:${input}`);
   console.log(`output in worker: ${output}`);
-  console.log(`calling worker`);
-  await worker_convertWebmToMp4({input: input, output: output});
-
+  console.log(`spawning worker`);
+  spawn("./build/resources/linux/ffmpeg", ["-version"], {stdio: ["pipe", 1, 2]});
   
   return;
 };
