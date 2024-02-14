@@ -5,6 +5,7 @@ import { PNG } from "pngjs";
 import { extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
 import { spawn  } from "node:child_process";
 import { PathLike } from "node:fs";
+import { ffmpegPath } from "../binUtils";
 
 export const add =  ({ a, b }: { a: number, b: number }) => {
     return a + b
@@ -24,7 +25,7 @@ export const convertWebmToMp4 = async ({input, output}: {input: string | PathLik
   console.log(`input in worker:${input}`);
   console.log(`output in worker: ${output}`);
   console.log(`spawning worker`);
-  spawn("./build/resources/linux/ffmpeg", ["-version"], {stdio: ["pipe", 1, 2]});
+  spawn(ffmpegPath, ["-version"], {stdio: ["pipe", 1, 2]});
   
   return;
 };
