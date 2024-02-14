@@ -63,6 +63,7 @@
     "@xzdarcy/react-timeline-editor": "^0.1.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "decompress": "^4.2.1",
     "electron-is-dev": "^3.0.1",
     "electron-store": "^8.1.0",
     "embla-carousel": "^8.0.0-rc19",
