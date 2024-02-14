@@ -160,7 +160,7 @@ function bindingFFmpeg(options: {
         fs.copyFileSync(ffmpegPath, resolver.join(output, options.binName)) 
         // copy for posix
       } else { // unzip to location for windows
-        decompress(ffmpegPath, output)
+        decompress(ffmpegPath, output) // windows dev build works
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .then((_) => {console.log(`${TAG} Done unzipping the Win executable`)})
         .catch((error) => {
