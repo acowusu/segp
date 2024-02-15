@@ -1,6 +1,7 @@
 import os
-from TTS.api import TTS
+
 from pydub import AudioSegment
+from TTS.api import TTS
 
 
 def seconds_to_srt_time(seconds):

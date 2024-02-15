@@ -1,6 +1,7 @@
-from datetime import timedelta
-import whisper
 import os
+from datetime import timedelta
+
+import whisper
 
 model = whisper.load_model("base")
 result = model.transcribe("generated_audio/full.mp3")
