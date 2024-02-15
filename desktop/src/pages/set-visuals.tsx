@@ -34,6 +34,8 @@ const defaultValues: Partial<FormValues> = {
 };
 
 export function SetVisuals() {
+  const [items, setItems] = useState<Audience[]>([]);
+  const [selectedAudience, setSelectedAudience] = useState<Audience>({} as Audience);
   const navigate = useNavigate();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
