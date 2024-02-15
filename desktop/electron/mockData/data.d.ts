@@ -3,9 +3,10 @@ export interface Topic {
   summary: string;
 }
 export interface ScriptData {
-  section: string;
-  script1: string;
-  script2: string;
+  id: string; // GUID 
+  selectedScriptIndex: number; // index of the selected script
+  scriptTexts: string[];  // array of script texts
+  section: string?; // Description of the section
 }
 
 export interface Audience {
