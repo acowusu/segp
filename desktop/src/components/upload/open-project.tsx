@@ -22,8 +22,13 @@ export const OpenProject: React.FC<OpenProjectProps> = ({
   const [recentProjects, setRecentProjects] = useState<string[]>([]);
   useEffect( () => {
     (async () => {
-      const project= await window.api.getLastProject();
+      try {
+        const project= await window.api.getLastProject();
       setRecentProjects([project]);
+      }
+      catch (e) {
+        console.log("Error getting last project", e);
+      }
     })();
   }, []);
     return (
