@@ -33,14 +33,6 @@ const sidebarNavItems = [
     href: "/welcome/set-topic",
   },
   {
-    title: "Audience",
-    href: "/welcome/set-audience",
-  },
-  {
-    title: "Voiceover",
-    href: "/welcome/set-voiceover",
-  },
-  {
     title: "Visuals",
     href: "/welcome/set-visuals",
   },

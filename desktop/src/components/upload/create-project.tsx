@@ -14,7 +14,7 @@ import { Label } from "../ui/label";
 interface CreateProjectProps {
   projectName?: string;
   setProjectName?: (name: SetStateAction<string>) => void;
-  setProjectFile?: (e?: unknown) => void;
+  setProjectFile?: (path?:string|undefined) => void;
   setReportFile?: (e?: unknown) => void;
   reportFilePath?: string;
   projectFilePath?: string;
@@ -49,7 +49,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
   handleNext = () => {},
 }) => {
   return (
-    <Card className="w-[400px]">
+    <>
       <CardHeader>
         <CardTitle>Create project</CardTitle>
         <CardDescription>
@@ -72,7 +72,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
               <Label htmlFor="file">Project Directory</Label>
               <Input
                 id="file"
-                onClick={setProjectFile}
+                onClick={()=>setProjectFile()}
                 placeholder="Select a Directory"
                 value={projectFilePath}
                 readOnly
@@ -99,7 +99,7 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
           Next
         </Button>
       </CardFooter>
-    </Card>
+    </>
   );
 };
 

@@ -14,35 +14,184 @@ import {
 } from "../components/ui/form";
 
 import { Switch } from "../components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import { Audience, Voiceover } from "../../electron/mockData/data";
+import { useCallback, useEffect, useState } from "react";
 
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
   subtitles: z.boolean().default(false).optional(),
+  audience: z
+    .string({ required_error: "Please Select an Audience" })
+    .default("").optional(),
+  voiceover: z
+    .string({ required_error: "Please Select an Voiceover" })
+    .default("").optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const defaultValues: Partial<FormValues> = {
-  avatar: false,
-  subtitles: false,
+const defaultValues: () => Promise<Partial<FormValues>> = async () => {
+  return {
+    avatar: await window.api.getProjectHasAvatar().catch(()=>false)!,
+    subtitles:  await window.api.getProjectHasSubtitles().catch(()=>false)!,
+    audience: ( await window.api.getProjectAudience().catch(()=>({name:""}))).name!,
+    voiceover: (await window.api.getProjectVoiceover().catch(()=>({id:""}))).id!,
+  }
 };
 
 export function SetVisuals() {
+  const [audienceItems, setAudienceItems] = useState<Audience[]>([]);
+  const [selectedAudience, setSelectedAudience] = useState<Audience>(
+    {} as Audience
+  );
+  const [voiceoverItems, setVoiceoverItems] = useState<Voiceover[]>([]);
+  const [selectedVoiceover, setSelectedVoiceover] = useState<Voiceover>(
+    {} as Voiceover
+  );
+
+  const setAudience = useCallback(async (audience: Audience) => {
+    if (audience !== undefined) {
+      setSelectedAudience(audience);
+      window.api.setAudience(audience);
+    }
+  }, []);
+  const setVoiceover = useCallback(async (voiceover: Voiceover) => {
+    if (voiceover !== undefined) {
+      setSelectedVoiceover(voiceover);
+      window.api.setVoiceover(voiceover);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.api
+      .getVoiceovers()
+      .then((data) => {
+        setVoiceoverItems(data);
+      })
+      .then(() =>
+        window.api
+          .getProjectVoiceover()
+          .then((data) => {
+            setVoiceover(data);
+          })
+          .catch((e) => {
+            console.log(e);
+          })
+      );
+  }, [setVoiceover]);
+
+  useEffect(() => {
+    window.api
+      .getAudiences()
+      .then((data) => {
+        setAudienceItems(data);
+      })
+      .then(() =>
+        window.api
+          .getProjectAudience()
+          .then((data) => {
+            setAudience(data);
+          })
+          .catch((e) => {
+            console.log(e);
+          })
+      );
+  }, [setAudience]);
+
   const navigate = useNavigate();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
 
-  function onSubmit(data: FormValues) {
+  const  onSubmit = useCallback((data: FormValues) =>  {
     console.log(data);
-    navigate("/welcome/script-editor");
-  }
+    window.api.setProjectHasAvatar(data.avatar || false);
+    window.api.setProjectHasSubtitles(data.subtitles || false);
+    setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
+    setAudience(audienceItems.find(item => item.name === data.audience)!)
+
+  }, [audienceItems, setAudience, setVoiceover, voiceoverItems])
+
+  const {watch,handleSubmit }  = form
+  useEffect(() => {
+    // TypeScript users 
+    const subscription = watch(() => handleSubmit(onSubmit)())
+    return () => subscription.unsubscribe();
+}, [watch, handleSubmit,  onSubmit]);
   const { avatar, subtitles } = form.watch();
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div>
+          <h3 className="mb-4 text-lg font-medium">Configuration</h3>
+          <FormField
+            control={form.control}
+            name="audience"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Audience</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={selectedAudience?.name || " Select an Audience"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {audienceItems.map((audienceItem) => (
+                      <SelectItem
+                        key={audienceItem.name}
+                        value={audienceItem.name}
+                      >
+                        {audienceItem.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                   {selectedAudience.description}
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="voiceover"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Voiceover</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                  <SelectValue placeholder={selectedVoiceover?.name || " Select a Voiceover"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {voiceoverItems.map((voiceoverItem) => (
+                      <SelectItem
+                        key={voiceoverItem.name}
+                        value={voiceoverItem.id}
+                      >
+                        {voiceoverItem.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                   {selectedVoiceover.description}
+                </FormDescription>
+              </FormItem>
+            )}
+          />
           <h3 className="mb-4 text-lg font-medium">Visuals</h3>
           <div className="space-y-4">
             <FormField

@@ -1,10 +1,10 @@
 import { Button } from "../ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
+import {  CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-
+import { useEffect, useState } from "react";
 interface OpenProjectProps {
-    setProjectFile?: (e?: unknown) => void;
+    setProjectFile?: (path?:string|undefined) => void;
     projectFilePath?: string;
     disableFilePicker?: boolean;
     disabledNext?: boolean;
@@ -17,37 +17,59 @@ export const OpenProject: React.FC<OpenProjectProps> = ({
     disableFilePicker = false,
     disabledNext = false,
     handleNext = () => {},
+    
 }) => {
+  const [recentProjects, setRecentProjects] = useState<string[]>([]);
+  useEffect( () => {
+    (async () => {
+      try {
+        const project= await window.api.getLastProject();
+      setRecentProjects([project]);
+      }
+      catch (e) {
+        console.log("Error getting last project", e);
+      }
+    })();
+  }, []);
     return (
-      <Card className="w-[400px]">
+      <>
         <CardHeader>
           <CardTitle>Open project</CardTitle>
           <CardDescription>Open an existing project.</CardDescription>
         </CardHeader>
         <CardContent>
           <form>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5 mb-32">
+            <div className="grid w-full items-center gap-4 ">
+              <div className="flex flex-col space-y-1.5 ">
                 <Label htmlFor="file">Project Directory</Label>
                 <Input
                   id="file"
-                  onClick={setProjectFile}
+                  onClick={()=>setProjectFile()}
                   placeholder="Select a Directory"
                   value={projectFilePath}
                   readOnly
                   disabled={disableFilePicker}
                 />
               </div>
+              <div>
+              <Label htmlFor="list">Open Recent Projects</Label>
+              {recentProjects.map((project) => (
+                <div key={project}>
+                  <Button type="button" className="w-full" variant={"secondary"}  onClick={() => setProjectFile(project)}>{project}</Button>
+                </div>
+              ))}
+
+              </div>
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-between mt-6">
+        <CardFooter className="flex justify-between relative bottom-[-72px]">
           <Button variant="outline">Cancel</Button>
           <Button disabled={disabledNext} onClick={handleNext}>
             Next
           </Button>
         </CardFooter>
-      </Card>
+      </>
     );
   };
   
