@@ -2,6 +2,7 @@ import os
 from TTS.api import TTS
 from pydub import AudioSegment
 
+
 def seconds_to_srt_time(seconds):
     """Converts seconds to SRT time format"""
     hours = seconds // 3600
@@ -9,6 +10,7 @@ def seconds_to_srt_time(seconds):
     seconds = seconds % 60
     milliseconds = (seconds - int(seconds)) * 1000
     return "%02d:%02d:%02d,%03d" % (hours, minutes, int(seconds), int(milliseconds))
+
 
 # Directory to store generated audio files
 AUDIO_DIRECTORY = "generated_audio"

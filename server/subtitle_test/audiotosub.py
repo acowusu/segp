@@ -6,6 +6,7 @@ def seconds_to_srt_time(seconds):
     milliseconds = (seconds - int(seconds)) * 1000
     return "%02d:%02d:%02d,%03d" % (hours, minutes, int(seconds), int(milliseconds))
 
+
 def create_srt(data):
     """Creates SRT format subtitles from data"""
     subtitles = ""
@@ -17,6 +18,7 @@ def create_srt(data):
         subtitles += subtitle
         start_time = end_time
     return subtitles
+
 
 data = [
     {
