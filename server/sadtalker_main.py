@@ -1,12 +1,13 @@
-from fastapi import FastAPI, Form
-from typing_extensions import Annotated
-from pydantic import BaseModel
-import subprocess
-from datetime import datetime
-import uvicorn
-from base64 import b64encode
-import os
 import glob
+import os
+import subprocess
+from base64 import b64encode
+from datetime import datetime
+
+import uvicorn
+from fastapi import FastAPI, Form
+from pydantic import BaseModel
+from typing_extensions import Annotated
 
 
 class SadTalker(BaseModel):
