@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
 import { useEffect } from 'react';
@@ -17,23 +17,24 @@ export const SetTopic: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic>({} as Topic);
-  const [disabled, setDisabled] = useState(false);
-  useEffect( () => {
-    window.api.getTopics().then((data) => {
-      setItems(data);
-    });
-  }, []);
- 
   
-  const setTopic = async (topic :Topic) => {
-    if (disabled) return;
-    setDisabled(true);
+  
+  const setTopic = useCallback(async (topic :Topic) => {
     if (topic !== undefined) {
       setSelectedTopic(topic);
       await window.api.setTopic(topic);
     }
-    setDisabled(false);
-  };
+  }, []);
+  useEffect( () => {
+    window.api.getTopics().then((data) => {
+      setItems(data);
+    }).then(() => window.api.getProjectTopic().then((data) => {
+        setTopic(data);
+      }).catch((e) => {
+        console.log(e);
+      }))
+
+  }, [setTopic]);
   const setAudience = async () => {
     navigate("/welcome/set-audience");
   };
