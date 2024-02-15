@@ -52,19 +52,23 @@ for line_idx, line in enumerate(lines, start=1):
     srt_file_path = os.path.join(SRT_DIRECTORY, srt_file_name)
 
     # Generate SRT content
-    srt_content = f"{line_idx}\n00:00:00,000 --> {seconds_to_srt_time(audio_duration)}\n{text}\n"
+    srt_content = (
+        f"{line_idx}\n00:00:00,000 --> {seconds_to_srt_time(audio_duration)}\n{text}\n"
+    )
 
     # Write SRT content to file
     with open(srt_file_path, "w") as srt_file:
         srt_file.write(srt_content)
 
     # Append data for the current line to the list
-    data.append({
-        "audioUrl": f"http://localhost:8888/audio/{file_name}",
-        "duration": audio_duration,
-        "text": text,
-        "srtUrl": f"http://localhost:8888/srt/{srt_file_name}"
-    })
+    data.append(
+        {
+            "audioUrl": f"http://localhost:8888/audio/{file_name}",
+            "duration": audio_duration,
+            "text": text,
+            "srtUrl": f"http://localhost:8888/srt/{srt_file_name}",
+        }
+    )
 
 # Print the generated data
 print(data)
