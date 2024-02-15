@@ -21,7 +21,7 @@ def read_root():
 @app.post("/avatar/")
 async def animate_portrait(sadtalker: SadTalker):
     try:
-        results_dir = "../../../../www/sadtalker_results/"
+        results_dir = "../../../../../www/sadtalker_results/"
         os.chdir("./SadTalker")
         command = [
             "python3", "inference.py",
