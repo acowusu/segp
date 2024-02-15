@@ -1,6 +1,7 @@
 import { Promisified } from "./apiTypes";
 import {
   getScript,
+  setScript,
   getTopics,
   setTopic,
   setAudience,
@@ -20,10 +21,11 @@ import {
   loadReport,
 } from "./setup";
 import { getProjectName, getProjectPath, getIsDev, getLastProject} from "./metadata";
-
+import * as projectData from "./projectData"
 const api = {
   loadReport,
   getScript,
+  setScript,
   getTopics,
   setTopic,
   getAudiences,
@@ -41,6 +43,7 @@ const api = {
   textToAudio,
   getIsDev,
   getLastProject,
+  ...projectData
   // Add your API methods here
 };
 export default api;
