@@ -5,7 +5,8 @@ from base64 import b64encode
 from datetime import datetime
 
 import uvicorn
-from fastapi import FastAPI, Form
+from fastapi import FastAPI
+from fastapi import Form
 from pydantic import BaseModel
 from typing_extensions import Annotated
 
