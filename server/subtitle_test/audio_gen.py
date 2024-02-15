@@ -14,7 +14,8 @@ def seconds_to_srt_time(seconds):
     minutes = (seconds % 3600) // 60
     seconds = seconds % 60
     milliseconds = (seconds - int(seconds)) * 1000
-    return "%02d:%02d:%02d,%03d" % (hours, minutes, int(seconds), int(milliseconds))
+    return "%02d:%02d:%02d,%03d" % (hours, minutes, int(seconds),
+                                    int(milliseconds))
 
 
 # Directory to store generated audio files
@@ -66,14 +67,12 @@ for line_idx, line in enumerate(lines, start=1):
         srt_file.write(srt_content)
 
     # Append data for the current line to the list
-    data.append(
-        {
-            "audioUrl": f"http://localhost:8888/audio/{file_name}",
-            "duration": audio_duration,
-            "text": text,
-            "srtUrl": f"http://localhost:8888/srt/{srt_file_name}",
-        }
-    )
+    data.append({
+        "audioUrl": f"http://localhost:8888/audio/{file_name}",
+        "duration": audio_duration,
+        "text": text,
+        "srtUrl": f"http://localhost:8888/srt/{srt_file_name}",
+    })
 
 # Print the generated data
 print(data)
