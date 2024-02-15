@@ -1,5 +1,9 @@
 def seconds_to_srt_time(seconds):
-    """Converts seconds to SRT time format"""
+    """Converts seconds to SRT time format
+
+    :param seconds: 
+
+    """
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60
     seconds = seconds % 60
@@ -8,7 +12,11 @@ def seconds_to_srt_time(seconds):
 
 
 def create_srt(data):
-    """Creates SRT format subtitles from data"""
+    """Creates SRT format subtitles from data
+
+    :param data: 
+
+    """
     subtitles = ""
     start_time = 0
     for idx, clip in enumerate(data, start=1):
