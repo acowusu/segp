@@ -21,9 +21,10 @@ def read_root():
 @app.post("/avatar/")
 async def animate_portrait(sadtalker: SadTalker):
     try:
-        results_dir = "../../www/sadtalker_results/"
+        results_dir = "../../../../www/sadtalker_results/"
+        os.chdir("./SadTalker")
         command = [
-            "python3", "./SadTalker/inference.py",
+            "python3", "inference.py",
             "--driven_audio", sadtalker.driven_audio,
             "--source_image", sadtalker.source_image,
             "--enhancer", "gfpgan",
