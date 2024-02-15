@@ -54,8 +54,9 @@ export const ScriptEditor: React.FC = () => {
     }
     setDisabled(false);
   };
-  const setAudience = async () => {
+  const setScript = async () => {
     navigate("/welcome/set-audience");
+    await window.api.setScript(items);
   };
   const updateScriptText = (e: React.FormEvent, index: number, id: string) => {
     const target = e.target as HTMLInputElement;
@@ -81,7 +82,7 @@ export const ScriptEditor: React.FC = () => {
 
                       key={item.id}
                       className={cn(
-                        "flex flex-col items-start gap-2 rounded-lg border bg-white	 p-3 text-left text-sm transition-all border-2",
+                        "flex flex-col items-start gap-2 rounded-lg border  p-3 text-left text-sm transition-all border-2",
                         selectedScript.id === item.id &&
                           " border-2 border-sky-500",
                         selectedScript.id !== item.id &&
@@ -146,7 +147,7 @@ export const ScriptEditor: React.FC = () => {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline">Back</Button>
-          <Button onClick={setAudience}>Next</Button>
+          <Button onClick={setScript}>Next</Button>
         </CardFooter>
       </FramelessCard>
     </div>
