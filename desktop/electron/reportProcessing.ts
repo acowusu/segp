@@ -13,7 +13,7 @@ import script from "./mockData/script.json";
 import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
-
+import * as projectData from "./projectData";
 
 
 
@@ -27,13 +27,22 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
 }
 
 export async function getScript(): Promise<ScriptData[]> {
-  return script;
+  // TODO forward error if not initialized (for now we just return the notional script)
+  try {
+    return  projectData.getProjectScript();
+  }catch(e){
+    return script;
+  }
+}
+
+export async function setScript(script: ScriptData[]): Promise<void> {
+  projectData.setProjectScript(script);
 }
 export async function getTopics(): Promise<Topic[]> {
   return topics;
 }
 export async function setTopic(topic: Topic): Promise<void> {
-  console.log(topic);
+  projectData.setProjectTopic(topic);
 }
 export async function getAudiences(): Promise<Audience[]> {
   return audiences;
@@ -46,12 +55,13 @@ export async function getVisuals(): Promise<Visual[]> {
 }
 
 export async function setAudience(audience: Audience): Promise<void> {
-  console.log(audience);
+  projectData.setProjectAudience(audience);
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
-  console.log(voiceover);
+  console.log("setVoiceover", voiceover);
+  projectData.setProjectVoiceover(voiceover);
 }
 export async function setVisual(visuals: Visual): Promise<void> {
-  console.log(visuals);
+  projectData.setProjectVisual(visuals);
 }
 // Usage example:
