@@ -53,8 +53,10 @@ export const SetTopic: React.FC = () => {
                 <button
                   key={item.topic}
                   className={cn(
-                    "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-                    selectedTopic.topic === item.topic && "bg-muted"
+                    "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all",
+                    selectedTopic.topic === item.topic && "border-2 border-sky-500",
+                    selectedTopic.topic !== item.topic &&
+                          "hover:border-sky-500 hover: hover:border-dashed border-2"
                   )}
                   onClick={()=>setTopic(item)}
                 >
@@ -74,7 +76,7 @@ export const SetTopic: React.FC = () => {
             </div>
           </ScrollArea>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between ">
           <Button variant="outline">Back</Button>
           <Button onClick={setAudience}>Next</Button>
         </CardFooter>
