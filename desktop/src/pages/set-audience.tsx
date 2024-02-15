@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "../components/ui/button";
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
@@ -25,29 +25,30 @@ import { Audience } from "../../electron/mockData/data";
 export const SetAudience: React.FC = () => {
   const [items, setItems] = useState<Audience[]>([]);
   const [selectedAudience, setSelectedAudience] = useState<Audience>({} as Audience);
-  const [disabled, setDisabled] = useState(false);
+
+ 
+  const navigate = useNavigate();
+  const navigateNext = async () => {
+    navigate("/welcome/set-voiceover");
+  }
+  const setAudience = useCallback(async (audience :Audience) => {
+ 
+    if (audience !== undefined) {
+      setSelectedAudience(audience);
+      window.api.setAudience(audience);
+      // console.log(audience)
+    }
+ 
+  }, []);
   useEffect( () => {
     window.api.getAudiences().then((data) => {
       setItems(data);
-    });
-  }, []);
- 
-  const navigate = useNavigate();
-  const setVoiceover = async () => {
-    navigate("/welcome/set-voiceover");
-  }
-  const setAudience = async (audience :Audience) => {
-    if (disabled) return;
-    setDisabled(true);
-    if (audience !== undefined) {
-      setSelectedAudience(audience);
-      console.log(selectedAudience)
-    }
-    // const path = await window.api.setTopic(items.find((topic) => topic.topic === selectedTopic) as Topic);
-    // console.log(path);
-    // setFilePath(path);
-    setDisabled(false);
-  };
+    }).then(() => window.api.getProjectAudience().then((data) => {
+      setAudience(data);
+    }).catch((e) => {
+      console.log(e);
+    }))
+  }, [setAudience]);
    
   return (
     <div className="flex items-center justify-center mt-4">
@@ -61,7 +62,10 @@ export const SetAudience: React.FC = () => {
         <CardContent className="h-4/6">
         <Select>
       <SelectTrigger >
-        <SelectValue placeholder="Select an Audience" />
+      <SelectValue  placeholder=" Select an Audience"  aria-label={selectedAudience.name}>
+        {selectedAudience.name }
+</SelectValue>
+        {/* <SelectValue placeholder={selectedAudience?.name || "Select an Audience"} /> */}
       </SelectTrigger>
       <SelectContent>
               <SelectGroup>
@@ -80,8 +84,9 @@ export const SetAudience: React.FC = () => {
     </Select>
         </CardContent>
         <CardFooter className="flex justify-between">
+          {selectedAudience?.name }
           <Button variant="outline">Back</Button>
-          <Button onClick={setVoiceover}>Next</Button>
+          <Button onClick={navigateNext}>Next</Button>
         </CardFooter>
       </FramelessCard>
     </div>
