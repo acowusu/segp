@@ -12,7 +12,7 @@ export const generateTextFromLLM = async (
     params.append("prompt", `[INST] ${systemPrompt}  ${userPromp} [/INST]${startOfResponse}`);
     params.append("temperature", "1");
     // console.log(systemPrompt, userPromp, temperature);
-    const url = "https://iguana.alexo.uk/v1/generate";
+    const url = "https://iguana.alexo.uk/generate";
 
     const options = {
         method: "POST",
@@ -115,6 +115,7 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
     //         summary: "",
     //     }
     // });
+    result = result.substring(TOPICS_SYS.length+16+ report.length, result.length-1)
     result = result.replace(/```/g, '')
     result = result.substring(1, result.length-1)
     const isNotList = !result.includes("[")
