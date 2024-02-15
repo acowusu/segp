@@ -1,4 +1,4 @@
-import { getVisuals, getVoiceovers, getTopics, getAudiences, setVoiceover, setAudience, setVisual, setTopic, getScript } from "./reportProcessing";
+import { getVisuals, getVoiceovers, getAudiences, setVoiceover, setAudience, setVisual, setTopic, getScript } from "./reportProcessing";
 import voiceovers from './mockData/voiceovers.json'
 import topics from './mockData/topics.json'
 import audiences from './mockData/audiences.json'
@@ -15,10 +15,6 @@ test("getVisuals should return an array of visuals", async () => {
     expect(Array.isArray(visuals)).toBe(true);
 });
 
-test("getTopics should return an array of topics", async () => {
-    const result = await getTopics();
-    expect(result).toEqual(topics);
-});
 
 test("getAudiences should return an array of audiences", async () => {
     const result = await getAudiences();

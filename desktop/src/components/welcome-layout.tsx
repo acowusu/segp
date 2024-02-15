@@ -48,6 +48,10 @@ const sidebarNavItems = [
     title: "Video Editor",
     href: "/welcome/video-editor",
   },
+  {
+    title: "LLM Debugger",
+    href: "/welcome/debug",
+  },
 ];
 
 export function WelcomeLayout() {

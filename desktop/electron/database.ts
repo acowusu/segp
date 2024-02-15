@@ -6,7 +6,6 @@ import { resolve } from "path";
 
 export function getDatabase(filename: string) {
   if (!isDev && !database) {
-    console.log("Using native binding");
     return new Database(filename, {
       nativeBinding:resolve(
         __dirname,
@@ -14,13 +13,13 @@ export function getDatabase(filename: string) {
       ),
     });
   }
-  console.log(__dirname);
-  return (database ??= new Database(filename, {
-    nativeBinding:resolve(
-      __dirname,
-      "../dist-native/better_sqlite3.node"
-    ),
-  }));
+  return (database ??= new Database(filename,
+    {
+      nativeBinding:resolve(
+        __dirname,
+        "../dist-native/better_sqlite3.node"
+      ),
+    }));
 }
 
 export function closeDatabase() {

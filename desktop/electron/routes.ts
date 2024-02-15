@@ -22,6 +22,7 @@ import {
 } from "./setup";
 import { getProjectName, getProjectPath, getIsDev, getLastProject} from "./metadata";
 import * as projectData from "./projectData"
+import {generateTextFromLLM, generateTopics} from "./server"
 const api = {
   loadReport,
   getScript,
@@ -43,7 +44,9 @@ const api = {
   textToAudio,
   getIsDev,
   getLastProject,
-  ...projectData
+  ...projectData,
+  generateTextFromLLM,
+  generateTopics,
   // Add your API methods here
 };
 export default api;
