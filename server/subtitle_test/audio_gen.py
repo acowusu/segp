@@ -5,7 +5,11 @@ from TTS.api import TTS
 
 
 def seconds_to_srt_time(seconds):
-    """Converts seconds to SRT time format"""
+    """Converts seconds to SRT time format
+
+    :param seconds: 
+
+    """
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60
     seconds = seconds % 60
