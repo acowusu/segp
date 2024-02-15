@@ -12,7 +12,7 @@ export const AudioGenerator: React.FC = () => {
   const [audioInfoList, setAudioInfoList] = useState<AudioInfo[]>([]);
   // const script = ["Good Morning I hope you have a lovely day.", "My name is John Cena - you can't see me.", "That's all, good bye world."]
   // const script = ["The sun was setting behind the distant mountains, casting a warm glow over the tranquil valley below. Birds chirped softly in the trees, and a gentle breeze rustled the leaves. As the evening descended, the sky turned into a canvas of vibrant colors, painting the horizon with shades of orange, pink, and purple. It was a peaceful scene, a moment of serenity amidst the chaos of the world."]
-  const script = ["The sun was setting behind the distant mountains, casting a warm glow over the tranquil valley below.", "Birds chirped softly in the trees, and a gentle breeze rustled the leaves.", "As the evening descended, the sky turned into a canvas of vibrant colors, painting the horizon with shades of orange, pink, and purple.", "It was a peaceful scene, a moment of serenity amidst the chaos of the world."]
+  // const script = ["The sun was setting behind the distant mountains, casting a warm glow over the tranquil valley below.", "Birds chirped softly in the trees, and a gentle breeze rustled the leaves.", "As the evening descended, the sky turned into a canvas of vibrant colors, painting the horizon with shades of orange, pink, and purple.", "It was a peaceful scene, a moment of serenity amidst the chaos of the world."]
 
   const generateAudio = async (script: string[]) => {
     try {

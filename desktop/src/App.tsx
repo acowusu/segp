@@ -15,7 +15,6 @@ import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
 import { Editor } from "./pages/editor";
-import { AudioGenerator } from "./pages/audiogen";
 
 function App() {
   // const [count, setCount] = useState(0);
@@ -34,7 +33,6 @@ function App() {
               <Route path="script-editor" element={<ScriptEditor />} />
               <Route path="media" element={<Media />} />
               <Route path="video-editor" element={<Editor />} />
-              <Route path="audio-generation" element={<AudioGenerator />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Route>

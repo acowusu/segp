@@ -8,17 +8,12 @@ import type {
   Topic,
   Visual,
   Voiceover,
+  AudioInfo,
 } from "./mockData/data";
 import script from "./mockData/script.json";
 import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
-
-interface AudioInfo {
-  audioUrl: string;
-  duration: number;
-  text: string;
-}
 
 // Takes in an array of strings and returns an array of AudioInfo
 export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
@@ -29,7 +24,7 @@ export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
       const postData = new FormData();
       postData.append('script', text);
 
-      const response = await fetch('http://0.0.0.0:8888/tts/', {
+      const response = await fetch('https://iguana.alexo.uk/tts/', {
           method: 'POST',
           body: postData,
       });
@@ -41,7 +36,7 @@ export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
       // Get audio link
       const responseData = await response.json();
       const audioLink: string = responseData.audio_link;
-      const fullAudioLink: string = 'http://localhost:8888' + audioLink;
+      const fullAudioLink: string = 'https://iguana.alexo.uk' + audioLink;
 
       // Get audio duration 
       const duration = responseData.duration;
