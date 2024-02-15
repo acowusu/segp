@@ -14,10 +14,14 @@ import {
 } from "../components/ui/form";
 
 import { Switch } from "../components/ui/switch";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
   subtitles: z.boolean().default(false).optional(),
+  audience:z.string({required_error:"Please Select an Audience"}).default(""),
+  voiceover:z.string({required_error:"Please Select an Audience"}).default("")
+
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -25,6 +29,8 @@ type FormValues = z.infer<typeof formSchema>;
 const defaultValues: Partial<FormValues> = {
   avatar: false,
   subtitles: false,
+  audience:"",
+  voiceover:"",
 };
 
 export function SetVisuals() {
@@ -36,6 +42,8 @@ export function SetVisuals() {
 
   function onSubmit(data: FormValues) {
     console.log(data);
+    window.api.setProjectHasAvatar(data.avatar || false);
+    window.api.setProjectHasSubtitles(data.subtitles || false);
     navigate("/welcome/script-editor");
   }
   const { avatar, subtitles } = form.watch();
@@ -43,6 +51,36 @@ export function SetVisuals() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div>
+        <h3 className="mb-4 text-lg font-medium">Visuals</h3>
+        <h3 className="mb-4 text-lg font-medium">Visuals</h3>
+        <FormField
+          control={form.control}
+          name="audience"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Audience</FormLabel>
+        <Select  onValueChange={field.onChange} defaultValue={field.value}>
+      <SelectTrigger >
+      <SelectValue  placeholder=" Select an Audience" />
+      </SelectTrigger>
+      <SelectContent>
+              {items.map((item) => (
+                <SelectItem
+                  key={item.name}
+                  value={item.name}
+                >
+                  {item.name}
+                </SelectItem>
+              ))}
+         
+      </SelectContent>
+    </Select>
+    <FormDescription>
+                You can manage email addresses in your{" "}
+              </FormDescription>
+            </FormItem>
+          )}
+        />
           <h3 className="mb-4 text-lg font-medium">Visuals</h3>
           <div className="space-y-4">
             <FormField
