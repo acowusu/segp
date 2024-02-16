@@ -16,6 +16,7 @@ import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
 import { Editor } from "./pages/editor";
 import { Button } from "./components/ui/button";
+import { VideoGeneratorDummy } from "./pages/videogen";
 // import { Topic } from "../../electron/mockData/data";
 
 function DummyButton() {
@@ -37,7 +38,7 @@ function App() {
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Routes>
-          <Route path="/" element={<DummyButton />}>
+          <Route path="/" element={<VideoGeneratorDummy />}>
             <Route index element={<Upload />} />
             <Route path="welcome/" element={<WelcomeLayout />}>
               <Route path="set-topic" element={<SetTopic />} />
