@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, HTTPException
 from typing_extensions import Annotated
 from pydantic import BaseModel
 import subprocess
@@ -18,11 +18,41 @@ app = FastAPI()
 def read_root():
     return {"msg": "Hello World"}
 
+def is_valid_path(path):
+    return os.path.exists("./SadTalker/" + path)
+
+def is_valid_audio_extension(path):
+    _, extension = os.path.splitext(path)
+    valid_audio_extensions = ['.wav', '.mp3']
+
+    if extension.lower() not in valid_audio_extensions:
+        return False
+
+    return True
+
+def is_valid_image_extension(path):
+    _, extension = os.path.splitext(path)
+    valid_image_extensions = ['.png', '.mp4'] 
+
+    if extension.lower() not in valid_image_extensions:
+        return False
+
+    return True
+
 @app.post("/avatar/")
 async def animate_portrait(sadtalker: SadTalker):
     try:
-        results_dir = "../../../../../www/sadtalker_results/"
+        if not is_valid_path(sadtalker.driven_audio):
+            raise HTTPException(status_code=400, detail="Invalid driven_audio path")
+        if not is_valid_path(sadtalker.source_image):
+            raise HTTPException(status_code=400, detail="Invalid source_image path")
+        if not is_valid_audio_extension(sadtalker.driven_audio):
+            raise HTTPException(status_code=400, detail="Invalid driven_audio extension")
+        if not is_valid_image_extension(sadtalker.source_image):
+            raise HTTPException(status_code=400, detail="Invalid source_image extension")
+        
         os.chdir("./SadTalker")
+        results_dir = "../../../../../www/sadtalker_results/"
         command = [
             "python3", "inference.py",
             "--driven_audio", sadtalker.driven_audio,
@@ -30,11 +60,9 @@ async def animate_portrait(sadtalker: SadTalker):
             "--enhancer", "gfpgan",
             "--result_dir", results_dir
         ]
-        print(' '.join(command))
-        subprocess.run(command, check=True)
+        subprocess.run(command, check=True, capture_output=True, shell=False)
         
         # get the last from results
-        print(os.listdir(results_dir))
         results = sorted(os.listdir(results_dir))
         mp4_name = glob.glob(results_dir + '*.mp4')[0]
         mp4 = open('{}'.format(mp4_name),'rb').read()
@@ -45,8 +73,10 @@ async def animate_portrait(sadtalker: SadTalker):
                 "message": "Returned animation: {}".format(mp4_name),
                 "data_url": data_url
                 }
-    except Exception as e:
-        return {"error": str(e)}
-    
+    except subprocess.CalledProcessError:
+        raise HTTPException(status_code=500, detail="Subprocess call error")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8888)
