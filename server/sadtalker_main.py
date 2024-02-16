@@ -13,6 +13,7 @@ from typing_extensions import Annotated
 
 class SadTalker(BaseModel):
     """ """
+
     driven_audio: Annotated[str, Form()]
     source_image: Annotated[str, Form()]
 
