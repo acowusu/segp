@@ -18,7 +18,6 @@ export const SetTopic: React.FC = () => {
   const [items, setItems] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic>({} as Topic);
   
-  
   const setTopic = useCallback(async (topic :Topic) => {
     if (topic !== undefined) {
       setSelectedTopic(topic);
@@ -33,10 +32,9 @@ export const SetTopic: React.FC = () => {
       }).catch((e) => {
         console.log(e);
       }))
-
   }, [setTopic]);
-  const setAudience = async () => {
-    navigate("/welcome/set-audience");
+  const setScript = async () => {
+    navigate("/welcome/script-editor");
   };
   return (
     <div className="flex items-center justify-center mt-4">
@@ -79,7 +77,7 @@ export const SetTopic: React.FC = () => {
         </CardContent>
         <CardFooter className="flex justify-between ">
           <Button variant="outline">Back</Button>
-          <Button onClick={setAudience}>Next</Button>
+          <Button onClick={setScript}>Next</Button>
         </CardFooter>
       </FramelessCard>
     </div>

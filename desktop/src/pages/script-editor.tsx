@@ -82,7 +82,7 @@ export const ScriptEditor: React.FC = () => {
 
                       key={item.id}
                       className={cn(
-                        "flex flex-col items-start gap-2 rounded-lg border  p-3 text-left text-sm transition-all border-2",
+                        "flex flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
                         selectedScript.id === item.id &&
                           " border-2 border-sky-500",
                         selectedScript.id !== item.id &&
@@ -99,7 +99,8 @@ export const ScriptEditor: React.FC = () => {
                         )}
                       >
                         {/* View Other Drafts */}
-                        {selectedScript.id === item.id ? (                        <Badge variant={showOtherDrafts && selectedScript.id === item.id  ? "cloud":"secondary"} onClick={handleShowDrafts}>View Other Drafts</Badge>
+                        {selectedScript.id === item.id ? (                        
+                        <Badge variant={showOtherDrafts && selectedScript.id === item.id  ? "cloud":"secondary"} onClick={handleShowDrafts}>View Other Drafts</Badge>
                         ) : null}
                       </div>
                       {(selectedScript.id === item.id && showOtherDrafts )&& (

@@ -49,6 +49,14 @@ export function getProjectScript(): ScriptData[] {
     return getProjectStore().get("script") as ScriptData[];
 }
 
+
+export function getProjectTopics(): Topic[] {
+  return getProjectStore().get("topics", []) as Topic[];
+}
+export function setProjectTopics(topics: Topic[]): void {
+  getProjectStore().set("topics", topics);
+}
+
 export function setProjectTopic(topic: Topic): void {
   getProjectStore().set("topic", topic);
 }

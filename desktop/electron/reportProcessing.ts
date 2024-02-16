@@ -43,11 +43,19 @@ export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);
 }
 export async function getTopics(): Promise<Topic[]> {
+  const proj_data = projectData.getProjectTopics()
+  if (proj_data.length !== 0) {
+    return proj_data
+  }
+
+
   const reportPath = getTextReportPath();
   
   if (fs.existsSync(reportPath)) {
     const report = await readFile(reportPath, "utf-8");
-    return await generateTopics(report);
+    const topics = await generateTopics(report);
+    projectData.setProjectTopics(topics);
+    return topics
   } else {
     return await new Promise<Topic[]>((resolve) => {
       const watcher = watch(reportPath, { persistent: true }, async (event, filename) => {

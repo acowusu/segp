@@ -41,7 +41,8 @@ export const LLMDebugger = () => {
     const handleSubmit = async () => {
             if(isLoading) return;
             setIsLoading(true);
-            setLLmResponse(await window.api.generateTextFromLLM(systemPrompt, userPrompt, temperature, startOfResponse));
+            // setLLmResponse(await window.api.generateTextFromLLM(systemPrompt, userPrompt, temperature, startOfResponse));
+            setLLmResponse(await window.api.generateTextFromLLM(userPrompt));
             setIsLoading(false);
     };
     const handleGetTopics = async () => {

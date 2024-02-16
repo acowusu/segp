@@ -1,15 +1,12 @@
 import fetch from "node-fetch";
-import type { ScriptData, ScriptData, Topic } from "./mockData/data";
+import type { ScriptData, Topic } from "./mockData/data";
 export const generateTextFromLLM = async (
-    systemPrompt: string,
-    userPromp: string,
-    temperature: number,
-    startOfResponse:string
+    prompt: string,
 ): Promise<string> => {
 
     const params = new URLSearchParams();
 
-    params.append("prompt", `[INST] ${systemPrompt}  ${userPromp} [/INST]${startOfResponse}`);
+    params.append("prompt", `[INST] ${prompt} [/INST] `);
     params.append("temperature", "1");
     // console.log(systemPrompt, userPromp, temperature);
     const url = "https://iguana.alexo.uk/generate";
@@ -54,8 +51,14 @@ export const generateTextFromLLM = async (
 
 //  Here are the topics mentioned in the article you provided: 
 
+const TOPICS_SYS = `
+Below is some information.
+Find me a list of topics from this information which you could create an informative video out of (as well as an overview topic). 
+For this video, you can use general knowledge, but you should aim to use only information which is supplied in the information. If there is information which conflicts with your knowledge, assume that the information provided is right:
 
-const TOPICS_SYS = `<<SYS>>You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
+`
+
+const TOPICS_FORMAT = `
 Format the response as a json list following this schema:
 <SCHEMA>
 {
@@ -64,7 +67,6 @@ Format the response as a json list following this schema:
 }
 </SCHEMA>
 <EXAMPLE>
-\`\`\`json
 [
   {
       "topic": "Overview of Deep Convolutional Neural Networks",
@@ -75,10 +77,10 @@ Format the response as a json list following this schema:
       "summary": "Exploring the role of the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) in advancing neural network research and object recognition technologies."
   }
 ]
-\`\`\`
 </EXAMPLE>
-Give the topics mentioned in the following article
-<</SYS>>`
+
+
+`
 
 export const generateTopics = async (report:string): Promise<Topic[]> => {
     
@@ -104,30 +106,24 @@ export const generateScript = async (report:string): Promise<ScriptData[]> => {
         
     }
     throw Error("Keeps failing")
-
 }
 
 const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
-    let result = await generateTextFromLLM(TOPICS_SYS, report, 1, "```json");
-    // const topics = result.split('\n').map((line) => {
-    //     return {
-    //         topic: line,
-    //         summary: "",
-    //     }
-    // });
-    result = result.substring(TOPICS_SYS.length+16+ report.length, result.length-1)
-    result = result.replace(/```/g, '')
-    result = result.substring(1, result.length-1)
+    const prompt = TOPICS_SYS + report + TOPICS_FORMAT
+
+    console.log("made call")
+
+    let result = await generateTextFromLLM(prompt);
+
+    result = result.substring(prompt.length + 16, result.length-1)
+    
     const isNotList = !result.includes("[")
     const hasNoObjects = !result.includes("{")
 
-    if(result.includes("[") && !result.includes("]")){
-        result = result.substring(0, result.lastIndexOf("}")+1) +"]"
-    }
     console.log("--------------------------------------------------");
     console.log(result);
     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
-    let topics = JSON.parse(result.replace(/```/g, ''))
+    let topics = JSON.parse(result)
     if(isNotList){
         topics = [topics]
     }
@@ -150,7 +146,7 @@ Generate the script for a radio voiceover summary based on the article provided.
 <</SYS>>
 <</SYS>>`
 const generateScriptInternal =async (report:string):Promise<ScriptData[]> => {
-    let result = await generateTextFromLLM(SCRIPT_SYS, report, 1, "Today, we are discussing the");
+    let result = await generateTextFromLLM(SCRIPT_SYS + report);
     result = "Today, we are discussing the" + result
     const segs = result.split('.').map((line, i) => {
         
@@ -159,7 +155,6 @@ const generateScriptInternal =async (report:string):Promise<ScriptData[]> => {
                     script1: line,
                     script2: "",
                         }
-         
     })
     return segs;
     
