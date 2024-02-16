@@ -6,7 +6,7 @@ export interface ScriptData {
   id: string; // GUID 
   selectedScriptIndex: number; // index of the selected script
   scriptTexts: string[];  // array of script texts
-  section: string?; // Description of the section
+  sectionName: string; // Name of section
 }
 
 export interface Audience {

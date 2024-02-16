@@ -1,5 +1,10 @@
 import fetch from "node-fetch";
 import type { ScriptData, Topic } from "./mockData/data";
+import { v4 as uuidv4 } from 'uuid';
+
+import mock from './mockData/llm.json'
+
+
 export const generateTextFromLLM = async (
     prompt: string,
 ): Promise<string> => {
@@ -7,7 +12,7 @@ export const generateTextFromLLM = async (
     const params = new URLSearchParams();
 
     params.append("prompt", `[INST] ${prompt} [/INST] `);
-    params.append("temperature", "1");
+    params.append("temperature", "0.7");
     // console.log(systemPrompt, userPromp, temperature);
     const url = "https://iguana.alexo.uk/generate";
 
@@ -78,8 +83,6 @@ Format the response as a json list following this schema:
   }
 ]
 </EXAMPLE>
-
-
 `
 
 export const generateTopics = async (report:string): Promise<Topic[]> => {
@@ -95,11 +98,11 @@ export const generateTopics = async (report:string): Promise<Topic[]> => {
     throw Error("Keeps failing")
 
 }
-export const generateScript = async (report:string): Promise<ScriptData[]> => {
+export const generateScript = async (topic: string, report:string): Promise<ScriptData[]> => {
     
     for (let i = 0; i < 5; i++) {
         try {
-            return await generateScriptInternal(report)
+            return await generateScriptInternal(topic, report)
         } catch (error) {
             console.log("error parsing", i)
         }
@@ -108,10 +111,9 @@ export const generateScript = async (report:string): Promise<ScriptData[]> => {
     throw Error("Keeps failing")
 }
 
+
 const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
     const prompt = TOPICS_SYS + report + TOPICS_FORMAT
-
-    console.log("made call")
 
     let result = await generateTextFromLLM(prompt);
 
@@ -138,25 +140,56 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
         )
     }
     return topics;
-    
 }
 
-const SCRIPT_SYS = `<<SYS>>
-Generate the script for a radio voiceover summary based on the article provided.
-<</SYS>>
-<</SYS>>`
-const generateScriptInternal =async (report:string):Promise<ScriptData[]> => {
-    let result = await generateTextFromLLM(SCRIPT_SYS + report);
-    result = "Today, we are discussing the" + result
-    const segs = result.split('.').map((line, i) => {
-        
-                return {
-                    section: i.toString(),
-                    script1: line,
-                    script2: "",
-                        }
+// TODO set settings here 
+
+const SCRIPTS_FORMAT = `
+[END OF REPORT]
+
+Format the response as a json list following this schema:
+{
+    sectionName: string;
+    scriptTexts: string[];
+}
+
+The response should look something like this:
+[{
+    sectionName: ...;
+    scriptTexts: [...]; 
+},...]
+`
+
+const generateScriptInternal =async (topic:string, report: string):Promise<ScriptData[]> => {
+
+    console.log("generating scripts")
+
+    const SCRIPT_SYS = `
+    Below is some information. 
+    Create a 2 minute script about ${topic} only using the information below. The script should be split up into as many sections as you deem necessary, where each section is a different part of the video and they should seamlessly connect together. for each section, create me 3 different scripts for that section, so that i can choose my favorite.
+    `
+
+    let prompt = SCRIPT_SYS + report + SCRIPTS_FORMAT;
+    
+    let result = await generateTextFromLLM(prompt);
+
+    result = result.substring(prompt.length + 16, result.length-1)
+
+    console.log("--------------------------------------------------");
+    console.log(result);
+    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
+
+    let scripts = JSON.parse(result)
+    // let scripts = mock
+
+    let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
+        return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
     })
-    return segs;
+
+    console.log(addedInfoScripts)
+
+
+    return addedInfoScripts;
     
 }
 

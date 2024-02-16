@@ -43,10 +43,7 @@ export function getProjectVisual(): Visual {
 }
 
 export function getProjectScript(): ScriptData[] {
-    if (!getProjectStore().has("script")) {
-        throw new Error("Script not set");
-    }
-    return getProjectStore().get("script") as ScriptData[];
+    return getProjectStore().get("script", []) as ScriptData[];
 }
 
 

@@ -59,6 +59,7 @@
     "etro": "^0.12.0",
     "framer-motion": "^11.0.5",
     "jotai": "^2.6.2",
+    "ldrs": "^1.0.1",
     "localforage": "^1.10.0",
     "lucide-react": "^0.311.0",
     "next-themes": "^0.2.1",
@@ -79,6 +80,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tinypool": "^0.8.2",
     "unpdf": "^0.10.1",
+    "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -90,6 +92,7 @@
     "@types/pngjs": "^6.0.4",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
     "@vitejs/plugin-react": "^4.0.4",
