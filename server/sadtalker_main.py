@@ -1,23 +1,36 @@
+<<<<<<< HEAD
 from fastapi import FastAPI, Form, HTTPException
 from typing_extensions import Annotated
 from pydantic import BaseModel
-import subprocess
-from datetime import datetime
-import uvicorn 
-from base64 import b64encode
-import os
+=======
 import glob
+import os
+>>>>>>> d7af8e7c750e624d0350431364c5b1362dc3c402
+import subprocess
+from base64 import b64encode
+from datetime import datetime
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi import Form
+from pydantic import BaseModel
+from typing_extensions import Annotated
+
 
 class SadTalker(BaseModel):
     driven_audio: Annotated[str, Form()]
     source_image: Annotated[str, Form()]
 
+
 app = FastAPI()
+
 
 @app.get("/")
 def read_root():
+    """ """
     return {"msg": "Hello World"}
 
+<<<<<<< HEAD
 def is_valid_path(path):
     return os.path.exists("./SadTalker/" + path)
 
@@ -38,6 +51,8 @@ def is_valid_image_extension(path):
         return False
 
     return True
+=======
+>>>>>>> d7af8e7c750e624d0350431364c5b1362dc3c402
 
 @app.post("/avatar/")
 async def animate_portrait(sadtalker: SadTalker):
@@ -54,22 +69,34 @@ async def animate_portrait(sadtalker: SadTalker):
         os.chdir("./SadTalker")
         results_dir = "../../../../../www/sadtalker_results/"
         command = [
-            "python3", "inference.py",
-            "--driven_audio", sadtalker.driven_audio,
-            "--source_image", sadtalker.source_image,
-            "--enhancer", "gfpgan",
-            "--result_dir", results_dir
+            "python3",
+            "inference.py",
+            "--driven_audio",
+            sadtalker.driven_audio,
+            "--source_image",
+            sadtalker.source_image,
+            "--enhancer",
+            "gfpgan",
+            "--result_dir",
+            results_dir,
         ]
+<<<<<<< HEAD
         subprocess.run(command, check=True, capture_output=True, shell=False)
         
+=======
+        print(" ".join(command))
+        subprocess.run(command, check=True)
+
+>>>>>>> d7af8e7c750e624d0350431364c5b1362dc3c402
         # get the last from results
         results = sorted(os.listdir(results_dir))
-        mp4_name = glob.glob(results_dir + '*.mp4')[0]
-        mp4 = open('{}'.format(mp4_name),'rb').read()
+        mp4_name = glob.glob(results_dir + "*.mp4")[0]
+        mp4 = open("{}".format(mp4_name), "rb").read()
         data_url = "data:video/mp4;base64," + b64encode(mp4).decode()
-        
+
         # Return data url
         return {
+<<<<<<< HEAD
                 "message": "Returned animation: {}".format(mp4_name),
                 "data_url": data_url
                 }
@@ -77,6 +104,14 @@ async def animate_portrait(sadtalker: SadTalker):
         raise HTTPException(status_code=500, detail="Subprocess call error")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
+=======
+            "message": "Returned animation: {}".format(mp4_name),
+            "data_url": data_url,
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+>>>>>>> d7af8e7c750e624d0350431364c5b1362dc3c402
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8888)
