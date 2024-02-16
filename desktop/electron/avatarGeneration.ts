@@ -4,7 +4,7 @@ interface Avatar {
 }
 
 export async function generateAvatar(avatar: Avatar, audioPath: string): Promise<string> {
-    
+
     const endpoint = 'https://iguana.alexo.uk/avatar/';
 
     const body = {
