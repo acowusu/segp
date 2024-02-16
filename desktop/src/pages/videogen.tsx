@@ -4,6 +4,7 @@ import etro from "etro";
 import { imageOptimizer } from "next/dist/server/image-optimizer";
 import { Button } from "../components/ui/button";
 import { log } from "console";
+import api from "../../electron/routes";
 
 type ChosenAsset = {
   src: string;
@@ -38,6 +39,7 @@ export const VideoGenerator: React.FC<{
   const [videoURL, setVideoURL] = useState<string>();
   const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
   const [isGenerateClicked, setIsGenerateClicked] = useState<boolean>(false);
+  const [videoBlob, setVideoBlob] = useState<Blob>();
 
   useEffect(() => {
     if (!canvasRef.current) return; //null canvas ref
@@ -96,6 +98,11 @@ export const VideoGenerator: React.FC<{
     movieRef.current = movie;
   }, []);
   
+  const downloadVideo = async () => {
+    if (videoBlob) {
+      await api.writeBlob(videoBlob, "./video.webm");
+    }
+  }
   const generateVideo = async () => {
     await movieRef.current
     ?.record({
@@ -111,7 +118,8 @@ export const VideoGenerator: React.FC<{
         },
       })
       .then((blob) => {
-        const newBlob = new Blob([blob], { type: "video/mp4" });
+        const newBlob = new Blob([blob], { type: "video/webm" });
+        setVideoBlob(newBlob);
         const url = URL.createObjectURL(newBlob);
         setVideoURL(url); // set the url so we can play
       });
@@ -123,9 +131,14 @@ export const VideoGenerator: React.FC<{
     <div>
       <h1> Video Generation </h1>
       {isVideoReady ? (
-        <video width="640" height="360" controls>
-          <source src={videoURL} type="video/webm" />
-        </video>
+        <div>
+          <video width="640" height="360" controls>
+            <source src={videoURL} type="video/webm" />
+          </video>
+          {/* <Button onClick={() => downloadVideo()} > 
+          download created webm
+          </Button> */}
+        </div>
       ) : (
         <div>
           <canvas className="w-full" ref={canvasRef}></canvas>
