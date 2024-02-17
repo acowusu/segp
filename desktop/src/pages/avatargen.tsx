@@ -53,13 +53,13 @@ export const AvatarGenerator: React.FC = () => {
   return (
     <div>
        <h2>Avatar Gen</h2>
-        <button 
-      style={{ 
-        backgroundColor: 'purple', 
-        color: 'white', 
-        border: 'none', 
-        cursor: 'pointer' 
-      }} 
+        <button
+      style={{
+        backgroundColor: 'purple',
+        color: 'white',
+        border: 'none',
+        cursor: 'pointer'
+      }}
       onClick={generateAvatar}
     >
       Generate Avatar
