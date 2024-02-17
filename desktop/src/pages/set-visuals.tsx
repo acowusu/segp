@@ -86,7 +86,11 @@ export function SetVisuals() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl> 
-                          <AvatarFrame label={avatar.label} avatarUrl={avatar.avatarUrl} onClick={() => field.onChange(avatar.avatarUrl)}/>
+                          <AvatarFrame 
+                            isSelected={selectedAvatar===avatar.avatarUrl} 
+                            label={avatar.label} 
+                            avatarUrl={avatar.avatarUrl} 
+                            onClick={() => field.onChange(avatar.avatarUrl)}/>
                       </FormControl>
                     </FormItem>
                   )}
