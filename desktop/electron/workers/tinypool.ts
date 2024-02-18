@@ -2,9 +2,8 @@ import fs from "fs";
 import { mkdir, readFile } from "node:fs/promises";
 import { sep } from "path";
 import { PNG } from "pngjs";
-import { extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
+import { getDocumentProxy, getResolvedPDFJS } from "unpdf";
 import { spawn  } from "node:child_process";
-import { PathLike } from "node:fs";
 import { ffmpegPath } from "../binUtils";
 
 export const add =  ({ a, b }: { a: number, b: number }) => {
@@ -21,35 +20,41 @@ export interface ImageData {
   width: number;
   height: number;
 }
-export const convertWebmToMp4 = async ({webm, mp4}: {webm: string , mp4: string }): Promise<void> => {
-  console.log(`webm path: ${webm}`);
-  console.log(`mp4 path: ${mp4}`);
 
-  console.log(`spawning worker`);
-  spawn(ffmpegPath, ["-i", `${webm}`, `${mp4}`], {stdio: ["pipe", 1, 2]})
-  console.log(`transcoding done`)
-  
-  
-  return;
-};
-
-export const extractTextFromPDF = async ({
-  filePath,projectPath
+export const convertWebmToMp4 = async ({
+  webm,
+  mp4,
 }: {
-  filePath: string;
-  projectPath:string
-}): Promise<{ text: string; images: ImageData[]; }> => {
-    console.log("# Loading document from disk", filePath);
-    const buffer = await readFile(filePath);
-    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+  webm: string;
+  mp4: string;
+}): Promise<void> => {
+  return new Promise<void>((resolve, reject) => {
+    console.log(`webm path: ${webm}`);
+    console.log(`mp4 path: ${mp4}`);
 
-    const { totalPages, text } = await extractText(pdf, { mergePages: true });
-    const images = [];
-    // console.log("# Extracting images 1");
-    for (let i = 1; i < totalPages; i++) {
-        images.push(...(await extractImagesFromPDF({ filePath, pageNumber:i, projectPath })));
-    }
-    return {text: text as string, images};
+    console.log(`spawning worker`);
+    // -y to auto overwrite the existing file
+
+    // TODO: handle ffmpeg errors?
+
+    const ffmpegProcess = spawn(ffmpegPath, ["-i", `${webm}`, "-y", `${mp4}`], {
+      stdio: ["pipe", 1, 2],
+    });
+    
+    ffmpegProcess.on("exit", (code, signal) => {
+      console.log(`ffmpeg exited with exit code ${code} and signal ${signal}`);
+      if (code === 0) {
+        console.log(`transcoding done`);
+        resolve();
+      } else {
+        reject(`Child process exited with no 0 exit code: ${code}`)
+      }
+    });
+    ffmpegProcess.on("error", (err) => {
+      console.log("Child process exited with error");
+      reject(err);
+    })
+  })
 };
 
 export const extractImagesFromPDF = async ({ filePath, pageNumber, projectPath }: { filePath: string, pageNumber: number, projectPath: string }) => {

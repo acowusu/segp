@@ -1,11 +1,6 @@
-/**
- * @prettier
- */
-
 import { PathLike } from "node:fs";
 import fs from "node:fs";
 import { pool } from "./pool";
-import { fdatasync } from "original-fs";
 // import { spawn } from "child_process";
 // import { ffmpegPath } from "./binUtils";
 
@@ -45,8 +40,6 @@ export async function webmBLobToMp4(
 ): Promise<void> {
   console.log("started webm -> mp4");
 
-  // TODO: add a way for the user to configure where to download the mp4 file?
-
   // write the contents of the buffer to a webm file
   const webmFile = `public/${outFile}`;
   fs.writeFileSync(webmFile, new Uint8Array(buff));
@@ -60,4 +53,35 @@ export async function webmBLobToMp4(
   console.log("finished webm -> mp4");
 }
 
-// export async prepareMp4()
+export async function prepareMp4Blob(buff: ArrayBuffer): Promise<ArrayBuffer> {
+  console.log("started creating the mp4 file");
+
+  const webmFile = "public/video.webm";
+  const mp4File = "public/video.mp4";
+
+  fs.writeFileSync(webmFile, new Uint8Array(buff));
+  fs.readFile;
+  // try {
+  await (pool!.run(
+    { webm: webmFile, mp4: mp4File },
+    { name: "convertWebmToMp4" }
+  ) as Promise<void>);
+
+  const data = fs.readFileSync(mp4File);
+
+  //delete the temp files
+  fs.unlinkSync(webmFile);
+  console.log("deleted webm");
+  fs.unlinkSync(mp4File); // not the best way to delete then redownload find another solution
+  console.log("deleted mp4");
+
+  return new Promise<ArrayBuffer>((resolve) => {
+    resolve(data.buffer as ArrayBuffer);
+  });
+  // }
+  // catch (err) {
+  //   console.log(`ffmpeg error: ${err}`);
+  // }
+
+  // on completion of the ffmpeg transcoding
+}

@@ -1,14 +1,7 @@
-/**
- * @prettier
- */
-
 import React, { useEffect, useRef, useState } from "react";
 // import { MediaStore } from "../contexts/media/mediaStore";
 import etro from "etro";
-import { imageOptimizer } from "next/dist/server/image-optimizer";
 import { Button } from "../components/ui/button";
-import { log } from "console";
-import api from "../../electron/routes";
 
 type ChosenAsset = {
   src: string;
@@ -17,12 +10,12 @@ type ChosenAsset = {
 };
 
 const dummyImages: ChosenAsset[] = [
-  { src: "./example-min.jpg", duration: 2 },
-  { src: "./example2-min.jpg", duration: 3 },
-  { src: "./example3-min.jpg", duration: 0 },
+  { src: "./example-min.jpg", duration: 5 },
+  { src: "./example2-min.jpg", duration: 5 },
+  { src: "./example3-min.jpg", duration: 7 },
 ];
 
-const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 5 }];
+const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 17 }];
 
 // Dummy generator before the types are hashed out
 export const VideoGeneratorDummy: React.FC = () => {
@@ -43,6 +36,10 @@ export const VideoGenerator: React.FC<{
   const [videoURL, setVideoURL] = useState<string>();
   const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
   const [isGenerateClicked, setIsGenerateClicked] = useState<boolean>(false);
+
+  const [isMp4Ready, setIsMp4Ready] = useState<boolean>(false);
+
+  // this is now used to store the mp4 blob
   const [videoBlob, setVideoBlob] = useState<Blob>();
 
   useEffect(() => {
@@ -103,16 +100,23 @@ export const VideoGenerator: React.FC<{
   }, []);
 
   const downloadVideo = async () => {
-    if (videoBlob) {
-      await window.api.webmBLobToMp4(
-        await videoBlob.arrayBuffer(),
-        "video.webm"
-      );
-      // window.api.writeBlob("video.webm");
+    if (isMp4Ready) {
+      const url = URL.createObjectURL(videoBlob!);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "video.mp4";
+      a.click();
+    } else {
+      console.log("mp4 not ready");
     }
   };
 
   const generateVideo = async () => {
+    const makeMp4Blob = (buff: ArrayBuffer) => {
+      setVideoBlob(new Blob([buff], { type: "video/mp4" }));
+      setIsMp4Ready(true);
+    };
+
     await movieRef.current
       ?.record({
         frameRate: 30,
@@ -126,11 +130,23 @@ export const VideoGenerator: React.FC<{
           console.log("recording started");
         },
       })
-      .then((blob) => {
+      .then(async (blob) => {
         const newBlob = new Blob([blob], { type: "video/webm" });
-        setVideoBlob(newBlob);
         const url = URL.createObjectURL(newBlob);
         setVideoURL(url); // set the url so we can play
+
+        // start the mp4 conversion here
+        console.log("starting the mp4 conversion");
+        window.api
+          .prepareMp4Blob(await newBlob.arrayBuffer())
+          .then((buff: ArrayBuffer) => {
+            console.log("got the mp4 data back making blob");
+
+            makeMp4Blob(buff);
+          });
+        console.log("mp4 conversion done");
+
+        // setVideoBlob(newBlob);
       });
     console.log("recording complete");
     setIsVideoReady(true); // change the display
@@ -144,7 +160,15 @@ export const VideoGenerator: React.FC<{
           <video width="640" height="360" controls>
             <source src={videoURL} type="video/webm" />
           </video>
-          <Button onClick={() => downloadVideo()}>download created webm</Button>
+          <Button
+            disabled={!isMp4Ready}
+            onClick={() => {
+              console.log("mp4 download clicked");
+              downloadVideo();
+            }}
+          >
+            Download Mp4
+          </Button>
         </div>
       ) : (
         <div>
