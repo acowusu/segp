@@ -11,7 +11,7 @@ import {
   getVoiceovers,
   textToAudio,
 } from "./reportProcessing";
-import { convertWebmToMp4, writeBlob } from "./videoProcessing";
+import { convertWebmToMp4, writeBlob, webmBLobToMp4 } from "./videoProcessing";
 // Import your API methods here
 import {
   getDirectory,
@@ -44,6 +44,7 @@ const api = {
   // Add your API methods here
   convertWebmToMp4,
   writeBlob,
+  webmBLobToMp4,
 
 
 };
