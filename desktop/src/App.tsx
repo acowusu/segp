@@ -28,6 +28,7 @@ function App() {
               <Route path="set-visuals" element={<SetVisuals />} />
               <Route path="script-editor" element={<ScriptEditor />} />
               <Route path="media" element={<Media />} />
+              <Route path="get-video" element={<VideoGeneratorDummy />} />
               <Route path="debug" element={<LLMDebugger />} />
               <Route path="video-editor" element={<Editor />} />
             </Route>

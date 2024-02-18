@@ -45,6 +45,10 @@ const sidebarNavItems = [
     href: "/welcome/script-editor",
   },
   {
+    title: "Video Generator",
+    href: "/welcome/get-video",
+  },
+  {
     title: "Video Editor",
     href: "/welcome/video-editor",
   },
