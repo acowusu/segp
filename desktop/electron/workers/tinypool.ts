@@ -21,11 +21,14 @@ export interface ImageData {
   width: number;
   height: number;
 }
-export const convertWebmToMp4 = async ({input, output}: {input: string | PathLike, output: string | PathLike}): Promise<void> => {
-  console.log(`input in worker:${input}`);
-  console.log(`output in worker: ${output}`);
+export const convertWebmToMp4 = async ({webm, mp4}: {webm: string , mp4: string }): Promise<void> => {
+  console.log(`webm path: ${webm}`);
+  console.log(`mp4 path: ${mp4}`);
+
   console.log(`spawning worker`);
-  spawn(ffmpegPath, ["-version"], {stdio: ["pipe", 1, 2]});
+  spawn(ffmpegPath, ["-i", `${webm}`, `${mp4}`], {stdio: ["pipe", 1, 2]})
+  console.log(`transcoding done`)
+  
   
   return;
 };
