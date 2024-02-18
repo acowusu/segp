@@ -17,12 +17,12 @@ type ChosenAsset = {
 };
 
 const dummyImages: ChosenAsset[] = [
-  { src: "./example-min.jpg", duration: 5 },
-  { src: "./example2-min.jpg", duration: 5 },
-  { src: "./example3-min.jpg", duration: 7 },
+  { src: "./example-min.jpg", duration: 2 },
+  { src: "./example2-min.jpg", duration: 3 },
+  { src: "./example3-min.jpg", duration: 0 },
 ];
 
-const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 17 }];
+const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 5 }];
 
 // Dummy generator before the types are hashed out
 export const VideoGeneratorDummy: React.FC = () => {
@@ -104,7 +104,8 @@ export const VideoGenerator: React.FC<{
 
   const downloadVideo = async () => {
     if (videoBlob) {
-      window.api.writeBlob(await videoBlob.arrayBuffer(), "./video.webm");
+      window.api.webmBLobToMp4(await videoBlob.arrayBuffer(), "video.webm");
+      // window.api.writeBlob("video.webm");
     }
   };
 
