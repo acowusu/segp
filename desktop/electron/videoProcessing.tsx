@@ -44,7 +44,7 @@ export async function webmBLobToMp4(
 ): Promise<void> {
   console.log("started webm -> mp4");
 
-  // TODO: add
+  // TODO: add a way for the user to configure where to download the mp4 file?
 
   // write the contents of the buffer to a webm file
   const webmFile = `public/${outFile}`;
