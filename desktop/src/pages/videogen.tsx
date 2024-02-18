@@ -1,3 +1,7 @@
+/**
+ * @prettier
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 // import { MediaStore } from "../contexts/media/mediaStore";
 import etro from "etro";
@@ -18,8 +22,7 @@ const dummyImages: ChosenAsset[] = [
   { src: "./example3-min.jpg", duration: 7 },
 ];
 
-const dummyAudio: ChosenAsset[] = [{src: "./daniel1.mp3", duration: 17}] 
-
+const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 17 }];
 
 // Dummy generator before the types are hashed out
 export const VideoGeneratorDummy: React.FC = () => {
@@ -32,7 +35,8 @@ export const VideoGeneratorDummy: React.FC = () => {
  * -> overlaiying of visual layers for subtitles on top of the visuals
  */
 export const VideoGenerator: React.FC<{
-  chosenImages: ChosenAsset[], chosenAudio: ChosenAsset[] /* settings: ? */;
+  chosenImages: ChosenAsset[];
+  chosenAudio: ChosenAsset[] /* settings: ? */;
 }> = ({ chosenImages, chosenAudio }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
@@ -78,7 +82,7 @@ export const VideoGenerator: React.FC<{
 
       movie.addLayer(layer);
     });
-    
+
     start = 0;
 
     // Add the Audio layers
@@ -94,22 +98,23 @@ export const VideoGenerator: React.FC<{
       });
       start += aud.duration;
       movie.addLayer(layer);
-    })
+    });
     movieRef.current = movie;
   }, []);
-  
+
   const downloadVideo = async () => {
     if (videoBlob) {
-      await api.writeBlob(videoBlob, "./video.webm");
+      window.api.writeBlob(await videoBlob.arrayBuffer(), "./video.webm");
     }
-  }
+  };
+
   const generateVideo = async () => {
     await movieRef.current
-    ?.record({
-      frameRate: 30,
-      type: "video/webm;codecs=vp9",
-      // audio: default true,
-      // video: default true,
+      ?.record({
+        frameRate: 30,
+        type: "video/webm;codecs=vp9",
+        // audio: default true,
+        // video: default true,
         // duration: default end of video
         // onStart: optional callback
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -135,9 +140,7 @@ export const VideoGenerator: React.FC<{
           <video width="640" height="360" controls>
             <source src={videoURL} type="video/webm" />
           </video>
-          {/* <Button onClick={() => downloadVideo()} > 
-          download created webm
-          </Button> */}
+          <Button onClick={() => downloadVideo()}>download created webm</Button>
         </div>
       ) : (
         <div>
