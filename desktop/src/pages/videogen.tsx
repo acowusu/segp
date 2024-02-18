@@ -104,7 +104,10 @@ export const VideoGenerator: React.FC<{
 
   const downloadVideo = async () => {
     if (videoBlob) {
-      window.api.webmBLobToMp4(await videoBlob.arrayBuffer(), "video.webm");
+      await window.api.webmBLobToMp4(
+        await videoBlob.arrayBuffer(),
+        "video.webm"
+      );
       // window.api.writeBlob("video.webm");
     }
   };
