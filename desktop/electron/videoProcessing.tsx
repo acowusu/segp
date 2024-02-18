@@ -5,6 +5,7 @@
 import { PathLike } from "node:fs";
 import fs from "node:fs";
 import { pool } from "./pool";
+import { fdatasync } from "original-fs";
 // import { spawn } from "child_process";
 // import { ffmpegPath } from "./binUtils";
 
@@ -51,10 +52,12 @@ export async function webmBLobToMp4(
   fs.writeFileSync(webmFile, new Uint8Array(buff));
 
   // transcode to mp4
-  (await pool!.run(
+  return pool!.run(
     { webm: webmFile, mp4: "public/video.mp4" },
     { name: "convertWebmToMp4" }
-  )) as Promise<void>;
+  ) as Promise<void>;
 
   console.log("finished webm -> mp4");
 }
+
+// export async prepareMp4()
