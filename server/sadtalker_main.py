@@ -11,6 +11,7 @@ from typing_extensions import Annotated
 
 
 class SadTalker(BaseModel):
+    """ """
     driven_audio: Annotated[str, Form()]
     source_image: Annotated[str, Form()]
 
@@ -25,10 +26,20 @@ def read_root():
 
 
 def is_valid_path(path):
+    """
+
+    :param path: 
+
+    """
     return path.startswith("/www")
 
 
 def is_valid_audio_extension(path):
+    """
+
+    :param path: 
+
+    """
     _, extension = os.path.splitext(path)
     valid_audio_extensions = [".wav", ".mp3"]
 
@@ -39,6 +50,11 @@ def is_valid_audio_extension(path):
 
 
 def is_valid_image_extension(path):
+    """
+
+    :param path: 
+
+    """
     _, extension = os.path.splitext(path)
     valid_image_extensions = [".png", ".mp4"]
 
