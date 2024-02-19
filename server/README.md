@@ -11,12 +11,17 @@
 
 ```bash
 ./clone_sadtalker_repo.sh
+cd SadTalker
 ```
 
 2. Create and activate the sadtalker conda environment
 
 ```python
 conda activate sadtalker
+```
+3. Download the models into the Sadtalker repository
+```bash
+./scripts/download_models.sh
 ```
 
 ## Usage
