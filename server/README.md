@@ -19,7 +19,9 @@ cd SadTalker
 ```python
 conda activate sadtalker
 ```
+
 3. Download the models into the Sadtalker repository
+
 ```bash
 ./scripts/download_models.sh
 ```
