@@ -1,4 +1,4 @@
-import { getVisuals, getVoiceovers, getAudiences, setVoiceover, setAudience, setVisual, setTopic, getScript } from "./reportProcessing";
+import { setVoiceover, setAudience, setVisual, setTopic } from "./reportProcessing";
 import voiceovers from './mockData/voiceovers.json'
 import topics from './mockData/topics.json'
 import audiences from './mockData/audiences.json'

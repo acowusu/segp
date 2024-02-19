@@ -10,7 +10,6 @@ import type {
   Visual,
   Voiceover,
 } from "./mockData/data";
-import script from "./mockData/script.json";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";

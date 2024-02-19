@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 import { OverlayPreview } from "../components/custom/overlay-preview";
 import { Button } from "../components/ui/button";
@@ -105,7 +105,7 @@ export function SetVisuals() {
       );
   }, [setAudience]);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,

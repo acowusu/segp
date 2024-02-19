@@ -1,8 +1,5 @@
 import fetch from "node-fetch";
 import type { ScriptData, Topic } from "./mockData/data";
-import { v4 as uuidv4 } from 'uuid';
-
-import mock from './mockData/llm.json'
 
 
 export const generateTextFromLLM = async (
