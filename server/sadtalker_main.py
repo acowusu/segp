@@ -8,7 +8,6 @@ from fastapi import FastAPI
 from fastapi import Form
 from fastapi import HTTPException
 from pydantic import BaseModel
-import shlex
 from typing_extensions import Annotated
 
 
@@ -49,32 +48,28 @@ def is_valid_image_extension(path):
 @app.post("/avatar/")
 async def animate_portrait(sadtalker: SadTalker):
     try:
-        # if not is_valid_path(sadtalker.driven_audio):
-        #    raise HTTPException(status_code=400, detail="Invalid driven_audio path")
-        # if not is_valid_path(sadtalker.source_image):
-        #    raise HTTPException(status_code=400, detail="Invalid source_image path")
+        if not is_valid_path(sadtalker.driven_audio):
+            raise HTTPException(status_code=400, detail="Invalid driven_audio path")
+        if not is_valid_path(sadtalker.source_image):
+            raise HTTPException(status_code=400, detail="Invalid source_image path")
         if not is_valid_audio_extension(sadtalker.driven_audio):
             raise HTTPException(status_code=400, detail="Invalid driven_audio extension")
         if not is_valid_image_extension(sadtalker.source_image):
             raise HTTPException(status_code=400, detail="Invalid source_image extension")
         
         os.chdir("./SadTalker")
-        results_dir = "/www/sadtalker_results"
-
-        driven_audio = shlex.quote(sadtalker.driven_audio)
-        source_image = shlex.quote(sadtalker.source_image)
-
+        results_dir = "/www/sadtalker_results/"
         command = [
             "python3",
             "inference.py",
             "--driven_audio",
-            driven_audio,
+            sadtalker.driven_audio,
             "--source_image",
-            source_image,
+            sadtalker.source_image,
             "--enhancer",
             "gfpgan",
             "--result_dir",
-            results_dir,
+            results_dir
         ]
         subprocess.run(command, check=True, capture_output=True, shell=False)
         
