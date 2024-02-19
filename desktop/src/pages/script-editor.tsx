@@ -44,11 +44,9 @@ export const ScriptEditor: React.FC = () => {
   const [loadingScripts, setLoadingScripts] = useState(true)
 
   useEffect(() => {
-    setLoadingScripts(true)
     window.api.getScript().then((data) => {
       setItems(data);
     }).finally(() => {setLoadingScripts(false)});
-    
   }, []);
   const handleShowDrafts = (e: { stopPropagation: () => void; }) => {
     e.stopPropagation();

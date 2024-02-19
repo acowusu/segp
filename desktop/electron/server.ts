@@ -85,6 +85,29 @@ Format the response as a json list following this schema:
 </EXAMPLE>
 `
 
+const REFORMAT = `
+Format the stuff above as a json list following this schema:
+<SCHEMA>
+{
+    sectionName: string;
+    scriptTexts: string[];
+}
+</SCHEMA>
+<EXAMPLE>
+[
+  {
+      "sectionName": "Overview of Deep Convolutional Neural Networks",
+      "scriptTexts": ["...", "..."]
+  },
+  {
+      "sectionName": "The ImageNet Challenge: Revolutionizing Object Recognition",
+      "scriptTexts": ["...", "..."]
+  }
+]
+</EXAMPLE>
+`
+
+
 export const generateTopics = async (report:string): Promise<Topic[]> => {
     
     for (let i = 0; i < 5; i++) {
@@ -115,6 +138,7 @@ export const generateScript = async (topic: string, report:string): Promise<Scri
 const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
     const prompt = TOPICS_SYS + report + TOPICS_FORMAT
 
+    console.log("here")
     let result = await generateTextFromLLM(prompt);
 
     result = result.substring(prompt.length + 16, result.length-1)
@@ -139,7 +163,9 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
             }
         )
     }
-    return topics;
+    return topics
+
+    
 }
 
 // TODO set settings here 
@@ -179,17 +205,32 @@ const generateScriptInternal =async (topic:string, report: string):Promise<Scrip
     console.log(result);
     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-    let scripts = JSON.parse(result)
-    // let scripts = mock
+    try {
+        let scripts = JSON.parse(result)
+        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
+            return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
+        })
+        return addedInfoScripts;
+        // let scripts = mock
+    } catch (e) {
+        const prompt = result + REFORMAT
+        let regenerated_result = await generateTextFromLLM(prompt);
 
-    let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
-        return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
-    })
+        regenerated_result = regenerated_result.substring(prompt.length + 16, regenerated_result.length-1)
 
-    console.log(addedInfoScripts)
+        console.log("--------------------------------------------------");
+        console.log(regenerated_result);
+        console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-
-    return addedInfoScripts;
+        let scripts = JSON.parse(regenerated_result)
+        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
+            return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
+        })
+        return addedInfoScripts;
+    }
+    
+        
+    
     
 }
 
