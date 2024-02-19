@@ -31,7 +31,7 @@ def is_valid_path(path):
 
 def is_valid_audio_extension(path):
     _, extension = os.path.splitext(path)
-    valid_audio_extensions = ['.wav', '.mp3']
+    valid_audio_extensions = [".wav", ".mp3"]
 
     if extension.lower() not in valid_audio_extensions:
         return False
@@ -41,7 +41,7 @@ def is_valid_audio_extension(path):
 
 def is_valid_image_extension(path):
     _, extension = os.path.splitext(path)
-    valid_image_extensions = ['.png', '.mp4']
+    valid_image_extensions = [".png", ".mp4"]
 
     if extension.lower() not in valid_image_extensions:
         return False
@@ -53,17 +53,17 @@ def is_valid_image_extension(path):
 async def animate_portrait(sadtalker: SadTalker):
     try:
         if not is_valid_path(sadtalker.driven_audio):
-            raise HTTPException(
-                status_code=400, detail="Invalid driven_audio path")
+            raise HTTPException(status_code=400, detail="Invalid driven_audio path")
         if not is_valid_path(sadtalker.source_image):
-            raise HTTPException(
-                status_code=400, detail="Invalid source_image path")
+            raise HTTPException(status_code=400, detail="Invalid source_image path")
         if not is_valid_audio_extension(sadtalker.driven_audio):
             raise HTTPException(
-                status_code=400, detail="Invalid driven_audio extension")
+                status_code=400, detail="Invalid driven_audio extension"
+            )
         if not is_valid_image_extension(sadtalker.source_image):
             raise HTTPException(
-                status_code=400, detail="Invalid source_image extension")
+                status_code=400, detail="Invalid source_image extension"
+            )
 
         os.chdir("./SadTalker")
         results_dir = "/www/sadtalker_results/"
@@ -77,7 +77,7 @@ async def animate_portrait(sadtalker: SadTalker):
             "--enhancer",
             "gfpgan",
             "--result_dir",
-            results_dir
+            results_dir,
         ]
         subprocess.run(command, check=True, capture_output=True, shell=False)
 
@@ -90,12 +90,13 @@ async def animate_portrait(sadtalker: SadTalker):
         # Return data url
         return {
             "message": "Returned animation: {}".format(mp4_name),
-            "data_url": data_url
+            "data_url": data_url,
         }
     except subprocess.CalledProcessError:
         raise HTTPException(status_code=500, detail="Subprocess call error")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8888)
