@@ -1,13 +1,19 @@
 import json
 import uuid
-from typing import Any, AsyncGenerator, Dict, TypedDict, Union
+from typing import Any
+from typing import AsyncGenerator
+from typing import Dict
+from typing import TypedDict
+from typing import Union
 
 import torch
 import uvicorn
-from fastapi import FastAPI, Form
+from fastapi import FastAPI
+from fastapi import Form
 from openllm import LLM
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig)
+from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer
+from transformers import BitsAndBytesConfig
 from typing_extensions import Annotated
 
 model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
