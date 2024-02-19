@@ -1,16 +1,14 @@
-from fastapi import FastAPI, Form
-
-from openllm import LLM
+import json
+import uuid
 from typing import Any, AsyncGenerator, Dict, TypedDict, Union
 
-from typing_extensions import Annotated
-import uuid
-
-import uvicorn
-import json
-
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+import uvicorn
+from fastapi import FastAPI, Form
+from openllm import LLM
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig)
+from typing_extensions import Annotated
 
 model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
