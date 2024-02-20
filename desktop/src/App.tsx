@@ -14,7 +14,6 @@ import { ThemeProvider } from "./components/theme";
 import { Media } from "./pages/mediaFiles";
 import { Editor } from "./pages/editor";
 import { VideoGeneratorDummy } from "./pages/videogen";
-import { Layout } from "./components/layout";
 import { LLMDebugger } from "./pages/llm-debugger";
 function App() {
   // const [count, setCount] = useState(0);
