@@ -2,7 +2,7 @@
 import { getProjectPath, getTextReportPath } from "./metadata";
 import audiences from "./mockData/audiences.json";
 import {pool } from "./pool";
-import {generateTopics} from "./server"
+import {generateTopics, generateScript} from "./server"
 import type {
   Audience,
   ScriptData,
@@ -10,7 +10,6 @@ import type {
   Visual,
   Voiceover,
 } from "./mockData/data";
-import script from "./mockData/script.json";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
@@ -32,22 +31,42 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
 
 export async function getScript(): Promise<ScriptData[]> {
   // TODO forward error if not initialized (for now we just return the notional script)
-  try {
-    return  projectData.getProjectScript();
-  }catch(e){
-    return script;
+  var script = projectData.getProjectScript();
+  if (script.length !== 0) {
+    return script
   }
+
+  const reportPath = getTextReportPath();
+  
+  if (fs.existsSync(reportPath)) {
+    const report = await readFile(reportPath, "utf-8");
+    script = await generateScript(projectData.getProjectTopic().topic, report)
+    await setScript(script)
+    return script
+  } else {
+    // Alex what does your watch code do??
+    throw Error("report does not exits")
+  }
+
 }
 
 export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);
 }
+
 export async function getTopics(): Promise<Topic[]> {
+  const proj_data = projectData.getProjectTopics()
+  if (proj_data.length !== 0) {
+    return proj_data
+  }
+
   const reportPath = getTextReportPath();
   
   if (fs.existsSync(reportPath)) {
     const report = await readFile(reportPath, "utf-8");
-    return await generateTopics(report);
+    const topics = await generateTopics(report);
+    projectData.setProjectTopics(topics);
+    return topics
   } else {
     return await new Promise<Topic[]>((resolve) => {
       const watcher = watch(reportPath, { persistent: true }, async (event, filename) => {

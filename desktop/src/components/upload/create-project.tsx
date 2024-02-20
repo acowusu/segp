@@ -1,7 +1,6 @@
 import { SetStateAction } from "react";
 import { Button } from "../ui/button";
 import {
-  Card,
   CardHeader,
   CardTitle,
   CardDescription,

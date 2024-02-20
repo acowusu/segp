@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "../components/ui/badge";
 import { Reorder } from "framer-motion";
 import ContentEditable from 'react-contenteditable'
-
+import { quantum } from 'ldrs'
 import {
   FramelessCard,
   CardContent,
@@ -17,22 +17,41 @@ import {
 import { ScriptData } from "../../electron/mockData/data";
 import { PlusIcon} from '@radix-ui/react-icons'
 
+
+const LoadingScripts = () => {
+  quantum.register()
+
+
+  return (
+    <div className="flex flex-col gap-8 items-center justify-center">
+      <h1 className="text-2xl font-bold p-4">Please wait while we generate your scripts</h1>
+      <l-quantum
+        size="100"
+        speed="3" 
+        color="red" 
+      ></l-quantum>
+    </div>
+  ) 
+}
+
+
 export const ScriptEditor: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<ScriptData[]>([]);
   const [selectedScript, setSelectedScript] = useState<ScriptData>({} as ScriptData);
   const [showOtherDrafts, setShowOtherDrafts] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [loadingScripts, setLoadingScripts] = useState(true)
+
   useEffect(() => {
     window.api.getScript().then((data) => {
       setItems(data);
-    });
+    }).finally(() => {setLoadingScripts(false)});
   }, []);
   const handleShowDrafts = (e: { stopPropagation: () => void; }) => {
     e.stopPropagation();
     console.log
     setShowOtherDrafts(!showOtherDrafts);
-
   };
   const updateScriptSelection = (e: React.MouseEvent, item: ScriptData, index: number) => {
 
@@ -69,6 +88,7 @@ export const ScriptEditor: React.FC = () => {
   }
   return (
     <div className="flex items-center justify-center mt-4">
+      {loadingScripts ? <LoadingScripts /> : 
       <FramelessCard>
         <CardHeader>
           <CardTitle>Script Editor</CardTitle>
@@ -79,10 +99,9 @@ export const ScriptEditor: React.FC = () => {
                 {items.map((item) => (
                   <Reorder.Item key={item.id} value={item} className="mb-4">
                     <div
-
                       key={item.id}
                       className={cn(
-                        "flex flex-col items-start gap-2 rounded-lg border  p-3 text-left text-sm transition-all border-2",
+                        "flex flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
                         selectedScript.id === item.id &&
                           " border-2 border-sky-500",
                         selectedScript.id !== item.id &&
@@ -99,7 +118,8 @@ export const ScriptEditor: React.FC = () => {
                         )}
                       >
                         {/* View Other Drafts */}
-                        {selectedScript.id === item.id ? (                        <Badge variant={showOtherDrafts && selectedScript.id === item.id  ? "cloud":"secondary"} onClick={handleShowDrafts}>View Other Drafts</Badge>
+                        {selectedScript.id === item.id ? (                        
+                        <Badge variant={showOtherDrafts && selectedScript.id === item.id  ? "cloud":"secondary"} onClick={handleShowDrafts}>View Other Drafts</Badge>
                         ) : null}
                       </div>
                       {(selectedScript.id === item.id && showOtherDrafts )&& (
@@ -122,7 +142,7 @@ export const ScriptEditor: React.FC = () => {
                       <div className="flex w-full flex-col gap-1">
                         <div className="flex items-center">
                           <div className="flex items-center gap-2">
-                            <div className="font-semibold">{item.section}</div>
+                            <div className="font-semibold">{item.sectionName}</div>
                           </div>
                         </div>
                       </div>
@@ -149,7 +169,7 @@ export const ScriptEditor: React.FC = () => {
           <Button variant="outline">Back</Button>
           <Button onClick={setScript}>Next</Button>
         </CardFooter>
-      </FramelessCard>
+      </FramelessCard> }
     </div>
   );
 };

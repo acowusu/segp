@@ -1,16 +1,15 @@
 import fetch from "node-fetch";
-import type { ScriptData, ScriptData, Topic } from "./mockData/data";
+import type { ScriptData, Topic } from "./mockData/data";
+
+
 export const generateTextFromLLM = async (
-    systemPrompt: string,
-    userPromp: string,
-    temperature: number,
-    startOfResponse:string
+    prompt: string,
 ): Promise<string> => {
 
     const params = new URLSearchParams();
 
-    params.append("prompt", `[INST] ${systemPrompt}  ${userPromp} [/INST]${startOfResponse}`);
-    params.append("temperature", "1");
+    params.append("prompt", `[INST] ${prompt} [/INST] `);
+    params.append("temperature", "0.7");
     // console.log(systemPrompt, userPromp, temperature);
     const url = "https://iguana.alexo.uk/generate";
 
@@ -54,8 +53,14 @@ export const generateTextFromLLM = async (
 
 //  Here are the topics mentioned in the article you provided: 
 
+const TOPICS_SYS = `
+Below is some information.
+Find me a list of topics from this information which you could create an informative video out of (as well as an overview topic). 
+For this video, you can use general knowledge, but you should aim to use only information which is supplied in the information. If there is information which conflicts with your knowledge, assume that the information provided is right:
 
-const TOPICS_SYS = `<<SYS>>You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
+`
+
+const TOPICS_FORMAT = `
 Format the response as a json list following this schema:
 <SCHEMA>
 {
@@ -64,7 +69,6 @@ Format the response as a json list following this schema:
 }
 </SCHEMA>
 <EXAMPLE>
-\`\`\`json
 [
   {
       "topic": "Overview of Deep Convolutional Neural Networks",
@@ -75,10 +79,31 @@ Format the response as a json list following this schema:
       "summary": "Exploring the role of the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) in advancing neural network research and object recognition technologies."
   }
 ]
-\`\`\`
 </EXAMPLE>
-Give the topics mentioned in the following article
-<</SYS>>`
+`
+
+const REFORMAT = `
+Format the stuff above as a json list following this schema:
+<SCHEMA>
+{
+    sectionName: string;
+    scriptTexts: string[];
+}
+</SCHEMA>
+<EXAMPLE>
+[
+  {
+      "sectionName": "Overview of Deep Convolutional Neural Networks",
+      "scriptTexts": ["...", "..."]
+  },
+  {
+      "sectionName": "The ImageNet Challenge: Revolutionizing Object Recognition",
+      "scriptTexts": ["...", "..."]
+  }
+]
+</EXAMPLE>
+`
+
 
 export const generateTopics = async (report:string): Promise<Topic[]> => {
     
@@ -93,41 +118,35 @@ export const generateTopics = async (report:string): Promise<Topic[]> => {
     throw Error("Keeps failing")
 
 }
-export const generateScript = async (report:string): Promise<ScriptData[]> => {
+export const generateScript = async (topic: string, report:string): Promise<ScriptData[]> => {
     
     for (let i = 0; i < 5; i++) {
         try {
-            return await generateScriptInternal(report)
+            return await generateScriptInternal(topic, report)
         } catch (error) {
             console.log("error parsing", i)
         }
         
     }
     throw Error("Keeps failing")
-
 }
 
+
 const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
-    let result = await generateTextFromLLM(TOPICS_SYS, report, 1, "```json");
-    // const topics = result.split('\n').map((line) => {
-    //     return {
-    //         topic: line,
-    //         summary: "",
-    //     }
-    // });
-    result = result.substring(TOPICS_SYS.length+16+ report.length, result.length-1)
-    result = result.replace(/```/g, '')
-    result = result.substring(1, result.length-1)
+    const prompt = TOPICS_SYS + report + TOPICS_FORMAT
+
+    console.log("here")
+    let result = await generateTextFromLLM(prompt);
+
+    result = result.substring(prompt.length + 16, result.length-1)
+    
     const isNotList = !result.includes("[")
     const hasNoObjects = !result.includes("{")
 
-    if(result.includes("[") && !result.includes("]")){
-        result = result.substring(0, result.lastIndexOf("}")+1) +"]"
-    }
     console.log("--------------------------------------------------");
     console.log(result);
     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
-    let topics = JSON.parse(result.replace(/```/g, ''))
+    let topics = JSON.parse(result)
     if(isNotList){
         topics = [topics]
     }
@@ -141,27 +160,74 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
             }
         )
     }
-    return topics;
+    return topics
+
     
 }
 
-const SCRIPT_SYS = `<<SYS>>
-Generate the script for a radio voiceover summary based on the article provided.
-<</SYS>>
-<</SYS>>`
-const generateScriptInternal =async (report:string):Promise<ScriptData[]> => {
-    let result = await generateTextFromLLM(SCRIPT_SYS, report, 1, "Today, we are discussing the");
-    result = "Today, we are discussing the" + result
-    const segs = result.split('.').map((line, i) => {
+// TODO set settings here 
+
+const SCRIPTS_FORMAT = `
+[END OF REPORT]
+
+Format the response as a json list following this schema:
+{
+    sectionName: string;
+    scriptTexts: string[];
+}
+
+The response should look something like this:
+[{
+    sectionName: ...;
+    scriptTexts: [...]; 
+},...]
+`
+
+const generateScriptInternal =async (topic:string, report: string):Promise<ScriptData[]> => {
+
+    console.log("generating scripts")
+
+    const SCRIPT_SYS = `
+    Below is some information. 
+    Create a 2 minute script about ${topic} only using the information below. The script should be split up into as many sections as you deem necessary, where each section is a different part of the video and they should seamlessly connect together. for each section, create me 3 different scripts for that section, so that i can choose my favorite.
+    `
+
+    let prompt = SCRIPT_SYS + report + SCRIPTS_FORMAT;
+    
+    let result = await generateTextFromLLM(prompt);
+
+    result = result.substring(prompt.length + 16, result.length-1)
+
+    console.log("--------------------------------------------------");
+    console.log(result);
+    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
+
+    try {
+        let scripts = JSON.parse(result)
+        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
+            return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
+        })
+        return addedInfoScripts;
+        // let scripts = mock
+    } catch (e) {
+        const prompt = result + REFORMAT
+        let regenerated_result = await generateTextFromLLM(prompt);
+
+        regenerated_result = regenerated_result.substring(prompt.length + 16, regenerated_result.length-1)
+
+        console.log("--------------------------------------------------");
+        console.log(regenerated_result);
+        console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
+
+        let scripts = JSON.parse(regenerated_result)
+        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
+            return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
+        })
+        return addedInfoScripts;
+    }
+    
         
-                return {
-                    section: i.toString(),
-                    script1: line,
-                    script2: "",
-                        }
-         
-    })
-    return segs;
+    
     
 }
 

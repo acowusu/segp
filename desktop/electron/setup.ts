@@ -22,12 +22,12 @@ export async function createProject(
   createProjectStore(projectDir);
   userStore.set("lastProject", projectDir);
   const projectStore = getProjectStore();
-  closeDatabase();
-  getDatabase(`${projectDir}${sep}project.db`);
+  // closeDatabase();
+  // getDatabase(`${projectDir}${sep}project.db`);
   projectStore.set("name", name);
   projectStore.set("path", projectDir);
   projectStore.set("reportPath", `${projectDir}${sep}report.pdf`);
-  projectStore.set("databasePath", `${projectDir}${sep}project.db`);
+  // projectStore.set("databasePath", `${projectDir}${sep}project.db`);
 }
 
 export async function openProject(projectPath: string): Promise<void> {
