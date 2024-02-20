@@ -3,7 +3,7 @@ import "./App.css";
 // import viteLogo from "/electron-vite.animate.svg";
 
 import { Route, Routes } from "react-router-dom";
-// import { Layout } from "./components/layout";
+import { Layout } from "./components/layout";
 import { WelcomeLayout } from "./components/welcome-layout";
 import { SetVisuals } from "./pages/set-visuals";
 import { NotFound } from "./pages/not-found";
