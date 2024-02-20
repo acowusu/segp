@@ -1,4 +1,4 @@
-import { Audience, ScriptData, Topic, Visual, Voiceover } from "./mockData/data";
+import { Audience, ScriptData, ScriptSelections, Topic, Visual, Voiceover } from "./mockData/data";
 import { getProjectStore } from "./store";
 
 export function getProjectTopic(): Topic {
@@ -43,7 +43,15 @@ export function getProjectVisual(): Visual {
 }
 
 export function getProjectScript(): ScriptData[] {
-    return getProjectStore().get("script", []) as ScriptData[];
+    const scriptData = getProjectStore().get("script_selections", []) as ScriptSelections[];
+    const projectTopic = getProjectTopic();
+    for (const {topic, script} of scriptData) {
+      if (projectTopic.topic === topic) {
+        return script as ScriptData[]
+      }
+    }
+    return []
+    
 }
 
 
@@ -75,6 +83,18 @@ export function setProjectVisual(visual: Visual): void {
   getProjectStore().set("visual", visual);
 }
 
-export function setProjectScript(script: ScriptData[]): void {
-    getProjectStore().set("script", script);
+export function setProjectScript(new_script: ScriptData[]): void {
+  const scriptSelection = getProjectStore().get("script_selections", []) as ScriptSelections[];
+  let foundTopic = false;
+  for (let i = 0; i < scriptSelection.length; i++) {
+    if (getProjectTopic().topic === scriptSelection[i].topic) {
+      scriptSelection[i] = {topic: getProjectTopic().topic, script: new_script};
+      foundTopic = true;
+      break;
+    }
+  }
+  if (!foundTopic) {
+    scriptSelection.push({topic: getProjectTopic().topic, script: new_script})
+  }
+  getProjectStore().set("script_selections", scriptSelection);
 }

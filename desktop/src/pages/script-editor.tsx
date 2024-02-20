@@ -74,8 +74,11 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    navigate("/welcome/set-audience");
+    // navigate("/welcome/set-audience");
     await window.api.setScript(items);
+  };
+  const selectTopic = async () => {
+    navigate("/welcome/set-topic");
   };
   const updateScriptText = (e: React.FormEvent, index: number, id: string) => {
     const target = e.target as HTMLInputElement;
@@ -166,7 +169,7 @@ export const ScriptEditor: React.FC = () => {
             </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline">Back</Button>
+          <Button onClick={selectTopic} variant="outline">Back</Button>
           <Button onClick={setScript}>Next</Button>
         </CardFooter>
       </FramelessCard> }

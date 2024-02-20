@@ -9,6 +9,11 @@ export interface ScriptData {
   sectionName: string; // Name of section
 }
 
+export interface ScriptSelections {
+  topic: string; 
+  script: ScriptData[];
+}
+
 export interface Audience {
   name: string;
   description: string;

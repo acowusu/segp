@@ -185,6 +185,8 @@ The response should look something like this:
 
 const generateScriptInternal =async (topic:string, report: string):Promise<ScriptData[]> => {
 
+    
+
     console.log("generating scripts")
 
     const SCRIPT_SYS = `
