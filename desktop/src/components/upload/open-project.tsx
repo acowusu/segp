@@ -55,7 +55,7 @@ export const OpenProject: React.FC<OpenProjectProps> = ({
               <Label htmlFor="list">Open Recent Projects</Label>
               {recentProjects.map((project) => (
                 <div key={project}>
-                  <Button type="button" className="w-full" variant={"secondary"}  onClick={() => setProjectFile(project)}>{project}</Button>
+                  <Button type="button" className="w-full text-left" variant={"secondary"}  onClick={() => setProjectFile(project)}>{project}</Button>
                 </div>
               ))}
 
