@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
 import { useEffect } from 'react';
@@ -17,25 +17,24 @@ export const SetTopic: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic>({} as Topic);
-  const [disabled, setDisabled] = useState(false);
-  useEffect( () => {
-    window.api.getTopics().then((data) => {
-      setItems(data);
-    });
-  }, []);
- 
   
-  const setTopic = async (topic :Topic) => {
-    if (disabled) return;
-    setDisabled(true);
+  const setTopic = useCallback(async (topic :Topic) => {
     if (topic !== undefined) {
       setSelectedTopic(topic);
       await window.api.setTopic(topic);
     }
-    setDisabled(false);
-  };
-  const setAudience = async () => {
-    navigate("/welcome/set-audience");
+  }, []);
+  useEffect( () => {
+    window.api.getTopics().then((data) => {
+      setItems(data);
+    }).then(() => window.api.getProjectTopic().then((data) => {
+        setTopic(data);
+      }).catch((e) => {
+        console.log(e);
+      }))
+  }, [setTopic]);
+  const setScript = async () => {
+    navigate("/welcome/script-editor");
   };
   return (
     <div className="flex items-center justify-center mt-4">
@@ -53,8 +52,10 @@ export const SetTopic: React.FC = () => {
                 <button
                   key={item.topic}
                   className={cn(
-                    "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-                    selectedTopic.topic === item.topic && "bg-muted"
+                    "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all",
+                    selectedTopic.topic === item.topic && "border-2 border-sky-500",
+                    selectedTopic.topic !== item.topic &&
+                          "hover:border-sky-500 hover: hover:border-dashed border-2"
                   )}
                   onClick={()=>setTopic(item)}
                 >
@@ -74,9 +75,9 @@ export const SetTopic: React.FC = () => {
             </div>
           </ScrollArea>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between ">
           <Button variant="outline">Back</Button>
-          <Button onClick={setAudience}>Next</Button>
+          <Button onClick={setScript}>Next</Button>
         </CardFooter>
       </FramelessCard>
     </div>

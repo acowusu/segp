@@ -1,10 +1,10 @@
 // import { Worker } from "worker_threads";
-import { getProjectPath } from "./metadata";
-import * as fs from 'fs';
+import { getProjectPath, getTextReportPath } from "./metadata";
 import * as https from 'https';
 import { app } from 'electron';
 import audiences from "./mockData/audiences.json";
 import {pool } from "./pool";
+import {generateTopics, generateScript} from "./server"
 import type {
   Audience,
   ScriptData,
@@ -13,11 +13,13 @@ import type {
   Voiceover,
   AudioInfo,
 } from "./mockData/data";
-import script from "./mockData/script.json";
-import topics from "./mockData/topics.json";
+// import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
-
+import * as projectData from "./projectData";
+import {  readFile } from "node:fs/promises";
+import watch from "node-watch"
+import fs from "fs";
 // Takes in an array of strings and returns an array of AudioInfo
 export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
 
@@ -104,13 +106,57 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
 }
 
 export async function getScript(): Promise<ScriptData[]> {
-  return script;
+  // TODO forward error if not initialized (for now we just return the notional script)
+  var script = projectData.getProjectScript();
+  if (script.length !== 0) {
+    return script
+  }
+
+  const reportPath = getTextReportPath();
+  
+  if (fs.existsSync(reportPath)) {
+    const report = await readFile(reportPath, "utf-8");
+    script = await generateScript(projectData.getProjectTopic().topic, report)
+    await setScript(script)
+    return script
+  } else {
+    // Alex what does your watch code do??
+    throw Error("report does not exits")
+  }
+
 }
+
+export async function setScript(script: ScriptData[]): Promise<void> {
+  projectData.setProjectScript(script);
+}
+
 export async function getTopics(): Promise<Topic[]> {
-  return topics;
+  const proj_data = projectData.getProjectTopics()
+  if (proj_data.length !== 0) {
+    return proj_data
+  }
+
+  const reportPath = getTextReportPath();
+  
+  if (fs.existsSync(reportPath)) {
+    const report = await readFile(reportPath, "utf-8");
+    const topics = await generateTopics(report);
+    projectData.setProjectTopics(topics);
+    return topics
+  } else {
+    return await new Promise<Topic[]>((resolve) => {
+      const watcher = watch(reportPath, { persistent: true }, async (event, filename) => {
+        if (event === 'update' && filename === reportPath) {
+          watcher.close();
+          const report = await readFile(reportPath, "utf-8");
+          resolve(generateTopics(report));
+        }
+      });
+    });
+  }
 }
 export async function setTopic(topic: Topic): Promise<void> {
-  console.log(topic);
+  projectData.setProjectTopic(topic);
 }
 export async function getAudiences(): Promise<Audience[]> {
   return audiences;
@@ -123,12 +169,13 @@ export async function getVisuals(): Promise<Visual[]> {
 }
 
 export async function setAudience(audience: Audience): Promise<void> {
-  console.log(audience);
+  projectData.setProjectAudience(audience);
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
-  console.log(voiceover);
+  console.log("setVoiceover", voiceover);
+  projectData.setProjectVoiceover(voiceover);
 }
 export async function setVisual(visuals: Visual): Promise<void> {
-  console.log(visuals);
+  projectData.setProjectVisual(visuals);
 }
 // Usage example:
