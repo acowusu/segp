@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-// import { MediaStore } from "../contexts/media/mediaStore";
 import { Progress } from "../components/ui/progress";
 import etro from "etro";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { SubtitleText } from "../lib/subtitle-layer";
-import { synchronized } from "../lib/utils";
 const WIDTH = 1920;
 const HEIGHT = 1080;
 
