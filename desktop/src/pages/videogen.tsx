@@ -4,6 +4,12 @@ import etro from "etro";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { SubtitleText } from "../lib/subtitle-layer";
+import {
+  CardContent,
+  CardHeader,
+  CardTitle,
+  FramelessCard,
+} from "../components/ui/card";
 const WIDTH = 1920;
 const HEIGHT = 1080;
 
@@ -40,6 +46,7 @@ export const VideoGenerator: React.FC<{
   const [videoURL, setVideoURL] = useState<string>();
   const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
   const [isGenerateClicked, setIsGenerateClicked] = useState<boolean>(false);
+  const [isDownloadStarted, setIsDownloadStarted] = useState<boolean>(false);
   const [generationProgress, setGenerationProgress] = useState<number>(0);
   const [currentProcess, setCurrentProcess] = useState<string>("");
 
@@ -138,22 +145,26 @@ export const VideoGenerator: React.FC<{
       }
 
       if (isVideoReady) {
+        setIsDownloadStarted(true);
         console.log(`download path  = ${path}`);
         setCurrentProcess("Preparing the video");
         setGenerationProgress(20);
         const buff = await webmBlob!.arrayBuffer(); // exists becuaase of isVideoReady
 
-        setCurrentProcess("Starting the Mp4 Conversion");
+        setCurrentProcess("Starting the mp4 Conversion");
         const interval = setInterval(() => {
           setGenerationProgress((prev) => {
-            if (prev < 80) return prev + 0.2;
+            if (prev < 95) return prev + 0.2;
             clearInterval(interval);
             return prev;
           });
         }, 50);
-        setCurrentProcess("Writing the mp4");
+
+        setCurrentProcess("Writing to mp4");
         window.api.webmDataToMp4File(buff, path).then(() => {
-          setCurrentProcess("Done!");
+          clearInterval(interval);
+          setGenerationProgress(100);
+          setCurrentProcess("Downloaded");
         });
       } else {
         console.log("Video is not ready, cannot convert to mp4");
@@ -167,7 +178,7 @@ export const VideoGenerator: React.FC<{
 
     const interval = setInterval(() => {
       setGenerationProgress((prev) => {
-        if (prev < 80) return prev + 0.5;
+        if (prev < 95) return prev + 0.5;
         clearInterval(interval);
         return prev;
       });
@@ -185,6 +196,7 @@ export const VideoGenerator: React.FC<{
         setCurrentProcess("Recording");
       },
     });
+    clearInterval(interval);
     setGenerationProgress(95);
     const newBlob = new Blob([blob!], { type: "video/webm" });
     setWebmBlob(newBlob);
@@ -198,63 +210,85 @@ export const VideoGenerator: React.FC<{
   };
 
   return (
-    <div>
-      <h1> Video Generation </h1>
-      {isVideoReady ? (
-        <div>
-          <video width="640" height="360" controls>
-            <source src={videoURL} type="video/webm" />
-          </video>
-          <Button
-            disabled={false}
-            onClick={() => {
-              console.log("mp4 download clicked");
-              downloadAsMp4();
-            }}
-          >
-            Download Mp4
-          </Button>
-        </div>
-      ) : (
-        <div>
-          {isGenerateClicked ? (
-            <>
-              <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-                <Progress value={generationProgress} className="w-5/6 mt-4" />
-                <p className="text-yellow-400">{currentProcess}</p>
-              </Skeleton>
-            </>
-          ) : (
-            <canvas className="w-full mb-4 " ref={canvasRef}></canvas>
-          )}
+    <div className="flex items-center justify-center flex-col gap-2">
+      <FramelessCard>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-center ">
+            Video Generation
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center gap-4">
+            {!isVideoReady ? (
+              <>
+                <Button
+                  variant="outline"
+                  className="flex items-center justify-center"
+                  onClick={() => {
+                    movieRef.current?.play();
+                  }}
+                >
+                  Play
+                </Button>
+                <Button
+                  className="flex items-center justify-center "
+                  onClick={() => {
+                    setIsGenerateClicked(true);
+                    console.log("video creation started");
+                    setTimeout(() => {
+                      console.log("generating");
+                      generateVideo();
+                    }, 1000);
+                  }}
+                >
+                  Create Video
+                </Button>
+              </>
+            ) : !isDownloadStarted ? (
+              <Button
+                onClick={() => {
+                  console.log("mp4 download clicked");
+                  downloadAsMp4();
+                }}
+              >
+                Download Video
+              </Button>
+            ) : (
+              <div className="w-full flex align-center  items-center justify-center flex-col">
+                <Progress value={generationProgress} className="w-5/6 mb-1" />
+                <p className=" text-yellow-400">{currentProcess}</p>
+              </div>
+            )}
+          </div>
 
-          <Button
-            onClick={() => {
-              setIsGenerateClicked(true);
-              console.log("video creation started");
-              setTimeout(() => {
-                console.log("generating");
-                generateVideo();
-              }, 1000);
-            }}
-          >
-            create video
-          </Button>
-          <Button
-            className="ml-4"
-            onClick={() => {
-              movieRef.current?.play(); //cannot record while playing.
-            }}
-          >
-            Play
-          </Button>
-          {isGenerateClicked ? (
-            <p className="text-yellow-400"> Generating...</p>
-          ) : (
-            ""
-          )}
-        </div>
-      )}
+          <div className="flex items-center justify-center gap-2 flex-col mt-4">
+            {isVideoReady ? (
+              <div>
+                <video
+                  className="rounded-md w-full mb-4 flex align-center items-centerjustify-center flex-col gap-2"
+                  width="640"
+                  height="360"
+                  controls
+                >
+                  <source src={videoURL} type="video/webm" />
+                </video>
+              </div>
+            ) : isGenerateClicked ? (
+              <>
+                <Skeleton
+                  className="aspect-video w-full h-96  flex align-center items-center justify-center flex-col"
+                  gap-2
+                >
+                  <Progress value={generationProgress} className="w-5/6 mb-1" />
+                  <p className="text-yellow-400">{currentProcess}</p>
+                </Skeleton>
+              </>
+            ) : (
+              <canvas className="w-full rounded_md" ref={canvasRef}></canvas>
+            )}
+          </div>
+        </CardContent>
+      </FramelessCard>
     </div>
   );
 };
