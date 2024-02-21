@@ -5,7 +5,7 @@ import etro from "etro";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { SubtitleText } from "../lib/subtitle-layer";
-const WIDTH = 1920; 
+const WIDTH = 1920;
 const HEIGHT = 1080;
 
 type ChosenAsset = {
@@ -143,7 +143,7 @@ export const VideoGenerator: React.FC<{
       setVideoBlob(new Blob([buff], { type: "video/mp4" }));
       setIsMp4Ready(true);
     };
-    
+
     setGenerationProgress(10);
     let interval = setInterval(() => {
       setGenerationProgress((prev) => {
