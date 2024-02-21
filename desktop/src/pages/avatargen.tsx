@@ -6,7 +6,7 @@ export const AvatarGenerator: React.FC = () => {
   const [avatar, setAvatar] = useState<{id: string, imagePath: string}>({id: '', imagePath: ''});
   const [avatarResponse, setAvatarResponse] = useState<string>('');
   const ttsMockAudioUrl = "./examples/driven_audio/full.wav";
-  const mockAvatar = {id: "1", imagePath: "./examples/source_image/lebron-green.png"}; 
+  const mockAvatar = {id: "1", imagePath: "./examples/source_image/lebron-green.png"};
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const generateAvatar = async () => {
