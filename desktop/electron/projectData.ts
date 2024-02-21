@@ -98,3 +98,12 @@ export function setProjectScript(new_script: ScriptData[]): void {
   }
   getProjectStore().set("script_selections", scriptSelection);
 }
+
+
+export function getProjectLength(): number {
+  return getProjectStore().get("length", 1) as number;
+}
+
+export function setProjectLength(length: number): void {
+  getProjectStore().set("length", length);
+}

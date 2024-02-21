@@ -9,6 +9,7 @@ import {
   setVisual,
   getVisuals,
   setVoiceover,
+  setLength,
   getVoiceovers,
   textToAudio,
 } from "./reportProcessing";
@@ -34,6 +35,7 @@ const api = {
   setVisual,
   getVisuals,
   setVoiceover,
+  setLength,
   getVoiceovers,
   getDirectory,
   getFile,

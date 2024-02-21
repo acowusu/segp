@@ -11,6 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "../components/ui/form";
 
 import { Switch } from "../components/ui/switch";
@@ -23,6 +24,7 @@ import {
 } from "../components/ui/select";
 import { Audience, Voiceover } from "../../electron/mockData/data";
 import { useCallback, useEffect, useState } from "react";
+import { Input } from "../components/ui/input";
 
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
@@ -33,6 +35,9 @@ const formSchema = z.object({
   voiceover: z
     .string({ required_error: "Please Select an Voiceover" })
     .default("").optional(),
+  videoLength: z
+  .number({ required_error: "Please Select a video length" })
+  .default(1).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -43,10 +48,11 @@ const defaultValues: () => Promise<Partial<FormValues>> = async () => {
     subtitles:  await window.api.getProjectHasSubtitles().catch(()=>false)!,
     audience: ( await window.api.getProjectAudience().catch(()=>({name:""}))).name!,
     voiceover: (await window.api.getProjectVoiceover().catch(()=>({id:""}))).id!,
+    videoLength: await window.api.getProjectLength(),
   }
 };
 
-export function SetVisuals() {
+export function SetVisuals({nextSlide}: {nextSlide: ((jump?: boolean | undefined) => void)}) {
   const [audienceItems, setAudienceItems] = useState<Audience[]>([]);
   const [selectedAudience, setSelectedAudience] = useState<Audience>(
     {} as Audience
@@ -55,6 +61,7 @@ export function SetVisuals() {
   const [selectedVoiceover, setSelectedVoiceover] = useState<Voiceover>(
     {} as Voiceover
   );
+  const [selectedLength, setSelectedLength] = useState<number>(1);
 
   const setAudience = useCallback(async (audience: Audience) => {
     if (audience !== undefined) {
@@ -68,7 +75,12 @@ export function SetVisuals() {
       window.api.setVoiceover(voiceover);
     }
   }, []);
-
+  const setLength = useCallback(async (length: number) => {
+    if (length !== undefined) {
+      setSelectedLength(length);
+      window.api.setLength(length);
+    }
+  }, []);
   useEffect(() => {
     window.api
       .getVoiceovers()
@@ -117,7 +129,7 @@ export function SetVisuals() {
     window.api.setProjectHasSubtitles(data.subtitles || false);
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
-
+    nextSlide()
   }, [audienceItems, setAudience, setVoiceover, voiceoverItems])
 
   const {watch,handleSubmit }  = form
@@ -128,125 +140,146 @@ export function SetVisuals() {
 }, [watch, handleSubmit,  onSubmit]);
   const { avatar, subtitles } = form.watch();
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div>
-          <h3 className="mb-4 text-lg font-medium">Configuration</h3>
-          <FormField
+    <>
+      <h1 className="text-4xl font-bold pb-8">
+        Project Settings
+      </h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div>
+            <h3 className="mb-4 text-lg font-medium">Configuration</h3>
+            <FormField
             control={form.control}
-            name="audience"
+            name="videoLength"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Audience</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={selectedAudience?.name || " Select an Audience"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {audienceItems.map((audienceItem) => (
-                      <SelectItem
-                        key={audienceItem.name}
-                        value={audienceItem.name}
-                      >
-                        {audienceItem.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormLabel>Video Length</FormLabel>
+                <FormControl>
+                  <Input placeholder="1" {...field} />
+                </FormControl>
                 <FormDescription>
-                   {selectedAudience.description}
+                  Select Video Length
                 </FormDescription>
+                <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="voiceover"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Voiceover</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger>
-                  <SelectValue placeholder={selectedVoiceover?.name || " Select a Voiceover"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {voiceoverItems.map((voiceoverItem) => (
-                      <SelectItem
-                        key={voiceoverItem.name}
-                        value={voiceoverItem.id}
-                      >
-                        {voiceoverItem.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                   {selectedVoiceover.description}
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-          <h3 className="mb-4 text-lg font-medium">Visuals</h3>
-          <div className="space-y-4">
             <FormField
               control={form.control}
-              name="avatar"
+              name="audience"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Avatar</FormLabel>
-                    <FormDescription>
-                      Show a picture of the narrator of the script
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
+                <FormItem>
+                  <FormLabel>Audience</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={selectedAudience?.name || " Select an Audience"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {audienceItems.map((audienceItem) => (
+                        <SelectItem
+                          key={audienceItem.name}
+                          value={audienceItem.name}
+                        >
+                          {audienceItem.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    {selectedAudience.description}
+                  </FormDescription>
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
-              name="subtitles"
+              name="voiceover"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Subtitles</FormLabel>
-                    <FormDescription>
-                      Show subtitles on the video
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
+                <FormItem>
+                  <FormLabel>Voiceover</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                    <SelectValue placeholder={selectedVoiceover?.name || " Select a Voiceover"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {voiceoverItems.map((voiceoverItem) => (
+                        <SelectItem
+                          key={voiceoverItem.name}
+                          value={voiceoverItem.id}
+                        >
+                          {voiceoverItem.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    {selectedVoiceover.description}
+                  </FormDescription>
                 </FormItem>
               )}
             />
+            <h3 className="mb-4 text-lg font-medium">Visuals</h3>
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="avatar"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Avatar</FormLabel>
+                      <FormDescription>
+                        Show a picture of the narrator of the script
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="subtitles"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Subtitles</FormLabel>
+                      <FormDescription>
+                        Show subtitles on the video
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
-        </div>
-        <h3 className="text-lg font-medium">Preview</h3>
+          <h3 className="text-lg font-medium">Preview</h3>
 
-        <OverlayPreview
-          backgroundUrl={"example2-min.jpg"}
-          avatarUrl={"big-person.png"}
-          showAvatar={avatar}
-          showSubtitle={subtitles}
-        />
+          <OverlayPreview
+            backgroundUrl={"example2-min.jpg"}
+            avatarUrl={"big-person.png"}
+            showAvatar={avatar}
+            showSubtitle={subtitles}
+          />
 
-        <Button type="submit">Finish</Button>
-      </form>
-    </Form>
+          <Button type="submit">Generate Topics</Button>
+        </form>
+      </Form>
+    </>
   );
 }

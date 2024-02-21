@@ -96,10 +96,12 @@ export async function setAudience(audience: Audience): Promise<void> {
   projectData.setProjectAudience(audience);
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
-  console.log("setVoiceover", voiceover);
   projectData.setProjectVoiceover(voiceover);
 }
 export async function setVisual(visuals: Visual): Promise<void> {
   projectData.setProjectVisual(visuals);
+}
+export async function setLength(length: number): Promise<void> {
+  projectData.setProjectLength(length);
 }
 // Usage example:

@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import type { ScriptData, Topic } from "./mockData/data";
 
 
+
 export const generateTextFromLLM = async (
     prompt: string,
 ): Promise<string> => {
@@ -135,7 +136,6 @@ export const generateScript = async (topic: string, report:string): Promise<Scri
 const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
     const prompt = TOPICS_SYS + report + TOPICS_FORMAT
 
-    console.log("here")
     let result = await generateTextFromLLM(prompt);
 
     result = result.substring(prompt.length + 16, result.length-1)
@@ -165,8 +165,6 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
     
 }
 
-// TODO set settings here 
-
 const SCRIPTS_FORMAT = `
 [END OF REPORT]
 
@@ -188,6 +186,9 @@ const generateScriptInternal =async (topic:string, report: string):Promise<Scrip
     
 
     console.log("generating scripts")
+    
+    // TODO set settings here 
+    
 
     const SCRIPT_SYS = `
     Below is some information. 
@@ -222,8 +223,8 @@ const generateScriptInternal =async (topic:string, report: string):Promise<Scrip
         console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
 
         let scripts = JSON.parse(regenerated_result)
-        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
-            return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
+        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}, index: number) => {
+            return {...script, id: String(index), selectedScriptIndex: 1} as ScriptData
         })
         return addedInfoScripts;
     }
