@@ -11,6 +11,8 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+  getAvatars,
+  setAvatar,
 } from "./reportProcessing";
 import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
@@ -53,8 +55,8 @@ const api = {
   writeBlob,
   webmBLobToMp4,
   prepareMp4Blob,
-
-
+  getAvatars,
+  setAvatar,
 };
 export default api;
 

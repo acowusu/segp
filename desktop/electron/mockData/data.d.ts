@@ -36,3 +36,10 @@ export interface AudioInfo {
   duration: number;
   subtitlePath: string;
 }
+
+export interface Avatar {
+  id: string;
+  name: string;
+  imagePath: string;
+  sadtalkerPath: string;
+}

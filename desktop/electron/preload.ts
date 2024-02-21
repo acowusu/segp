@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { Topic, Audience, Voiceover, Visual } from './mockData/data'
+import { Topic, Audience, Voiceover, Visual, Avatar } from './mockData/data'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))
@@ -11,7 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setVoiceovers: (voiceover: Voiceover) => ipcRenderer.invoke('dialog:setVoiceover', voiceover),
   setVisuals: (visuals: Visual) => ipcRenderer.invoke('dialog:setVisuals', visuals),
   getScript: () => ipcRenderer.invoke('dialog:getScript'),
-  textToAudio: (text: string[]) => ipcRenderer.invoke('textToAudio', text)
+  textToAudio: (text: string[]) => ipcRenderer.invoke('textToAudio', text),
+  setAvatars: (avatar: Avatar) => ipcRenderer.invoke('dialog:setAvatar', avatar),
 })
 
 

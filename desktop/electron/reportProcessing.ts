@@ -12,10 +12,12 @@ import type {
   Visual,
   Voiceover,
   AudioInfo,
+  Avatar,
 } from "./mockData/data";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
+import avatars from "./mockData/avatars.json";
 import * as projectData from "./projectData";
 import {  readFile } from "node:fs/promises";
 import watch from "node-watch"
@@ -166,6 +168,15 @@ export async function getVoiceovers(): Promise<Voiceover[]> {
 }
 export async function getVisuals(): Promise<Visual[]> {
   return visuals;
+}
+
+export async function getAvatars(): Promise<Avatar[]> {
+  return avatars;
+}
+
+export async function setAvatar(avatar: Avatar): Promise<void> {
+  console.log("setAvatar", avatar);
+  projectData.setProjectAvatar(avatar);
 }
 
 export async function setAudience(audience: Audience): Promise<void> {
