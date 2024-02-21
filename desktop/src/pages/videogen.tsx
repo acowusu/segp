@@ -1,3 +1,7 @@
+/**
+ * @prettier
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 // import { MediaStore } from "../contexts/media/mediaStore";
 import { Progress } from "../components/ui/progress";
@@ -6,7 +10,7 @@ import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { SubtitleText } from "../lib/subtitle-layer";
 import { synchronized } from "../lib/utils";
-const WIDTH = 1920; 
+const WIDTH = 1920;
 const HEIGHT = 1080;
 
 type ChosenAsset = {
@@ -44,10 +48,9 @@ export const VideoGenerator: React.FC<{
   const [isGenerateClicked, setIsGenerateClicked] = useState<boolean>(false);
   const [generationProgress, setGenerationProgress] = useState<number>(0);
   const [currentProcess, setCurrentProcess] = useState<string>("");
-  const [isMp4Ready, setIsMp4Ready] = useState<boolean>(false);
 
   // this is now used to store the mp4 blob
-  const [videoBlob, setVideoBlob] = useState<Blob>();
+  const [webmBlob, setWebmBlob] = useState<Blob>();
 
   useEffect(() => {
     if (!canvasRef.current) return; //null canvas ref
@@ -89,21 +92,23 @@ export const VideoGenerator: React.FC<{
     const subtitleLayer = new SubtitleText({
       startTime: 0,
       duration: 20,
-      text:  (_element: etro.EtroObject, time: number) => {
-        return Math.round(time) % 2 === 0 ? "Lorem ipsum dolor sit amet, ct dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum" : "World";
+      text: (_element: etro.EtroObject, time: number) => {
+        return Math.round(time) % 2 === 0
+          ? "Lorem ipsum dolor sit amet, ct dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum"
+          : "World";
       },
-      x:0, // default: 0
-      y:0, // default: 0
+      x: 0, // default: 0
+      y: 0, // default: 0
       // width: WIDTH/2, // default: null (full width)
       // height: 120, // default: null (full height)
       opacity: 1, // default: 1
-      color: etro.parseColor('white'), // default: new etro.Color(0, 0, 0, 1)
-      font: '100px sans-serif', // default: '10px sans-serif'
-      textX: WIDTH/2, // default: 0
+      color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
+      font: "100px sans-serif", // default: '10px sans-serif'
+      textX: WIDTH / 2, // default: 0
       textY: HEIGHT, // default: 0
-      textAlign: 'center', // default: 'left'
-      textBaseline: 'alphabetic', // default: 'alphabetic'
-      textDirection: 'ltr', // default: 'ltr'
+      textAlign: "center", // default: 'left'
+      textBaseline: "alphabetic", // default: 'alphabetic'
+      textDirection: "ltr", // default: 'ltr'
       background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
     });
     movie.addLayer(subtitleLayer);
@@ -126,53 +131,44 @@ export const VideoGenerator: React.FC<{
     movieRef.current = movie;
   }, [chosenAudio, chosenImages]);
 
-  const downloadVideo = async () => {
-    if (isMp4Ready) {
-      const url = URL.createObjectURL(videoBlob!);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "video.mp4";
-      a.click();
-    } else {
-      console.log("mp4 not ready");
-    }
-  };
-  const [webmBlob, setWebmBlob] = useState<Blob>()
-  const downloadLock = useState<boolean>(false)
-  const [downloadPath, setDownloadPath] = useState<string>("") 
-  
-  // synchronized(downloadLock, async () => {
-  //   console.log("ask for dir to download")
-    
-  // });
-
   const downloadAsMp4 = async () => {
-    const path = await window.api.getDirectory()
-    console.log(`download path = ${path}`)
-    
-    if (path === "" || path === undefined || path === null) {
-      console.log("No download path selected") // TODO: make this an alert popup
-    }
+    setCurrentProcess("Selecting the path to download Mp4...");
+    setGenerationProgress(10);
 
-    setDownloadPath(path)
+    window.api.getDirectory().then(async (path: string) => {
+      console.log(`download path = ${path}`);
 
-    if (isVideoReady) {
-      console.log(`download path state var (?) = ${downloadPath}`)
-      const buff = await webmBlob!.arrayBuffer(); // exists becuaase of isVideoReady
-      window.api.webmDataToMp4File(buff, path)
-    } else {
-      console.log("Video is not ready, cannot convert to mp4")
-    }
-  } 
+      if (path === "" || path === undefined || path === null) {
+        console.log("No download path selected"); // TODO: make this an alert popup
+        return;
+      }
 
-    
+      if (isVideoReady) {
+        console.log(`download path  = ${path}`);
+        setCurrentProcess("Preparing the video");
+        setGenerationProgress(20);
+        const buff = await webmBlob!.arrayBuffer(); // exists becuaase of isVideoReady
+
+        setCurrentProcess("Starting the Mp4 Conversion");
+        const interval = setInterval(() => {
+          setGenerationProgress((prev) => {
+            if (prev < 80) return prev + 0.2;
+            clearInterval(interval);
+            return prev;
+          });
+        }, 50);
+        setCurrentProcess("Writing the mp4");
+        window.api.webmDataToMp4File(buff, path).then(() => {
+          setCurrentProcess("Done!");
+        });
+      } else {
+        console.log("Video is not ready, cannot convert to mp4");
+      }
+    });
+  };
   const generateVideo = async () => {
-    // const makeMp4Blob = (buff: ArrayBuffer) => {
-      //   setVideoBlob(new Blob([buff], { type: "video/mp4" }));
-      //   setIsMp4Ready(true);
-      // };
-      setCurrentProcess("Starting");
-      
+    setCurrentProcess("Starting");
+
     setGenerationProgress(10);
 
     const interval = setInterval(() => {
@@ -180,7 +176,8 @@ export const VideoGenerator: React.FC<{
         if (prev < 80) return prev + 0.5;
         clearInterval(interval);
         return prev;
-    })}, 80);
+      });
+    }, 50);
     const blob = await movieRef.current?.record({
       frameRate: 30,
       type: "video/webm;codecs=vp9",
@@ -194,41 +191,16 @@ export const VideoGenerator: React.FC<{
         setCurrentProcess("Recording");
       },
     });
-    setGenerationProgress(80);
+    setGenerationProgress(95);
     const newBlob = new Blob([blob!], { type: "video/webm" });
-    setWebmBlob(newBlob)
+    setWebmBlob(newBlob);
     const url = URL.createObjectURL(newBlob);
     setVideoURL(url); // set the url so we can play
     clearInterval(interval);
     setGenerationProgress(100);
-    setCurrentProcess("Done generating the video")
+    setCurrentProcess("Done generating the video");
     // start the mp4 conversion here
     setIsVideoReady(true); // change the display
-    
-
-    // setCurrentProcess("Converting to mp4");
-    // console.log("starting the mp4 conversion");
-    // const buff = await newBlob.arrayBuffer();
-    // setGenerationProgress(70);
-    // interval = setInterval(() => {
-    //   setGenerationProgress((prev) => {
-    //     if (prev < 90) return prev + 0.1;
-    //     clearInterval(interval);
-    //     return prev;
-    // })}, 50);
-    // setCurrentProcess("Post processing mp4");
-    // // const mp4 = await window.api.prepareMp4Blob(buff);
-    // clearInterval(interval);
-    // setGenerationProgress(90);
-    // setCurrentProcess("Finishing up");
-    // console.log("got the mp4 data back making blob");
-
-    // // makeMp4Blob(mp4);
-    // console.log("mp4 conversion done");
-    // setGenerationProgress(100);
-    // // setVideoBlob(newBlob);
-    // setCurrentProcess("Done");
-    // console.log("recording complete");
   };
 
   return (
@@ -251,17 +223,16 @@ export const VideoGenerator: React.FC<{
         </div>
       ) : (
         <div>
-
-            {isGenerateClicked ? (
-              <>
-          <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-            <Progress value={generationProgress} className="w-5/6 mt-4" />
-            <p className="text-yellow-400">{currentProcess}</p>
-          </Skeleton>
+          {isGenerateClicked ? (
+            <>
+              <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+                <Progress value={generationProgress} className="w-5/6 mt-4" />
+                <p className="text-yellow-400">{currentProcess}</p>
+              </Skeleton>
             </>
-            ) : (
-          <canvas className="w-full mb-4 " ref={canvasRef}></canvas>
-            )}
+          ) : (
+            <canvas className="w-full mb-4 " ref={canvasRef}></canvas>
+          )}
 
           <Button
             onClick={() => {
