@@ -5,6 +5,7 @@ import etro from "etro";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { SubtitleText } from "../lib/subtitle-layer";
+import { synchronized } from "../lib/utils";
 const WIDTH = 1920; 
 const HEIGHT = 1080;
 
@@ -136,21 +137,50 @@ export const VideoGenerator: React.FC<{
       console.log("mp4 not ready");
     }
   };
-
-  const generateVideo = async () => {
-    setCurrentProcess("Starting");
-    const makeMp4Blob = (buff: ArrayBuffer) => {
-      setVideoBlob(new Blob([buff], { type: "video/mp4" }));
-      setIsMp4Ready(true);
-    };
+  const [webmBlob, setWebmBlob] = useState<Blob>()
+  const downloadLock = useState<boolean>(false)
+  const [downloadPath, setDownloadPath] = useState<string>("") 
+  
+  // synchronized(downloadLock, async () => {
+  //   console.log("ask for dir to download")
     
+  // });
+
+  const downloadAsMp4 = async () => {
+    const path = await window.api.getDirectory()
+    console.log(`download path = ${path}`)
+    
+    if (path === "" || path === undefined || path === null) {
+      console.log("No download path selected") // TODO: make this an alert popup
+    }
+
+    setDownloadPath(path)
+
+    if (isVideoReady) {
+      console.log(`download path state var (?) = ${downloadPath}`)
+      const buff = await webmBlob!.arrayBuffer(); // exists becuaase of isVideoReady
+      window.api.webmDataToMp4File(buff, path)
+    } else {
+      console.log("Video is not ready, cannot convert to mp4")
+    }
+  } 
+
+    
+  const generateVideo = async () => {
+    // const makeMp4Blob = (buff: ArrayBuffer) => {
+      //   setVideoBlob(new Blob([buff], { type: "video/mp4" }));
+      //   setIsMp4Ready(true);
+      // };
+      setCurrentProcess("Starting");
+      
     setGenerationProgress(10);
-    let interval = setInterval(() => {
+
+    const interval = setInterval(() => {
       setGenerationProgress((prev) => {
-        if (prev < 50) return prev + 0.1;
+        if (prev < 80) return prev + 0.5;
         clearInterval(interval);
         return prev;
-    })}, 50);
+    })}, 80);
     const blob = await movieRef.current?.record({
       frameRate: 30,
       type: "video/webm;codecs=vp9",
@@ -164,37 +194,41 @@ export const VideoGenerator: React.FC<{
         setCurrentProcess("Recording");
       },
     });
-    setGenerationProgress(20);
+    setGenerationProgress(80);
     const newBlob = new Blob([blob!], { type: "video/webm" });
+    setWebmBlob(newBlob)
     const url = URL.createObjectURL(newBlob);
     setVideoURL(url); // set the url so we can play
     clearInterval(interval);
-    setGenerationProgress(50);
-    // start the mp4 conversion here
-    setCurrentProcess("Converting to mp4");
-    console.log("starting the mp4 conversion");
-    const buff = await newBlob.arrayBuffer();
-    setGenerationProgress(70);
-    interval = setInterval(() => {
-      setGenerationProgress((prev) => {
-        if (prev < 90) return prev + 0.1;
-        clearInterval(interval);
-        return prev;
-    })}, 50);
-    setCurrentProcess("Post processing mp4");
-    const mp4 = await window.api.prepareMp4Blob(buff);
-    clearInterval(interval);
-    setGenerationProgress(90);
-    setCurrentProcess("Finishing up");
-    console.log("got the mp4 data back making blob");
-
-    makeMp4Blob(mp4);
-    console.log("mp4 conversion done");
     setGenerationProgress(100);
-    // setVideoBlob(newBlob);
-    setCurrentProcess("Done");
-    console.log("recording complete");
+    setCurrentProcess("Done generating the video")
+    // start the mp4 conversion here
     setIsVideoReady(true); // change the display
+    
+
+    // setCurrentProcess("Converting to mp4");
+    // console.log("starting the mp4 conversion");
+    // const buff = await newBlob.arrayBuffer();
+    // setGenerationProgress(70);
+    // interval = setInterval(() => {
+    //   setGenerationProgress((prev) => {
+    //     if (prev < 90) return prev + 0.1;
+    //     clearInterval(interval);
+    //     return prev;
+    // })}, 50);
+    // setCurrentProcess("Post processing mp4");
+    // // const mp4 = await window.api.prepareMp4Blob(buff);
+    // clearInterval(interval);
+    // setGenerationProgress(90);
+    // setCurrentProcess("Finishing up");
+    // console.log("got the mp4 data back making blob");
+
+    // // makeMp4Blob(mp4);
+    // console.log("mp4 conversion done");
+    // setGenerationProgress(100);
+    // // setVideoBlob(newBlob);
+    // setCurrentProcess("Done");
+    // console.log("recording complete");
   };
 
   return (
@@ -206,10 +240,10 @@ export const VideoGenerator: React.FC<{
             <source src={videoURL} type="video/webm" />
           </video>
           <Button
-            disabled={!isMp4Ready}
+            disabled={false}
             onClick={() => {
               console.log("mp4 download clicked");
-              downloadVideo();
+              downloadAsMp4();
             }}
           >
             Download Mp4
@@ -244,7 +278,7 @@ export const VideoGenerator: React.FC<{
           <Button
             className="ml-4"
             onClick={() => {
-              movieRef.current?.play();
+              movieRef.current?.play(); //cannot record while playing.
             }}
           >
             Play
