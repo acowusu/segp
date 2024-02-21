@@ -1,7 +1,7 @@
 def seconds_to_srt_time(seconds):
     """Converts seconds to SRT time format
 
-    :param seconds:
+    :param seconds: 
 
     """
     hours = seconds // 3600
@@ -14,7 +14,7 @@ def seconds_to_srt_time(seconds):
 def create_srt(data):
     """Creates SRT format subtitles from data
 
-    :param data:
+    :param data: 
 
     """
     subtitles = ""

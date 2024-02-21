@@ -7,7 +7,7 @@ from TTS.api import TTS
 def seconds_to_srt_time(seconds):
     """Converts seconds to SRT time format
 
-    :param seconds:
+    :param seconds: 
 
     """
     hours = seconds // 3600
