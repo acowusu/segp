@@ -12,7 +12,7 @@ import {
   getVoiceovers,
   textToAudio,
 } from "./reportProcessing";
-import { webmDataToMp4File, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
+import { webmDataToMp4File } from "./videoProcessing";
 // Import your API methods here
 import {
   getDirectory,
@@ -50,9 +50,6 @@ const api = {
   generateTopics,
   // Add your API methods here
   webmDataToMp4File,
-  writeBlob,
-  webmBLobToMp4,
-  prepareMp4Blob,
 
 
 };
