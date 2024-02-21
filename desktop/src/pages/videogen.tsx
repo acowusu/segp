@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 import React, { useEffect, useRef, useState } from "react";
 // import { MediaStore } from "../contexts/media/mediaStore";
 import { Progress } from "../components/ui/progress";
