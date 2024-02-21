@@ -19,9 +19,11 @@ quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_compute_dtype=torch.float16
 )
-model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=quantization_config)
+model = AutoModelForCausalLM.from_pretrained(
+    model_id, quantization_config=quantization_config)
 
 app = FastAPI(root_path="/v1")
+
 
 @app.post("/generate")
 async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float, Form()]):
