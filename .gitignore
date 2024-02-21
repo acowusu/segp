@@ -1,2 +1,6 @@
 desktop/coverage/coverage-summary.json
 desktop/coverage/coverage-final.json
+desktop/dist-native/better_sqlite3.node
+.prettierrc
+desktop/.env
+desktop/dist-native/better_sqlite3.node
