@@ -14,6 +14,7 @@ from typing_extensions import Annotated
 
 class SadTalker(BaseModel):
     """ """
+
     driven_audio: Annotated[str, Form()]
     source_image: Annotated[str, Form()]
 
@@ -70,17 +71,17 @@ def is_valid_image_extension(path):
 async def animate_portrait(sadtalker: SadTalker):
     try:
         if not is_valid_path(sadtalker.driven_audio):
-            raise HTTPException(status_code=400,
-                                detail="Invalid driven_audio path")
+            raise HTTPException(status_code=400, detail="Invalid driven_audio path")
         if not is_valid_path(sadtalker.source_image):
-            raise HTTPException(status_code=400,
-                                detail="Invalid source_image path")
+            raise HTTPException(status_code=400, detail="Invalid source_image path")
         if not is_valid_audio_extension(sadtalker.driven_audio):
-            raise HTTPException(status_code=400,
-                                detail="Invalid driven_audio extension")
+            raise HTTPException(
+                status_code=400, detail="Invalid driven_audio extension"
+            )
         if not is_valid_image_extension(sadtalker.source_image):
-            raise HTTPException(status_code=400,
-                                detail="Invalid source_image extension")
+            raise HTTPException(
+                status_code=400, detail="Invalid source_image extension"
+            )
 
         os.chdir("./SadTalker")
         results_dir = "/www/sadtalker_results/"
