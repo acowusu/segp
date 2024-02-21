@@ -1,14 +1,22 @@
 import os
-from TTS.api import TTS
+
 from pydub import AudioSegment
+from TTS.api import TTS
+
 
 def seconds_to_srt_time(seconds):
-    """Converts seconds to SRT time format"""
+    """Converts seconds to SRT time format
+
+    :param seconds:
+
+    """
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60
     seconds = seconds % 60
     milliseconds = (seconds - int(seconds)) * 1000
-    return "%02d:%02d:%02d,%03d" % (hours, minutes, int(seconds), int(milliseconds))
+    return "%02d:%02d:%02d,%03d" % (hours, minutes, int(seconds),
+                                    int(milliseconds))
+
 
 # Directory to store generated audio files
 AUDIO_DIRECTORY = "generated_audio"
@@ -50,7 +58,9 @@ for line_idx, line in enumerate(lines, start=1):
     srt_file_path = os.path.join(SRT_DIRECTORY, srt_file_name)
 
     # Generate SRT content
-    srt_content = f"{line_idx}\n00:00:00,000 --> {seconds_to_srt_time(audio_duration)}\n{text}\n"
+    srt_content = (
+        f"{line_idx}\n00:00:00,000 --> {seconds_to_srt_time(audio_duration)}\n{text}\n"
+    )
 
     # Write SRT content to file
     with open(srt_file_path, "w") as srt_file:
@@ -61,7 +71,7 @@ for line_idx, line in enumerate(lines, start=1):
         "audioUrl": f"http://localhost:8888/audio/{file_name}",
         "duration": audio_duration,
         "text": text,
-        "srtUrl": f"http://localhost:8888/srt/{srt_file_name}"
+        "srtUrl": f"http://localhost:8888/srt/{srt_file_name}",
     })
 
 # Print the generated data
