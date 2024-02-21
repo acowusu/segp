@@ -1,5 +1,8 @@
 // import { Worker } from "worker_threads";
 import { getProjectPath } from "./metadata";
+import * as fs from 'fs';
+import * as https from 'https';
+import { app } from 'electron';
 import audiences from "./mockData/audiences.json";
 import {pool } from "./pool";
 import type {
@@ -35,17 +38,64 @@ export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
 
       // Get audio link
       const responseData = await response.json();
-      const audioLink: string = responseData.audio_link;
-      const fullAudioLink: string = 'https://iguana.alexo.uk' + audioLink;
+      const audioLink: string = 'https://iguana.alexo.uk' + responseData.audio_link;
 
       // Get audio duration 
       const duration = responseData.duration;
 
-      audioInfoArray.push({ audioUrl: fullAudioLink, duration, text});
-    }
+      // Create audio file path
+      const audioFilePath = app.getAppPath() + '/public/audio/' + extractFilenameFromURL(audioLink);
+      
+      try {
+        await downloadMP3(audioLink, audioFilePath);
+        console.log('MP3 file downloaded successfully.');
 
-    // console.log(audioInfoArray);
+        const subtitlesFilePath = audioFilePath.replace('.mp3', '.srt');
+        await saveSubtitles(responseData.subtitles, subtitlesFilePath);
+        console.log('Subtitles saved successfully.');
+
+        audioInfoArray.push({ audioPath: audioFilePath, duration, subtitlePath: subtitlesFilePath });
+      } catch (error) {
+        console.error('Error downloading MP3 file:', error);
+      }
+      
+    }
     return audioInfoArray;
+}
+
+// Function to get audio file name
+function extractFilenameFromURL(url: string): string {
+  const parts = url.split('/');
+  return parts[parts.length - 1];
+}
+
+// Function to download MP3 file from URL
+function downloadMP3(url: string, destinationPath: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+      const file = fs.createWriteStream(destinationPath);
+      https.get(url, (response) => {
+          response.pipe(file);
+          file.on('finish', () => {
+              file.close();
+              resolve();
+          });
+      }).on('error', (err) => {
+          fs.unlink(destinationPath, () => reject(err));
+      });
+  });
+}
+
+// Function to save subtitles content as an .srt file
+function saveSubtitles(subtitlesContent: string, subtitlesFilePath: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+      fs.writeFile(subtitlesFilePath, subtitlesContent, 'utf8', (err) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
+      });
+  });
 }
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {

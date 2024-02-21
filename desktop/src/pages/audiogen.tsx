@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 interface AudioInfo {
-  audioUrl: string;
+  audioPath: string;
   duration: number;
   text: string;
 }
@@ -12,7 +12,7 @@ export const AudioGenerator: React.FC = () => {
   const [audioInfoList, setAudioInfoList] = useState<AudioInfo[]>([]);
   // const script = ["Good Morning I hope you have a lovely day.", "My name is John Cena - you can't see me.", "That's all, good bye world."]
   // const script = ["The sun was setting behind the distant mountains, casting a warm glow over the tranquil valley below. Birds chirped softly in the trees, and a gentle breeze rustled the leaves. As the evening descended, the sky turned into a canvas of vibrant colors, painting the horizon with shades of orange, pink, and purple. It was a peaceful scene, a moment of serenity amidst the chaos of the world."]
-  // const script = ["The sun was setting behind the distant mountains, casting a warm glow over the tranquil valley below.", "Birds chirped softly in the trees, and a gentle breeze rustled the leaves.", "As the evening descended, the sky turned into a canvas of vibrant colors, painting the horizon with shades of orange, pink, and purple.", "It was a peaceful scene, a moment of serenity amidst the chaos of the world."]
+  const script = ["The sun was setting behind the distant mountains, casting a warm glow over the tranquil valley below.", "Birds chirped softly in the trees, and a gentle breeze rustled the leaves.", "As the evening descended, the sky turned into a canvas of vibrant colors, painting the horizon with shades of orange, pink, and purple.", "It was a peaceful scene, a moment of serenity amidst the chaos of the world."]
 
   const generateAudio = async (script: string[]) => {
     try {
@@ -48,10 +48,10 @@ export const AudioGenerator: React.FC = () => {
             <div key={index}>
               <p>Audio {index + 1} Duration: {audioInfo.duration} seconds</p>
               <audio controls>
-                <source src={audioInfo.audioUrl} type="audio/mpeg" />
+                <source src={audioInfo.audioPath} type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
-              <a href={audioInfo.audioUrl} download={`generated_audio_${index}.mp3`}>Download Audio</a>
+              <a href={audioInfo.audioPath} download={`generated_audio_${index}.mp3`}>Download Audio</a>
             </div>
           ))}
         </div>
