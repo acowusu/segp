@@ -3,9 +3,8 @@ import { mkdir, readFile } from "node:fs/promises";
 import { sep } from "path";
 import { PNG } from "pngjs";
 import { getDocumentProxy, getResolvedPDFJS } from "unpdf";
-import { spawn  } from "node:child_process";
 import { ffmpegPath } from "../binUtils";
-
+import promiseSpawn from '@npmcli/promise-spawn'
 export const add =  ({ a, b }: { a: number, b: number }) => {
     return a + b
 }
@@ -28,33 +27,16 @@ export const convertWebmToMp4 = async ({
   webm: string;
   mp4: string;
 }): Promise<void> => {
-  return new Promise<void>((resolve, reject) => {
-    console.log(`webm path: ${webm}`);
-    console.log(`mp4 path: ${mp4}`);
-
-    console.log(`spawning worker`);
-    // -y to auto overwrite the existing file
-
-    // TODO: handle ffmpeg errors?
-
-    const ffmpegProcess = spawn(ffmpegPath, ["-i", `${webm}`, "-y", `${mp4}`], {
+  let result;
+  try {
+    result = await promiseSpawn(ffmpegPath, ["-i", `${webm}`, "-y", `${mp4}`], {
       stdio: ["pipe", 1, 2],
     });
-    
-    ffmpegProcess.on("exit", (code, signal) => {
-      console.log(`ffmpeg exited with exit code ${code} and signal ${signal}`);
-      if (code === 0) {
-        console.log(`transcoding done`);
-        resolve();
-      } else {
-        reject(`Child process exited with no 0 exit code: ${code}`)
-      }
-    });
-    ffmpegProcess.on("error", (err) => {
-      console.log("Child process exited with error");
-      reject(err);
-    })
-  })
+  } catch (error) {
+    console.error('failed!', error)
+
+  }
+  console.log('ok!', result)
 };
 
 export const extractImagesFromPDF = async ({ filePath, pageNumber, projectPath }: { filePath: string, pageNumber: number, projectPath: string }) => {
