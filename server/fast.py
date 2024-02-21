@@ -1,3 +1,7 @@
+# This is responsible for running the image model
+# https://iguana.alexo.uk/v2/image 
+
+
 import numpy as np
 import pandas as pd
 import bentoml
@@ -5,21 +9,25 @@ from bentoml.io import NumpyNdarray, JSON
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 from io import BytesIO
-from openllm import LLM
 from typing import Any, AsyncGenerator, Dict, TypedDict, Union
 from fastapi import FastAPI, Form, Response
 from openllm import LLM
 from typing import Any, AsyncGenerator, Dict, TypedDict, Union
 import torch
-from diffusers import StableDiffusionPipeline
 import bentoml
 from bentoml.io import Image, JSON, Multipart
 from typing_extensions import Annotated
 import uuid
-llm = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq', dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
+# llm = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq', dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
 # dataautogpt3/ProteusV0.2
 # LDA
 # Bert Topic
+import os
+# sudo mount -t tmpfs -o size=100000m tmpfs /hf
+os.environ['HF_HOME'] = '/hf'
+
+
+
 import uvicorn
 import json
 # bentoml.diffusers.import_model(
@@ -35,10 +43,10 @@ import json
 #     "midjourney",
 #     "prompthero/openjourney-v4",
 # )
-# bentoml.diffusers.import_model(
-#     "proteus",
-#     "dataautogpt3/ProteusV0.2",
-# )
+bentoml.diffusers.import_model(
+    "proteus",
+    "dataautogpt3/ProteusV0.2",
+)
 # bentoml.diffusers.import_model(
 #     "sdvid",
 #     "stabilityai/stable-video-diffusion-img2vid-xt",
@@ -55,8 +63,12 @@ bento_model = bentoml.diffusers.get("proteus:latest")
 anything_v3_runner = bento_model.to_runner()
 anything_v3_runner.init_local()
 
-
-svc = bentoml.Service("anything_v3", runners=[anything_v3_runner])
+# @bentoml.service(
+#     resources={"cpu": "2"},
+#     traffic={"timeout": 10},
+# )
+svc = bentoml.Service("anything_v3",    
+      runners=[anything_v3_runner])
 
 
 @svc.api(input=JSON(), output=Image())
@@ -65,7 +77,7 @@ def txt2img(input_data):
     return images[0]
 
 
-fastapi_app = FastAPI(root_path="/v1")
+fastapi_app = FastAPI(root_path="/v2")
 svc.mount_asgi_app(fastapi_app)
 
 
@@ -83,24 +95,5 @@ async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotat
 
 
 
-@fastapi_app.post("/generate")
-async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float, Form()]):
-    request_id = f"tinyllm-{uuid.uuid4().hex}"
-    previous_texts = [[]] * 1
-
-    generator = llm.generate_iterator(
-        prompt, request_id=request_id, n=1, temperature=temperature
-    )
-    async def streamer() -> AsyncGenerator[str, None]:
-        async for request_output in generator:
-            for output in request_output.outputs:
-                i = output.index
-                previous_texts[i].append(output.text)
-                yield output.text
-
-  
-    async for _ in streamer():
-        pass
-    return "".join(previous_texts[0])
 if __name__ == "__main__":
-    uvicorn.run(fastapi_app, host="0.0.0.0", port=8888)
+    uvicorn.run(fastapi_app, host="0.0.0.0", port=8892)

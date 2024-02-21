@@ -1,13 +1,13 @@
 # from IPython.display import Audio
 from transformers import BarkModel
 
-model = BarkModel.from_pretrained("suno/bark-small")
 import torch
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 model = model.to(device)
-from transformers import AutoProcessor
 
+from transformers import AutoProcessor
+model = BarkModel.from_pretrained("suno/bark-small")
 processor = AutoProcessor.from_pretrained("suno/bark")
 text_prompt = "Let's try generating speech, with Bark, a text-to-speech model"
 inputs = processor(text_prompt, voice_preset="fr_speaker_3")
