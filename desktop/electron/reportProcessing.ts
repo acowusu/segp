@@ -1,5 +1,7 @@
 // import { Worker } from "worker_threads";
 import { getProjectPath, getTextReportPath } from "./metadata";
+import * as https from 'https';
+import { app } from 'electron';
 import audiences from "./mockData/audiences.json";
 import {pool } from "./pool";
 import {generateTopics, generateScript} from "./server"
@@ -9,6 +11,7 @@ import type {
   Topic,
   Visual,
   Voiceover,
+  AudioInfo,
 } from "./mockData/data";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
@@ -17,11 +20,84 @@ import * as projectData from "./projectData";
 import {  readFile } from "node:fs/promises";
 import watch from "node-watch"
 import fs from "fs";
+// Takes in an array of strings and returns an array of AudioInfo
+export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
 
+    const audioInfoArray: AudioInfo[] = [];
 
+    for (const text of textArray) {
+      const postData = new FormData();
+      postData.append('script', text);
 
-export async function textToAudio() {
-  // return [generationId, audioUrl];
+      const response = await fetch('https://iguana.alexo.uk/tts/', {
+          method: 'POST',
+          body: postData,
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Get audio link
+      const responseData = await response.json();
+      const audioLink: string = 'https://iguana.alexo.uk' + responseData.audio_link;
+
+      // Get audio duration 
+      const duration = responseData.duration;
+
+      // Create audio file path
+      const audioFilePath = app.getAppPath() + '/public/audio/' + extractFilenameFromURL(audioLink);
+      
+      try {
+        await downloadMP3(audioLink, audioFilePath);
+        console.log('MP3 file downloaded successfully.');
+
+        const subtitlesFilePath = audioFilePath.replace('.mp3', '.srt');
+        await saveSubtitles(responseData.subtitles, subtitlesFilePath);
+        console.log('Subtitles saved successfully.');
+
+        audioInfoArray.push({ audioPath: audioFilePath, duration, subtitlePath: subtitlesFilePath });
+      } catch (error) {
+        console.error('Error downloading MP3 file:', error);
+      }
+      
+    }
+    return audioInfoArray;
+}
+
+// Function to get audio file name
+function extractFilenameFromURL(url: string): string {
+  const parts = url.split('/');
+  return parts[parts.length - 1];
+}
+
+// Function to download MP3 file from URL
+function downloadMP3(url: string, destinationPath: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+      const file = fs.createWriteStream(destinationPath);
+      https.get(url, (response) => {
+          response.pipe(file);
+          file.on('finish', () => {
+              file.close();
+              resolve();
+          });
+      }).on('error', (err) => {
+          fs.unlink(destinationPath, () => reject(err));
+      });
+  });
+}
+
+// Function to save subtitles content as an .srt file
+function saveSubtitles(subtitlesContent: string, subtitlesFilePath: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+      fs.writeFile(subtitlesFilePath, subtitlesContent, 'utf8', (err) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
+      });
+  });
 }
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {

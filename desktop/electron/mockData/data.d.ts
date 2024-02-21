@@ -30,3 +30,9 @@ export interface RawReport {
   path: string;
   text: string;
 }
+
+export interface AudioInfo {
+  audioPath: string;
+  duration: number;
+  subtitlePath: string;
+}
