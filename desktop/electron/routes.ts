@@ -11,6 +11,8 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+  getAvatars,
+  setAvatar,
 } from "./reportProcessing";
 import { generateAvatar } from "./avatarGeneration";
 import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
@@ -55,6 +57,8 @@ const api = {
   writeBlob,
   webmBLobToMp4,
   prepareMp4Blob,
+  getAvatars,
+  setAvatar,
 };
 export default api;
 
