@@ -26,6 +26,10 @@ export function getTextReportPath(): string {
   return `${getProjectPath()}${sep}report.txt`;
 }
 
+export function getOutputPath(): string {
+  return `${getProjectPath()}${sep}output.mp4`;
+}
+
 export function getIsDev(): boolean {
   return isDev
 }

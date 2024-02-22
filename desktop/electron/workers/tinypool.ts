@@ -2,9 +2,9 @@ import fs from "fs";
 import { mkdir, readFile } from "node:fs/promises";
 import { sep } from "path";
 import { PNG } from "pngjs";
-import { extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
-
-
+import { getDocumentProxy, getResolvedPDFJS } from "unpdf";
+import { ffmpegPath } from "../binUtils";
+import promiseSpawn from '@npmcli/promise-spawn'
 export const add =  ({ a, b }: { a: number, b: number }) => {
     return a + b
 }
@@ -12,7 +12,7 @@ export const multiply =  ({ a, b }: { a: number, b: number }) => {
     return a * b
 }
 
-
+// import { worker_convertWebmToMp4 } from "./worker";
 
 export interface ImageData {
   data: Uint8ClampedArray;
@@ -20,24 +20,23 @@ export interface ImageData {
   height: number;
 }
 
-
-export const extractTextFromPDF = async ({
-  filePath,projectPath
+export const convertWebmToMp4 = async ({
+  webm,
+  mp4,
 }: {
-  filePath: string;
-  projectPath:string
-}): Promise<{ text: string; images: ImageData[]; }> => {
-    console.log("# Loading document from disk", filePath);
-    const buffer = await readFile(filePath);
-    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+  webm: string;
+  mp4: string;
+}): Promise<void> => {
+  let result;
+  try {
+    result = await promiseSpawn(ffmpegPath, ["-i", `${webm}`, "-y", `${mp4}`], {
+      stdio: ["pipe", 1, 2],
+    });
+  } catch (error) {
+    console.error('failed!', error)
 
-    const { totalPages, text } = await extractText(pdf, { mergePages: true });
-    const images = [];
-    // console.log("# Extracting images 1");
-    for (let i = 1; i < totalPages; i++) {
-        images.push(...(await extractImagesFromPDF({ filePath, pageNumber:i, projectPath })));
-    }
-    return {text: text as string, images};
+  }
+  console.log('ok!', result)
 };
 
 export const extractImagesFromPDF = async ({ filePath, pageNumber, projectPath }: { filePath: string, pageNumber: number, projectPath: string }) => {

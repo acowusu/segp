@@ -5,7 +5,7 @@ let database: DatabaseType | undefined;
 import { resolve } from "path";
 
 export function getDatabase(filename: string) {
-  if (!isDev || !database) {
+  if (!isDev && !database) {
     return new Database(filename, {
       nativeBinding:resolve(
         __dirname,
@@ -13,7 +13,13 @@ export function getDatabase(filename: string) {
       ),
     });
   }
-  return (database ??= new Database(filename));
+  return (database ??= new Database(filename,
+    {
+      nativeBinding:resolve(
+        __dirname,
+        "../dist-native/better_sqlite3.node"
+      ),
+    }));
 }
 
 export function closeDatabase() {

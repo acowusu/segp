@@ -1,6 +1,7 @@
 import { Promisified } from "./apiTypes";
 import {
   getScript,
+  setScript,
   getTopics,
   setTopic,
   setAudience,
@@ -11,6 +12,7 @@ import {
   getVoiceovers,
   textToAudio,
 } from "./reportProcessing";
+import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
 import {
   getDirectory,
@@ -19,11 +21,13 @@ import {
   openProject,
   loadReport,
 } from "./setup";
-import { getProjectName, getProjectPath, getIsDev} from "./metadata";
-
+import { getProjectName, getProjectPath, getIsDev, getLastProject} from "./metadata";
+import * as projectData from "./projectData"
+import {generateTextFromLLM, generateTopics} from "./server"
 const api = {
   loadReport,
   getScript,
+  setScript,
   getTopics,
   setTopic,
   getAudiences,
@@ -40,7 +44,15 @@ const api = {
   getProjectPath,
   textToAudio,
   getIsDev,
+  getLastProject,
+  ...projectData,
+  generateTextFromLLM,
+  generateTopics,
   // Add your API methods here
+  convertWebmToMp4,
+  writeBlob,
+  webmBLobToMp4,
+  prepareMp4Blob,
 };
 export default api;
 
