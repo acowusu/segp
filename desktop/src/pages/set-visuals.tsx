@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { OverlayPreview } from "../components/custom/overlay-preview";
 import { Button } from "../components/ui/button";
+import { AvatarFrame } from "../components/custom/avatarFrame";
 import {
   Form,
   FormControl,
@@ -23,6 +24,13 @@ import {
 } from "../components/ui/select";
 import { Audience, Voiceover } from "../../electron/mockData/data";
 import { useCallback, useEffect, useState } from "react";
+
+const avatarList = [
+  {label: "Default Man", avatarUrl: "big-person.png"}, 
+  {label: "Lebron James", avatarUrl: "lebron.png"},
+  {label: "Messi", avatarUrl: "messi.png"},
+  {label: "Obama", avatarUrl: "obama.png"},
+];
 
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
@@ -214,6 +222,28 @@ export function SetVisuals() {
                 </FormItem>
               )}
             />
+            {avatar && (
+              <div className="grid grid-cols-3 gap-4 overflow-auto no-scrollbar p-2 border-t-2 border-black">
+              {avatarList.map((avatar, index) => (
+                <FormField
+                  key={index}
+                  control={form.control}
+                  name="selectedAvatar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl> 
+                          <AvatarFrame 
+                            isSelected={selectedAvatar===avatar.avatarUrl} 
+                            label={avatar.label} 
+                            avatarUrl={avatar.avatarUrl} 
+                            onClick={() => field.onChange(avatar.avatarUrl)}/>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              ))}
+              </div>
+            )}
             <FormField
               control={form.control}
               name="subtitles"
@@ -240,7 +270,7 @@ export function SetVisuals() {
 
         <OverlayPreview
           backgroundUrl={"example2-min.jpg"}
-          avatarUrl={"big-person.png"}
+          avatarUrl={selectedAvatar ?? "big-person.png"}
           showAvatar={avatar}
           showSubtitle={subtitles}
         />

@@ -12,6 +12,7 @@ import {
   getVoiceovers,
   textToAudio,
 } from "./reportProcessing";
+import { generateAvatar } from "./avatarGeneration";
 import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
 import {
@@ -44,6 +45,7 @@ const api = {
   getProjectPath,
   textToAudio,
   getIsDev,
+  generateAvatar,
   getLastProject,
   ...projectData,
   generateTextFromLLM,
