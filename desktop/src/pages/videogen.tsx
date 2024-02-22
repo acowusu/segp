@@ -283,10 +283,7 @@ export const VideoGenerator: React.FC<{
               </div>
             ) : isGenerateClicked ? (
               <>
-                <Skeleton
-                  className="aspect-video w-full h-96  flex align-center items-center justify-center flex-col"
-                  gap-2
-                >
+                <Skeleton className="aspect-video w-full h-96  flex align-center items-center justify-center flex-col">
                   <Progress value={generationProgress} className="w-5/6 mb-1" />
                   <p className="text-yellow-400">{currentProcess}</p>
                 </Skeleton>
