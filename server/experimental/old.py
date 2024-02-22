@@ -23,7 +23,7 @@ from torch import autocast
 
 class StableDiffusionRunnable(bentoml.Runnable):
     """ """
-    SUPPORTED_RESOURCES = ("nvidia.com/gpu",)
+    SUPPORTED_RESOURCES = ("nvidia.com/gpu", )
     SUPPORTS_CPU_MULTI_THREADING = True
 
     def __init__(self):
@@ -31,8 +31,7 @@ class StableDiffusionRunnable(bentoml.Runnable):
         self.device = "cuda"
 
         txt2img_pipe = StableDiffusionPipeline.from_pretrained(
-            model_id, torch_dtype=torch.float16, revision="fp16"
-        )
+            model_id, torch_dtype=torch.float16, revision="fp16")
         self.txt2img_pipe = txt2img_pipe.to(self.device)
 
         self.img2img_pipe = StableDiffusionImg2ImgPipeline(
@@ -106,10 +105,9 @@ class StableDiffusionRunnable(bentoml.Runnable):
 llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm")
 # stable_diffusion = diffusers_simple.stable_diffusion.create_runner("CompVis/stable-diffusion-v1-4")
 # stable_diffusion_runner = bentoml.Runner(StableDiffusionRunnable, name='stable_diffusion_runner', max_batch_size=10)
-stable_diffusion_runner = bentoml.Runner(
-    StableDiffusionRunnable, name="stable_diffusion_runner", max_batch_size=10
-)
-
+stable_diffusion_runner = bentoml.Runner(StableDiffusionRunnable,
+                                         name="stable_diffusion_runner",
+                                         max_batch_size=10)
 
 # mistralai/Mistral-7B-Instruct-v0.2
 #  LLM(model="TheBloke/Mistral-7B-Instruct-v0.1-AWQ",2)
@@ -142,18 +140,19 @@ class GenerateInput(TypedDict):
             prompt="What is time?",
             stream=False,
             sampling_params={"temperature": 0.73},
-        )
-    ),
+        )),
     output=Text(content_type="text/event-stream"),
 )
-async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], str]:
+async def generate(
+        request: GenerateInput) -> Union[AsyncGenerator[str, None], str]:
     n = request["sampling_params"].pop("n", 1)
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * n
 
-    generator = llm.generate_iterator(
-        request["prompt"], request_id=request_id, n=n, **request["sampling_params"]
-    )
+    generator = llm.generate_iterator(request["prompt"],
+                                      request_id=request_id,
+                                      n=n,
+                                      **request["sampling_params"])
 
     async def streamer() -> AsyncGenerator[str, None]:
         async for request_output in generator:

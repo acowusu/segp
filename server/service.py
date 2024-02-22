@@ -34,6 +34,7 @@ If a question does not make any sense, or is not factually coherent, explain why
 )
 class SDXLTurbo:
     """ """
+
     def __init__(self) -> None:
         self.pipe = bentoml.diffusers.load_model(IMAGE_MODEL_ID)
 
@@ -79,6 +80,7 @@ class SDXLTurbo:
 )
 class LLMGenerator:
     """ """
+
     def __init__(self) -> None:
         # self.model = LLM(LLM_MODEL_ID)
         self.model = LLM(
@@ -99,9 +101,10 @@ class LLMGenerator:
         request_id = f"tinyllm-{uuid.uuid4().hex}"
         previous_texts = [[]] * 1
 
-        generator = self.model.generate_iterator(
-            prompt, request_id=request_id, n=1, temperature=temperature
-        )
+        generator = self.model.generate_iterator(prompt,
+                                                 request_id=request_id,
+                                                 n=1,
+                                                 temperature=temperature)
 
         async def streamer() -> AsyncGenerator[str, None]:
             async for request_output in generator:
@@ -158,6 +161,6 @@ class controller:
         :param guidance_scale: float:  (Default value = 0.0)
 
         """
-        return self.image_service.txt2img(
-            prompt, num_inference_steps, width, height, negative_prompt, guidance_scale
-        )
+        return self.image_service.txt2img(prompt, num_inference_steps, width,
+                                          height, negative_prompt,
+                                          guidance_scale)
