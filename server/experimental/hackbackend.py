@@ -11,7 +11,7 @@ STT_API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large"
 app = Flask(__name__)
 
 
-@app.route('/api/speech_to_text', methods=['POST'])
+@app.route("/api/speech_to_text", methods=["POST"])
 def query():
     file = request.files["audioFile"]
     response = requests.post(STT_API_URL, headers=headers, data=file)
@@ -30,8 +30,9 @@ def tts():
     sampling_rate = model.generation_config.sample_rate
     # Audio(speech_output[0].cpu().numpy(), rate=sampling_rate)
 
-    scipy.io.wavfile.write("bark_out.wav", rate=sampling_rate,
-                           data=speech_output[0].cpu().numpy())
+    scipy.io.wavfile.write(
+        "bark_out.wav", rate=sampling_rate, data=speech_output[0].cpu().numpy()
+    )
 
     return
 
@@ -54,5 +55,5 @@ processor = AutoProcessor.from_pretrained("suno/bark")
 # scipy.io.wavfile.write("bark_out.wav", rate=sampling_rate, data=speech_output[0].cpu().numpy())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

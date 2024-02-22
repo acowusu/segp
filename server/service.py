@@ -6,7 +6,9 @@ import uuid
 
 IMAGE_MODEL_ID = "proteus:latest"
 LLM_MODEL_ID = "TheBloke/Mixtral-8x7B-v0.1-GPTQ"
-sample_prompt = "A cinematic shot of a baby racoon wearing an intricate italian priest robe."
+sample_prompt = (
+    "A cinematic shot of a baby racoon wearing an intricate italian priest robe."
+)
 
 MAX_TOKENS = 1024
 PROMPT_TEMPLATE = """<s>[INST] <<SYS>>
@@ -33,13 +35,13 @@ class SDXLTurbo:
 
     @bentoml.api
     def txt2img(
-            self,
-            prompt: str = sample_prompt,
-            num_inference_steps: int = 1,
-            width: int = 512,
-            height: int = 512,
-            negative_prompt: str = "",
-            guidance_scale: float = 0.0,
+        self,
+        prompt: str = sample_prompt,
+        num_inference_steps: int = 1,
+        width: int = 512,
+        height: int = 512,
+        negative_prompt: str = "",
+        guidance_scale: float = 0.0,
     ) -> Image:
         image = self.pipe(
             prompt=prompt,
@@ -64,11 +66,21 @@ class SDXLTurbo:
 class LLMGenerator:
     def __init__(self) -> None:
         # self.model = LLM(LLM_MODEL_ID)
-        self.model = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq',
-                         dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
+        self.model = LLM(
+            model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ",
+            quantization="awq",
+            dtype="half",
+            gpu_memory_utilization=0.95,
+            max_model_len=8192,
+            backend="vllm",
+        )
 
     @bentoml.api
-    async def generate(self, prompt: str = "Explain superconductors like I'm five years old", temperature: float = 1) -> AsyncGenerator[str, None]:
+    async def generate(
+        self,
+        prompt: str = "Explain superconductors like I'm five years old",
+        temperature: float = 1,
+    ) -> AsyncGenerator[str, None]:
         request_id = f"tinyllm-{uuid.uuid4().hex}"
         previous_texts = [[]] * 1
 
@@ -92,8 +104,7 @@ class LLMGenerator:
     traffic={
         "timeout": 500,
     },
-    resources={"cpu": "1"}
-
+    resources={"cpu": "1"},
     # http={"port": 5000}
 )
 class controller:
@@ -104,17 +115,23 @@ class controller:
         pass
 
     @bentoml.api
-    async def generate(self, prompt: str = "Explain superconductors like I'm five years old", temperature: float = 1) -> AsyncGenerator[str, None]:
+    async def generate(
+        self,
+        prompt: str = "Explain superconductors like I'm five years old",
+        temperature: float = 1,
+    ) -> AsyncGenerator[str, None]:
         return await self.llm_service.generate(prompt, temperature)
 
     @bentoml.api
     def txt2img(
-            self,
-            prompt: str = sample_prompt,
-            num_inference_steps: int = 1,
-            width: int = 512,
-            height: int = 512,
-            negative_prompt: str = "",
-            guidance_scale: float = 0.0,
+        self,
+        prompt: str = sample_prompt,
+        num_inference_steps: int = 1,
+        width: int = 512,
+        height: int = 512,
+        negative_prompt: str = "",
+        guidance_scale: float = 0.0,
     ) -> Image:
-        return self.image_service.txt2img(prompt, num_inference_steps, width, height, negative_prompt, guidance_scale)
+        return self.image_service.txt2img(
+            prompt, num_inference_steps, width, height, negative_prompt, guidance_scale
+        )

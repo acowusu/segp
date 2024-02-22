@@ -13,7 +13,7 @@ from openllm import LLM
 
 
 class StableDiffusionRunnable(bentoml.Runnable):
-    SUPPORTED_RESOURCES = ("nvidia.com/gpu", )
+    SUPPORTED_RESOURCES = ("nvidia.com/gpu",)
     SUPPORTS_CPU_MULTI_THREADING = True
 
     def __init__(self):
@@ -21,7 +21,8 @@ class StableDiffusionRunnable(bentoml.Runnable):
         self.device = "cuda"
 
         txt2img_pipe = StableDiffusionPipeline.from_pretrained(
-            model_id, torch_dtype=torch.float16, revision="fp16")
+            model_id, torch_dtype=torch.float16, revision="fp16"
+        )
         self.txt2img_pipe = txt2img_pipe.to(self.device)
 
         self.img2img_pipe = StableDiffusionImg2ImgPipeline(
@@ -37,10 +38,10 @@ class StableDiffusionRunnable(bentoml.Runnable):
     @bentoml.Runnable.method(batchable=False, batch_dim=0)
     def txt2img(self, input_data):
         prompt = input_data["prompt"]
-        guidance_scale = input_data.get('guidance_scale', 7.5)
-        height = input_data.get('height', 512)
-        width = input_data.get('width', 512)
-        num_inference_steps = input_data.get('num_inference_steps', 50)
+        guidance_scale = input_data.get("guidance_scale", 7.5)
+        height = input_data.get("height", 512)
+        width = input_data.get("width", 512)
+        num_inference_steps = input_data.get("num_inference_steps", 50)
         with autocast(self.device):
             images = self.txt2img_pipe(
                 prompt=prompt,
@@ -65,9 +66,9 @@ class StableDiffusionRunnable(bentoml.Runnable):
             init_image = init_image.resize(new_size)
 
         prompt = data["prompt"]
-        strength = data.get('strength', 0.8)
-        guidance_scale = data.get('guidance_scale', 7.5)
-        num_inference_steps = data.get('num_inference_steps', 50)
+        strength = data.get("strength", 0.8)
+        guidance_scale = data.get("guidance_scale", 7.5)
+        num_inference_steps = data.get("num_inference_steps", 50)
         with autocast(self.device):
             images = self.img2img_pipe(
                 prompt=prompt,
@@ -85,7 +86,8 @@ llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm")
 # stable_diffusion = diffusers_simple.stable_diffusion.create_runner("CompVis/stable-diffusion-v1-4")
 # stable_diffusion_runner = bentoml.Runner(StableDiffusionRunnable, name='stable_diffusion_runner', max_batch_size=10)
 stable_diffusion_runner = bentoml.Runner(
-    StableDiffusionRunnable, name='stable_diffusion_runner', max_batch_size=10)
+    StableDiffusionRunnable, name="stable_diffusion_runner", max_batch_size=10
+)
 
 
 # mistralai/Mistral-7B-Instruct-v0.2
@@ -162,6 +164,7 @@ async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], s
 # async def stable_diffusion(request: Dict[str, Any]) -> str:
 #     result = stable_diffusion.txt2img.run(request)
 #     return result
+
 
 @svc.api(input=JSON(), output=Image())
 def txt2img(input_data):
