@@ -1,6 +1,5 @@
 // import { Worker } from "worker_threads";
 import { getProjectPath, getTextReportPath } from "./metadata";
-import * as https from 'https';
 import { app } from 'electron';
 import audiences from "./mockData/audiences.json";
 import {pool } from "./pool";
@@ -20,6 +19,7 @@ import * as projectData from "./projectData";
 import {  readFile } from "node:fs/promises";
 import watch from "node-watch"
 import fs from "fs";
+import fetch from "node-fetch";
 // Takes in an array of strings and returns an array of AudioInfo
 export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
 
@@ -72,20 +72,28 @@ function extractFilenameFromURL(url: string): string {
 }
 
 // Function to download MP3 file from URL
-function downloadMP3(url: string, destinationPath: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-      const file = fs.createWriteStream(destinationPath);
-      https.get(url, (response) => {
-          response.pipe(file);
-          file.on('finish', () => {
-              file.close();
-              resolve();
-          });
-      }).on('error', (err) => {
-          fs.unlink(destinationPath, () => reject(err));
-      });
-  });
+async function downloadMP3(url: string, destinationPath: string): Promise<void> {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok ) {
+      throw new Error(`Failed to download MP3: HTTP Error ${response.status}`);
+    }
+    if (response === null || response.body === null) {
+      throw new Error(`Failed to download MP3: Response is null`);
+    }
+    const fileStream = fs.createWriteStream(destinationPath);
+    await new Promise((resolve, reject) => {
+      response.body!.pipe(fileStream);
+      response.body!.on("error", reject);
+      fileStream.on("finish", resolve);
+    });
+  } catch (error) {
+    console.error("Error downloading MP3:", error);
+    throw error; // Re-throw to allow for error handling where the function is called
+  }
 }
+
 
 // Function to save subtitles content as an .srt file
 function saveSubtitles(subtitlesContent: string, subtitlesFilePath: string): Promise<void> {
@@ -107,7 +115,7 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
 
 export async function getScript(): Promise<ScriptData[]> {
   // TODO forward error if not initialized (for now we just return the notional script)
-  var script = projectData.getProjectScript();
+  let script = projectData.getProjectScript();
   if (script.length !== 0) {
     return script
   }
