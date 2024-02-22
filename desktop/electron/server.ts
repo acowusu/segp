@@ -11,7 +11,7 @@ export const generateTextFromLLM = async (
     params.append("prompt", `[INST] ${prompt} [/INST] `);
     params.append("temperature", "0.7");
     // console.log(systemPrompt, userPromp, temperature);
-    const url = "https://iguana.alexo.uk/generate";
+    const url = "https://iguana.alexo.uk/v3/generate";
 
     const options = {
         method: "POST",
