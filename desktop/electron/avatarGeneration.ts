@@ -4,13 +4,13 @@ import avatars from './mockData/avatars.json';
 
 export async function generateAvatar(avatar: Avatar, audioPath: string): Promise<string> {
 
-    const endpoint = 'https://iguana.alexo.uk/avatar/';
+    const endpoint = 'https://iguana.alexo.uk/v4/avatar/';
 
     const body = {
         driven_audio: audioPath,
-        source_image: avatar.imagePath,
+        source_image: avatar.sadtalkerPath,
     }
-
+   
     const reponse = await fetch(endpoint, {
         method: 'POST',
         headers: {

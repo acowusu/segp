@@ -2,17 +2,15 @@ import React, { useState, useEffect } from 'react';
 import etro from "etro"
 
 export const AvatarGenerator: React.FC = () => {
-  const [sourceImage, setSourceImage] = useState<string>('');
-  const [avatar, setAvatar] = useState<{id: string, imagePath: string}>({id: '', imagePath: ''});
   const [avatarResponse, setAvatarResponse] = useState<string>('');
-  const ttsMockAudioUrl = "./examples/driven_audio/full.wav";
-  const mockAvatar = {id: "1", imagePath: "./examples/source_image/lebron-green.png"};
+  const ttsMockAudioUrl = "/www/sadtalker_assets/driven_audio/full.wav";
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const generateAvatar = async () => {
 
     try {
-        const result = await window.electronAPI.generateAvatar(mockAvatar, ttsMockAudioUrl);
+        const avatar = await window.api.getProjectAvatar();
+        const result = await window.api.generateAvatar(avatar, ttsMockAudioUrl);
         setAvatarResponse(result);
     } catch (error) {
         console.error('Error generating avatar:', error);
