@@ -1,8 +1,9 @@
-import bentoml
-from PIL.Image import Image
-from typing import Optional, AsyncGenerator, List
-from openllm import LLM
 import uuid
+from typing import AsyncGenerator, List, Optional
+
+import bentoml
+from openllm import LLM
+from PIL.Image import Image
 
 IMAGE_MODEL_ID = "proteus:latest"
 LLM_MODEL_ID = "TheBloke/Mixtral-8x7B-v0.1-GPTQ"
