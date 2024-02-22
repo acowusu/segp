@@ -11,6 +11,7 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+  fetchImages,
 } from "./reportProcessing";
 import {
   generateAvatar,
@@ -58,6 +59,7 @@ const api = {
   webmDataToMp4File,
   getAvatars,
   setAvatar,
+  fetchImages,
 };
 export default api;
 
