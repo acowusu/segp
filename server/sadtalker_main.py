@@ -19,7 +19,7 @@ class SadTalker(BaseModel):
     source_image: Annotated[str, Form()]
 
 
-app = FastAPI()
+app = FastAPI(root="/v4")
 
 
 @app.get("/")
@@ -34,7 +34,7 @@ def is_valid_path(path):
     :param path:
 
     """
-    return path.startswith("/www")
+    return path.startswith("/")
 
 
 def is_valid_audio_extension(path):
@@ -117,4 +117,4 @@ async def animate_portrait(sadtalker: SadTalker):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8888)
+    uvicorn.run(app, host="0.0.0.0", port=8894)
