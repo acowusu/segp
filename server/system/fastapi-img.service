@@ -1,0 +1,12 @@
+[Unit]
+Description=FastAPI Image Server
+After=network.target
+
+[Service]
+User=alexa
+WorkingDirectory=/home/alexa/segp-1/server 
+Environment=PATH=/home/alexa/.conda/envs/bark/bin:$PATH 
+ExecStart=/home/alexa/.conda/envs/bark/bin/python fast.py
+
+[Install]
+WantedBy=multi-user.target
