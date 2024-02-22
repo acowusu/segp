@@ -21,6 +21,7 @@ CORS(app)
 
 @app.route("/api/speech_to_text", methods=["POST"])
 def query():
+    """ """
     file = request.files["audioFile"]
     response = requests.post(STT_API_URL, headers=headers, data=file)
 
@@ -30,6 +31,7 @@ def query():
 
 @app.router("generate_response", methods=["POST"])
 def gen_res():
+    """ """
     data = request.files["convo"]
 
     response = client.chat.completions.create(
@@ -51,6 +53,7 @@ def gen_res():
 
 @app.route("/api/tts", methods=["POST"])
 def tts():
+    """ """
     text_prompt = "Let's try generating speech, with Bark, a text-to-speech model"
     inputs = processor(text_prompt, voice_preset="fr_speaker_3")
 

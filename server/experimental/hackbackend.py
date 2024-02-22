@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 @app.route("/api/speech_to_text", methods=["POST"])
 def query():
+    """ """
     file = request.files["audioFile"]
     response = requests.post(STT_API_URL, headers=headers, data=file)
     return response.json()
@@ -20,6 +21,7 @@ def query():
 # from IPython.display import Audio
 @app.route("/api/tts", methods=["POST"])
 def tts():
+    """ """
     text_prompt = "Let's try generating speech, with Bark, a text-to-speech model"
     inputs = processor(text_prompt, voice_preset="fr_speaker_3")
 

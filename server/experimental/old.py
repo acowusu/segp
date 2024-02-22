@@ -13,6 +13,7 @@ from torch import autocast
 
 
 class StableDiffusionRunnable(bentoml.Runnable):
+    """ """
     SUPPORTED_RESOURCES = ("nvidia.com/gpu",)
     SUPPORTS_CPU_MULTI_THREADING = True
 
@@ -37,6 +38,11 @@ class StableDiffusionRunnable(bentoml.Runnable):
 
     @bentoml.Runnable.method(batchable=False, batch_dim=0)
     def txt2img(self, input_data):
+        """
+
+        :param input_data: 
+
+        """
         prompt = input_data["prompt"]
         guidance_scale = input_data.get("guidance_scale", 7.5)
         height = input_data.get("height", 512)
@@ -55,6 +61,12 @@ class StableDiffusionRunnable(bentoml.Runnable):
 
     @bentoml.Runnable.method(batchable=False, batch_dim=0)
     def img2img(self, init_image, data):
+        """
+
+        :param init_image: 
+        :param data: 
+
+        """
         new_size = None
         longer_side = max(*init_image.size)
         if longer_side > 512:
@@ -96,6 +108,7 @@ svc = Service("tinyllm", runners=[llm.runner, stable_diffusion_runner])
 
 
 class GenerateSDInput(TypedDict):
+    """ """
     prompt: str
     negative_prompt: Union[str, None]
     height: int
@@ -107,6 +120,7 @@ class GenerateSDInput(TypedDict):
 
 
 class GenerateInput(TypedDict):
+    """ """
     prompt: str
     stream: bool
     sampling_params: Dict[str, Any]
@@ -168,6 +182,11 @@ async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], s
 
 @svc.api(input=JSON(), output=Image())
 def txt2img(input_data):
+    """
+
+    :param input_data: 
+
+    """
     return stable_diffusion_runner.txt2img.run(input_data)
 
 
@@ -176,4 +195,10 @@ img2img_input_spec = Multipart(img=Image(), data=JSON())
 
 @svc.api(input=img2img_input_spec, output=Image())
 def img2img(img, data):
+    """
+
+    :param img: 
+    :param data: 
+
+    """
     return stable_diffusion_runner.img2img.run(img, data)

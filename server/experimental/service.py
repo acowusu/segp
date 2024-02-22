@@ -17,6 +17,7 @@ svc = Service("tinyllm", runners=[llm.runner])
 
 
 class GenerateInput(TypedDict):
+    """ """
     prompt: str
     stream: bool
     sampling_params: Dict[str, Any]

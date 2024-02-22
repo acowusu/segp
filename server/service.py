@@ -31,6 +31,7 @@ If a question does not make any sense, or is not factually coherent, explain why
     # http={"port": 5000}
 )
 class SDXLTurbo:
+    """ """
     def __init__(self) -> None:
         self.pipe = bentoml.diffusers.load_model(IMAGE_MODEL_ID)
 
@@ -44,6 +45,16 @@ class SDXLTurbo:
         negative_prompt: str = "",
         guidance_scale: float = 0.0,
     ) -> Image:
+        """
+
+        :param prompt: str:  (Default value = sample_prompt)
+        :param num_inference_steps: int:  (Default value = 1)
+        :param width: int:  (Default value = 512)
+        :param height: int:  (Default value = 512)
+        :param negative_prompt: str:  (Default value = "")
+        :param guidance_scale: float:  (Default value = 0.0)
+
+        """
         image = self.pipe(
             prompt=prompt,
             num_inference_steps=num_inference_steps,
@@ -65,6 +76,7 @@ class SDXLTurbo:
     # http={"port": 5000}
 )
 class LLMGenerator:
+    """ """
     def __init__(self) -> None:
         # self.model = LLM(LLM_MODEL_ID)
         self.model = LLM(
@@ -109,6 +121,7 @@ class LLMGenerator:
     # http={"port": 5000}
 )
 class controller:
+    """ """
     image_service = bentoml.depends(SDXLTurbo)
     llm_service = bentoml.depends(LLMGenerator)
 
@@ -133,6 +146,16 @@ class controller:
         negative_prompt: str = "",
         guidance_scale: float = 0.0,
     ) -> Image:
+        """
+
+        :param prompt: str:  (Default value = sample_prompt)
+        :param num_inference_steps: int:  (Default value = 1)
+        :param width: int:  (Default value = 512)
+        :param height: int:  (Default value = 512)
+        :param negative_prompt: str:  (Default value = "")
+        :param guidance_scale: float:  (Default value = 0.0)
+
+        """
         return self.image_service.txt2img(
             prompt, num_inference_steps, width, height, negative_prompt, guidance_scale
         )
