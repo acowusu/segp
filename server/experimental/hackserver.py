@@ -19,7 +19,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/api/speech_to_text', methods=['POST'])
+@app.route("/api/speech_to_text", methods=["POST"])
 def query():
     file = request.files["audioFile"]
     response = requests.post(STT_API_URL, headers=headers, data=file)
@@ -28,19 +28,23 @@ def query():
     return response.json()
 
 
-@app.router('generate_response', methods=['POST'])
+@app.router("generate_response", methods=["POST"])
 def gen_res():
     data = request.files["convo"]
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system",
-                "content": "You are a helpful language tutor! please help assist your students with their leearning. Today, the topic of discussion will be" + data["topic"]},
+            {
+                "role": "system",
+                "content": "You are a helpful language tutor! please help assist your students with their leearning. Today, the topic of discussion will be"
+                + data["topic"],
+            },
             {"role": "user", "content": data["chat"]},
-        ]
+        ],
     )
     return response.json()
+
 
 # from IPython.display import Audio
 
@@ -56,8 +60,9 @@ def tts():
     sampling_rate = model.generation_config.sample_rate
     # Audio(speech_output[0].cpu().numpy(), rate=sampling_rate)
 
-    scipy.io.wavfile.write("bark_out.wav", rate=sampling_rate,
-                           data=speech_output[0].cpu().numpy())
+    scipy.io.wavfile.write(
+        "bark_out.wav", rate=sampling_rate, data=speech_output[0].cpu().numpy()
+    )
 
     return
 
@@ -80,5 +85,5 @@ processor = AutoProcessor.from_pretrained("suno/bark")
 # scipy.io.wavfile.write("bark_out.wav", rate=sampling_rate, data=speech_output[0].cpu().numpy())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
