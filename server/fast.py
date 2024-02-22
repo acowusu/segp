@@ -1,7 +1,9 @@
 # This is responsible for running the image model
-# https://iguana.alexo.uk/v2/image 
+# https://iguana.alexo.uk/v2/image
 
 
+import json
+import uvicorn
 import numpy as np
 import pandas as pd
 import bentoml
@@ -27,9 +29,6 @@ import os
 os.environ['HF_HOME'] = '/hf'
 
 
-
-import uvicorn
-import json
 # bentoml.diffusers.import_model(
 #     "anything-v3",
 #     "Linaqruf/anything-v3.0",
@@ -67,8 +66,8 @@ anything_v3_runner.init_local()
 #     resources={"cpu": "2"},
 #     traffic={"timeout": 10},
 # )
-svc = bentoml.Service("anything_v3",    
-      runners=[anything_v3_runner])
+svc = bentoml.Service("anything_v3",
+                      runners=[anything_v3_runner])
 
 
 @svc.api(input=JSON(), output=Image())
@@ -92,7 +91,6 @@ async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotat
     images[0][0].save(filtered_image, "JPEG")
     filtered_image.seek(0)
     return StreamingResponse(filtered_image, media_type="image/jpeg")
-
 
 
 if __name__ == "__main__":

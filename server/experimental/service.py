@@ -11,7 +11,7 @@ from openllm import LLM
 # stable_diffusion = bentoml.diffusers_simple.stable_diffusion.create_runner("CompVis/stable-diffusion-v1-4")
 
 # mistralai/Mistral-7B-Instruct-v0.2
- LLM(model="mistralai/Mixtral-8x7B-Instruct-v0.1",2)
+LLM(model="mistralai/Mixtral-8x7B-Instruct-v0.1", 2)
 svc = Service("tinyllm", runners=[llm.runner])
 
 

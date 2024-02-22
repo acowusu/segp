@@ -1,10 +1,17 @@
 from __future__ import annotations
+from bentoml.io import Image, JSON, Multipart
+from diffusers import StableDiffusionImg2ImgPipeline
+from diffusers import StableDiffusionPipeline
+from torch import autocast
+import torch
 import uuid
 from typing import Any, AsyncGenerator, Dict, TypedDict, Union
 import bentoml
 from bentoml import Service, diffusers_simple
 from bentoml.io import JSON, Text
 from openllm import LLM
+
+
 class StableDiffusionRunnable(bentoml.Runnable):
     SUPPORTED_RESOURCES = ("nvidia.com/gpu", )
     SUPPORTS_CPU_MULTI_THREADING = True
@@ -13,7 +20,8 @@ class StableDiffusionRunnable(bentoml.Runnable):
         model_id = "CompVis/stable-diffusion-v1-4"
         self.device = "cuda"
 
-        txt2img_pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, revision="fp16")
+        txt2img_pipe = StableDiffusionPipeline.from_pretrained(
+            model_id, torch_dtype=torch.float16, revision="fp16")
         self.txt2img_pipe = txt2img_pipe.to(self.device)
 
         self.img2img_pipe = StableDiffusionImg2ImgPipeline(
@@ -44,7 +52,6 @@ class StableDiffusionRunnable(bentoml.Runnable):
             image = images[0]
             return image
 
-
     @bentoml.Runnable.method(batchable=False, batch_dim=0)
     def img2img(self, init_image, data):
         new_size = None
@@ -55,7 +62,7 @@ class StableDiffusionRunnable(bentoml.Runnable):
             new_size = (longer_side, longer_side)
 
         if new_size:
-            init_image =init_image.resize(new_size)
+            init_image = init_image.resize(new_size)
 
         prompt = data["prompt"]
         strength = data.get('strength', 0.8)
@@ -72,24 +79,18 @@ class StableDiffusionRunnable(bentoml.Runnable):
             image = images[0]
             return image
 
+
 # llm = LLM("HuggingFaceH4/zephyr-7b-alpha", backend="vllm")
-llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm"  )
+llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm")
 # stable_diffusion = diffusers_simple.stable_diffusion.create_runner("CompVis/stable-diffusion-v1-4")
 # stable_diffusion_runner = bentoml.Runner(StableDiffusionRunnable, name='stable_diffusion_runner', max_batch_size=10)
-stable_diffusion_runner = bentoml.Runner(StableDiffusionRunnable, name='stable_diffusion_runner', max_batch_size=10)
+stable_diffusion_runner = bentoml.Runner(
+    StableDiffusionRunnable, name='stable_diffusion_runner', max_batch_size=10)
 
 
 # mistralai/Mistral-7B-Instruct-v0.2
 #  LLM(model="TheBloke/Mistral-7B-Instruct-v0.1-AWQ",2)
 svc = Service("tinyllm", runners=[llm.runner, stable_diffusion_runner])
-
-import torch
-from torch import autocast
-from diffusers import StableDiffusionPipeline
-from diffusers import StableDiffusionImg2ImgPipeline
-
-import bentoml
-from bentoml.io import Image, JSON, Multipart
 
 
 class GenerateSDInput(TypedDict):
@@ -101,6 +102,7 @@ class GenerateSDInput(TypedDict):
     guidance_scale: float
     eta: int
     lora_weights: Union[str, None]
+
 
 class GenerateInput(TypedDict):
     prompt: str
@@ -165,7 +167,10 @@ async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], s
 def txt2img(input_data):
     return stable_diffusion_runner.txt2img.run(input_data)
 
+
 img2img_input_spec = Multipart(img=Image(), data=JSON())
+
+
 @svc.api(input=img2img_input_spec, output=Image())
 def img2img(img, data):
     return stable_diffusion_runner.img2img.run(img, data)

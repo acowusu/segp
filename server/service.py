@@ -64,7 +64,8 @@ class SDXLTurbo:
 class LLMGenerator:
     def __init__(self) -> None:
         # self.model = LLM(LLM_MODEL_ID)
-        self.model =  LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq', dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
+        self.model = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq',
+                         dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
 
     @bentoml.api
     async def generate(self, prompt: str = "Explain superconductors like I'm five years old", temperature: float = 1) -> AsyncGenerator[str, None]:
@@ -98,8 +99,10 @@ class LLMGenerator:
 class controller:
     image_service = bentoml.depends(SDXLTurbo)
     llm_service = bentoml.depends(LLMGenerator)
+
     def __init__(self) -> None:
         pass
+
     @bentoml.api
     async def generate(self, prompt: str = "Explain superconductors like I'm five years old", temperature: float = 1) -> AsyncGenerator[str, None]:
         return await self.llm_service.generate(prompt, temperature)
