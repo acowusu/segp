@@ -10,6 +10,7 @@ import {
   CardTitle,
   FramelessCard,
 } from "../components/ui/card";
+import { ScriptData } from "../../electron/mockData/data";
 const WIDTH = 1920;
 const HEIGHT = 1080;
 
@@ -90,29 +91,36 @@ export const VideoGenerator: React.FC<{
 
       movie.addLayer(layer);
     });
-    const subtitleLayer = new SubtitleText({
-      startTime: 0,
-      duration: 20,
-      text: (_element: etro.EtroObject, time: number) => {
-        return Math.round(time) % 2 === 0
-          ? "Lorem ipsum dolor sit amet, ct dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum"
-          : "World";
-      },
-      x: 0, // default: 0
-      y: 0, // default: 0
-      // width: WIDTH/2, // default: null (full width)
-      // height: 120, // default: null (full height)
-      opacity: 1, // default: 1
-      color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
-      font: "100px sans-serif", // default: '10px sans-serif'
-      textX: WIDTH / 2, // default: 0
-      textY: HEIGHT, // default: 0
-      textAlign: "center", // default: 'left'
-      textBaseline: "alphabetic", // default: 'alphabetic'
-      textDirection: "ltr", // default: 'ltr'
-      background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
-    });
-    movie.addLayer(subtitleLayer);
+
+    window.api.getScript().then((subtitles: ScriptData[]) => {
+      start = 0
+      console.log("Started subtitles")
+      subtitles.map((subtitle: ScriptData) => {
+        const subtitleLayer = new SubtitleText({
+          startTime: start,
+          duration: 10,
+          text: "hello",
+          x: 0, // default: 0
+          y: 0, // default: 0
+          // width: WIDTH/2, // default: null (full width)
+          // height: 120, // default: null (full height)
+          opacity: 1, // default: 1
+          color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
+          font: "100px sans-serif", // default: '10px sans-serif'
+          textX: WIDTH / 2, // default: 0
+          textY: HEIGHT, // default: 0
+          textAlign: "center", // default: 'left'
+          textBaseline: "alphabetic", // default: 'alphabetic'
+          textDirection: "ltr", // default: 'ltr'
+          background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
+        })
+        start += 10;
+        movie.addLayer(subtitleLayer)
+        console.log("Started subtitles")
+      })
+    })
+
+
     start = 0;
 
     // Add the Audio layers
