@@ -1,17 +1,17 @@
-from fastapi import FastAPI, Form
-from openllm import LLM
-from typing import Any, AsyncGenerator, Dict, TypedDict, Union
-import torch
-from diffusers import StableDiffusionPipeline
-import bentoml
-from bentoml.io import Image, JSON, Multipart
-from typing_extensions import Annotated
+import json
 import uuid
+from typing import Any, AsyncGenerator, Dict, TypedDict, Union
 
+import bentoml
+import torch
 # LDA
 # Bert Topic
 import uvicorn
-import json
+from bentoml.io import JSON, Image, Multipart
+from diffusers import StableDiffusionPipeline
+from fastapi import FastAPI, Form
+from openllm import LLM
+from typing_extensions import Annotated
 
 # llm = LLM("TheBloke/Llama-2-13B-chat-GPTQ", backend="vllm"  )
 # llm = LLM("TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ", backend="vllm"  )

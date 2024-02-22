@@ -1,15 +1,15 @@
 from __future__ import annotations
-from bentoml.io import Image, JSON, Multipart
-from diffusers import StableDiffusionImg2ImgPipeline
-from diffusers import StableDiffusionPipeline
-from torch import autocast
-import torch
+
 import uuid
 from typing import Any, AsyncGenerator, Dict, TypedDict, Union
+
 import bentoml
+import torch
 from bentoml import Service, diffusers_simple
-from bentoml.io import JSON, Text
+from bentoml.io import JSON, Image, Multipart, Text
+from diffusers import StableDiffusionImg2ImgPipeline, StableDiffusionPipeline
 from openllm import LLM
+from torch import autocast
 
 
 class StableDiffusionRunnable(bentoml.Runnable):

@@ -1,9 +1,7 @@
 # from IPython.display import Audio
 import scipyd
-from transformers import AutoProcessor
-from transformers import BarkModel
-
 import torch
+from transformers import AutoProcessor, BarkModel
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 model = model.to(device)
