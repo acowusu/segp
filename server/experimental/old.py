@@ -49,7 +49,7 @@ class StableDiffusionRunnable(bentoml.Runnable):
     def txt2img(self, input_data):
         """
 
-        :param input_data: 
+        :param input_data:
 
         """
         prompt = input_data["prompt"]
@@ -72,8 +72,8 @@ class StableDiffusionRunnable(bentoml.Runnable):
     def img2img(self, init_image, data):
         """
 
-        :param init_image: 
-        :param data: 
+        :param init_image:
+        :param data:
 
         """
         new_size = None
@@ -193,7 +193,7 @@ async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], s
 def txt2img(input_data):
     """
 
-    :param input_data: 
+    :param input_data:
 
     """
     return stable_diffusion_runner.txt2img.run(input_data)
@@ -206,8 +206,8 @@ img2img_input_spec = Multipart(img=Image(), data=JSON())
 def img2img(img, data):
     """
 
-    :param img: 
-    :param data: 
+    :param img:
+    :param data:
 
     """
     return stable_diffusion_runner.img2img.run(img, data)
