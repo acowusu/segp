@@ -1,0 +1,12 @@
+[Unit]
+Description=Text-to-Speech Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/conda/envs/tts-server/bin/python /home/ac2220/main.py
+WorkingDirectory=/home/ac2220
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

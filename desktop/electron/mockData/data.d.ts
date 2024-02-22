@@ -30,3 +30,16 @@ export interface RawReport {
   path: string;
   text: string;
 }
+
+export interface AudioInfo {
+  audioPath: string;
+  duration: number;
+  subtitlePath: string;
+}
+
+export interface Avatar {
+  id: string;
+  name: string;
+  imagePath: string;
+  sadtalkerPath: string;
+}

@@ -4,3 +4,4 @@ desktop/dist-native/better_sqlite3.node
 .prettierrc
 desktop/.env
 desktop/dist-native/better_sqlite3.node
+server/__pycache__/
