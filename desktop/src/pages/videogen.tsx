@@ -1,3 +1,6 @@
+/**
+ * @prettier
+ */
 import React, { useEffect, useRef, useState } from "react";
 import { Progress } from "../components/ui/progress";
 import etro from "etro";
@@ -35,8 +38,6 @@ export const VideoGeneratorDummy: React.FC = () => {
 
 /** TODOs:
  * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
- * -> support other layers, audio
- * -> overlaiying of visual layers for subtitles on top of the visuals
  */
 export const VideoGenerator: React.FC<{
   chosenImages: ChosenAsset[];
@@ -51,7 +52,6 @@ export const VideoGenerator: React.FC<{
   const [generationProgress, setGenerationProgress] = useState<number>(0);
   const [currentProcess, setCurrentProcess] = useState<string>("");
 
-  // this is now used to store the mp4 blob
   const [webmBlob, setWebmBlob] = useState<Blob>();
 
   useEffect(() => {
@@ -92,14 +92,17 @@ export const VideoGenerator: React.FC<{
       movie.addLayer(layer);
     });
 
+    start = 0;
+
+    // Add the Subtitle Layers
     window.api.getScript().then((subtitles: ScriptData[]) => {
-      start = 0
-      console.log("Started subtitles")
+      start = 0;
+      console.log("Started subtitles");
       subtitles.map((subtitle: ScriptData) => {
         const subtitleLayer = new SubtitleText({
           startTime: start,
-          duration: 10,
-          text: "hello",
+          duration: 10, // TODO: change so that this reflects the duration of the actual section
+          text: subtitle.scriptTexts[subtitle.selectedScriptIndex],
           x: 0, // default: 0
           y: 0, // default: 0
           // width: WIDTH/2, // default: null (full width)
@@ -113,15 +116,13 @@ export const VideoGenerator: React.FC<{
           textBaseline: "alphabetic", // default: 'alphabetic'
           textDirection: "ltr", // default: 'ltr'
           background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
-        })
+        });
+
         start += 10;
-        movie.addLayer(subtitleLayer)
-        console.log("Started subtitles")
-      })
-    })
-
-
-    start = 0;
+        movieRef.current!.addLayer(subtitleLayer); // must exist here
+        console.log("Finsihed subtitles");
+      });
+    });
 
     // Add the Audio layers
     chosenAudio.map((aud: ChosenAsset) => {
@@ -268,7 +269,6 @@ export const VideoGenerator: React.FC<{
               </div>
             )}
           </div>
-
           <div className="flex items-center justify-center gap-2 flex-col mt-4">
             {isVideoReady ? (
               <div>

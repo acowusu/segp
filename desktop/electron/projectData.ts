@@ -1,4 +1,4 @@
-import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar } from "./mockData/data";
+import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar, ScriptSelection } from "./mockData/data";
 import { getProjectStore } from "./store";
 
 export function getProjectTopic(): Topic {
@@ -43,7 +43,12 @@ export function getProjectVisual(): Visual {
 }
 
 export function getProjectScript(): ScriptData[] {
-    return getProjectStore().get("script", []) as ScriptData[];
+    const selections =  getProjectStore().get("script_selections", []) as ScriptSelection[];
+    console.log(`available scripts = ${selections.length}`)
+    
+    return selections.length === 0 
+            ? [] 
+            : selections[0].script as ScriptData[];
 }
 
 

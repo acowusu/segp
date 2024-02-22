@@ -11,6 +11,11 @@ export interface ScriptData {
 
 }
 
+export interface ScriptSelection {
+  topic: string,
+  script: ScriptData[],
+}
+
 export interface Audience {
   name: string;
   description: string;
