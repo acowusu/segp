@@ -1,6 +1,5 @@
 // import { Worker } from "worker_threads";
 import { getProjectPath, getTextReportPath } from "./metadata";
-import { app } from 'electron';
 import audiences from "./mockData/audiences.json";
 import { pool } from "./pool";
 import { generateTopics, generateScript } from "./server"
@@ -30,18 +29,23 @@ import path from "path";
  */
 export async function getReportText(): Promise<string> {
   const reportPath = getTextReportPath();
-
+  console.log("Getting report text", reportPath);
   if (fs.existsSync(reportPath)) {
+    console.log("Report Exists", reportPath);
     const report = await readFile(reportPath, "utf-8");
     return report
   } else {
+    console.log("Report does not exist, waiting for it to be created", reportPath);
     return await new Promise<string>((resolve) => {
-      const watcher = watch(reportPath, { persistent: true }, async (event, filename) => {
-        if (event === 'update' && filename === reportPath) {
+      const watcher = watch(getProjectPath(), { persistent: true }, async (event, filename) => {
+        console.log("Event", event, filename, reportPath)
+        if (event === 'update' && filename === reportPath && fs.existsSync(reportPath)) {
           watcher.close();
+          console.log("Report Exists now",fs.existsSync(reportPath) , reportPath);
           const report = await readFile(reportPath, "utf-8");
           resolve(report);
         }
+        
       });
     });
   }
