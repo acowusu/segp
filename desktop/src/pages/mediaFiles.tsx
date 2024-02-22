@@ -90,7 +90,7 @@ import React, { useEffect, useState } from 'react';
 // };
 
 export const Media: React.FC = () => {
-  const prompts = ["cat", "dog", "mountain"]; 
+  const prompts = ["cat", "dog", "mountain"];
 
   const handleDownloadImages = async () => {
     try {
