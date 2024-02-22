@@ -3,10 +3,13 @@ import time
 import requests
 import scipy
 import torch
-from flask import Flask, jsonify, request
+from flask import Flask
+from flask import jsonify
+from flask import request
 from flask_cors import CORS
 from openai import OpenAI
-from transformers import AutoProcessor, BarkModel
+from transformers import AutoProcessor
+from transformers import BarkModel
 
 client = OpenAI()
 

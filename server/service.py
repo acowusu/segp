@@ -1,5 +1,7 @@
 import uuid
-from typing import AsyncGenerator, List, Optional
+from typing import AsyncGenerator
+from typing import List
+from typing import Optional
 
 import bentoml
 from openllm import LLM

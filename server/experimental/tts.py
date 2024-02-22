@@ -2,13 +2,15 @@ import io
 import tempfile
 import wave
 
-# from fastapi.responses import StreamingResponse
 import uvicorn
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
+from fastapi import Request
+from fastapi import Response
 from fastapi.responses import FileResponse
 from TTS.api import TTS
-# You'll need to install Coqui TTS: pip install TTS
 from TTS.utils.synthesizer import Synthesizer
+# from fastapi.responses import StreamingResponse
+# You'll need to install Coqui TTS: pip install TTS
 
 app = FastAPI(root_path="/v0")
 tts = TTS(model_name="tts_models/en/jenny/jenny", progress_bar=False)
