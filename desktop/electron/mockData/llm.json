@@ -1,0 +1,55 @@
+[
+  {
+  "sectionName": "Introduction",
+  "scriptTexts": [
+  "Hello and welcome to our channel! Today, we're excited to introduce you to Matthew Tate, a Full Stack Engineer at Terra (YC W21).",
+  "Hi there! I'm Matthew Tate, a Full Stack Engineer at Terra (YC W21). I'm excited to share with you my experiences and background in the tech industry."
+  ]
+  },
+  {
+  "sectionName": "Education",
+  "scriptTexts": [
+  "Matthew is currently pursuing a MEng in Computing at Imperial College London, where he has completed the first and second year with a first class honors, achieving over 95% in multiple modules including Computing Practical.",
+  "I have always been passionate about learning and technology. I completed my A-levels in Maths, Further Maths, Computer Science, and Physics with 4 A* at Mill Hill County High School in London.",
+  "My education has provided me with a strong foundation in technical skills and knowledge, which I have been able to apply in my work experiences."
+  ]
+  },
+  {
+  "sectionName": "Experiences - Full Stack Engineer at Terra (YC W21)",
+  "scriptTexts": [
+  "As a Full Stack Engineer at Terra (YC W21), I had the opportunity to work on various projects and develop my skills in project management, teamwork, and customer insight.",
+  "For a steps challenge for MIT and Harvard students, I was put in charge of creating the project from scratch. I used NextJS to build the website, postgreSQL for the database, and AWS to deploy the site and database.",  
+  "I also worked with a team of engineers to deploy a brand new dashboard. We communicated often to reduce duplication and adapt to each other's coding standards.",
+  "In addition, I implemented solutions to reduce the amount of support needed by going through past support issues.",
+  "These experiences have helped me to develop my skills in project management, teamwork, and customer insight."
+  ]
+  },
+  {
+  "sectionName": "Previous Experiences",
+  "scriptTexts": [
+  "Prior to Terra (YC W21), I worked as a Software Engineer at FIRST BASE IT where I learnt about the importance of keeping data secure and helped test the companyΓÇÖs API.",
+  "I also worked as a Tutor at North Finchley Tutors, where I taught students Maths and managed newer Teaching Assistants.",
+  "These experiences allowed me to develop my skills in security, API testing, leadership, and communication."
+  ]
+  },
+  {
+  "sectionName": "Projects",
+  "scriptTexts": [
+  "I have also worked on various projects, including a Chess AI, Optical Sheet Music Recognition, Chase.IO, and Pintos.",
+  "For the Chess AI, I designed and implemented the game of chess from scratch in Java and learnt how to create a GUI with JSWING.",
+  "For the Optical Sheet Music Recognition, I designed and implemented a musical composition recognition software in a 4-person team using C.",
+  "For Chase.IO, I recreated the famous game agar.io in real life using wristwatch data to add twists to the game.",
+  "For Pintos, I worked with the code base of the pintos operating system framework to add features such as implementing a better scheduler.",
+  "These projects allowed me to develop my skills in programming languages, communication between server and client, and operating systems."
+  ]
+  },
+  {
+  "sectionName": "Skills and Achievements",
+  "scriptTexts": [
+  "I am proficient in various programming languages such as Java, Python, C, Haskell, Kotlin, JavaScript, HTML/CSS, Tailwind, React, NextJS, Rust, and PostgreSQL.",
+  "I have also achieved various awards and recognitions, including being a two-time winner at ICHack, the largest student run hackathon in the UK, and being awarded the Olav Beckmann Project Prize for outstanding second year undergraduate laboratory work.",
+  "I am also a violinist and have achieved merits or distinctions in all my violin exams from grades 1-8. I have had the privilege to play alongside the Royal Philharmonic Orchestra on multiple occasions.",
+  "I am also a competitor in the UKMT Teams Challenge, where I represented my school with 3 other students and placed 4th."
+  ]
+  }
+  ]

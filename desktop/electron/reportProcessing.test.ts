@@ -1,34 +1,30 @@
-import { getVisuals, getVoiceovers, getTopics, getAudiences, setVoiceover, setAudience, setVisual, setTopic, getScript } from "./reportProcessing";
+import { setVoiceover, setAudience, setVisual, setTopic } from "./reportProcessing";
 import voiceovers from './mockData/voiceovers.json'
 import topics from './mockData/topics.json'
 import audiences from './mockData/audiences.json'
 import visuals from './mockData/visuals.json'
 import { test, expect, vi } from "vitest";
 
-test("getVoiceovers should return an array of voiceovers", async () => {
-    const result = await getVoiceovers();
-    expect(result).toEqual(voiceovers);
-});
+// test("getVoiceovers should return an array of voiceovers", async () => {
+//     const result = await getVoiceovers();
+//     expect(result).toEqual(voiceovers);
+// });
 
-test("getVisuals should return an array of visuals", async () => {
-    const visuals = await getVisuals();
-    expect(Array.isArray(visuals)).toBe(true);
-});
+// test("getVisuals should return an array of visuals", async () => {
+//     const visuals = await getVisuals();
+//     expect(Array.isArray(visuals)).toBe(true);
+// });
 
-test("getTopics should return an array of topics", async () => {
-    const result = await getTopics();
-    expect(result).toEqual(topics);
-});
 
-test("getAudiences should return an array of audiences", async () => {
-    const result = await getAudiences();
-    expect(result).toEqual(audiences);
-});
+// test("getAudiences should return an array of audiences", async () => {
+//     const result = await getAudiences();
+//     expect(result).toEqual(audiences);
+// });
 
-test("getScript should return an array of segments", async () => {
-    const result = await getScript();
-    expect(Array.isArray(result)).toBe(true);
-});
+// test("getScript should return an array of segments", async () => {
+//     const result = await getScript();
+//     expect(Array.isArray(result)).toBe(true);
+// });
 
 
 

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Card} from "../components/ui/card";
+
 import {
   Tabs,
   TabsContent,
@@ -15,7 +17,7 @@ export const Upload: React.FC = () => {
   const navigate = useNavigate();
   const [reportFilePath, setReportFilePath] = useState("");
   const [projectFilePath, setProjectFilePath] = useState("");
-  const [isExistingProject, setIsExistingProject] = useState(false);
+  const [isExistingProject, setIsExistingProject] = useState(true);
   const lock = useState(false);
   const [disableFilePicker] = lock;
   const [disabledNext, setDisabledNext] = useState(false);
@@ -26,14 +28,17 @@ export const Upload: React.FC = () => {
       const path = await window.api.getFile();
       setReportFilePath(path);
     });
-  const setProjectFile = () =>
+  const setProjectFile = (path?: string | undefined) =>
     synchronized(lock, async () => {
       console.log("setProjectFile");
-      const path = await window.api.getDirectory();
+      if(path === undefined || path === "" || path === null) {
+        path = await window.api.getDirectory();
+      }
       setProjectFilePath(path);
     });
 
   const handleNext = async () => {
+    console.log("handleNext", projectFilePath, disabledNext, isExistingProject);
     if (disabledNext || projectFilePath == "") return;
     if (isExistingProject) {
       window.api.openProject(projectFilePath);
@@ -59,16 +64,18 @@ export const Upload: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <Tabs defaultValue="new" className="w-[400px]">
+      <Tabs defaultValue="open" className="min-w-[400px] ">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger onClick={() => setIsExistingProject(false)} value="new">
-            New Project
-          </TabsTrigger>
           <TabsTrigger onClick={() => setIsExistingProject(true)} value="open">
             Open Project
           </TabsTrigger>
+          <TabsTrigger onClick={() => setIsExistingProject(false)} value="new">
+            New Project
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="new">
+        <Card className="w-[400px] mt-4 h-[400px]" layout >
+          
+        <TabsContent value="new" className="h-full">
           <CreateProject
             projectName={projectName}
             setProjectName={setProjectName}
@@ -81,7 +88,7 @@ export const Upload: React.FC = () => {
             handleNext={handleNext}
           />
         </TabsContent>
-        <TabsContent value="open">
+        <TabsContent value="open" className="h-full">
           <OpenProject
             setProjectFile={setProjectFile}
             projectFilePath={projectFilePath}
@@ -90,6 +97,7 @@ export const Upload: React.FC = () => {
             handleNext={handleNext}
           />
         </TabsContent>
+        </Card>
       </Tabs>
     </div>
   );

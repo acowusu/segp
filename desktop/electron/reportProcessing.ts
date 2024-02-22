@@ -1,24 +1,111 @@
 // import { Worker } from "worker_threads";
-import { getProjectPath } from "./metadata";
+import { getProjectPath, getTextReportPath } from "./metadata";
+import { app } from 'electron';
 import audiences from "./mockData/audiences.json";
 import {pool } from "./pool";
+import {generateTopics, generateScript} from "./server"
 import type {
   Audience,
   ScriptData,
   Topic,
   Visual,
   Voiceover,
+  AudioInfo,
 } from "./mockData/data";
-import script from "./mockData/script.json";
-import topics from "./mockData/topics.json";
+// import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
+import * as projectData from "./projectData";
+import {  readFile } from "node:fs/promises";
+import watch from "node-watch"
+import fs from "fs";
+import fetch from "node-fetch";
+// Takes in an array of strings and returns an array of AudioInfo
+export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
+
+    const audioInfoArray: AudioInfo[] = [];
+
+    for (const text of textArray) {
+      const postData = new FormData();
+      postData.append('script', text);
+
+      const response = await fetch('https://iguana.alexo.uk/tts/', {
+          method: 'POST',
+          body: postData,
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Get audio link
+      const responseData = await response.json();
+      const audioLink: string = 'https://iguana.alexo.uk' + responseData.audio_link;
+
+      // Get audio duration 
+      const duration = responseData.duration;
+
+      // Create audio file path
+      const audioFilePath = app.getAppPath() + '/public/audio/' + extractFilenameFromURL(audioLink);
+      
+      try {
+        await downloadMP3(audioLink, audioFilePath);
+        console.log('MP3 file downloaded successfully.');
+
+        const subtitlesFilePath = audioFilePath.replace('.mp3', '.srt');
+        await saveSubtitles(responseData.subtitles, subtitlesFilePath);
+        console.log('Subtitles saved successfully.');
+
+        audioInfoArray.push({ audioPath: audioFilePath, duration, subtitlePath: subtitlesFilePath });
+      } catch (error) {
+        console.error('Error downloading MP3 file:', error);
+      }
+      
+    }
+    return audioInfoArray;
+}
+
+// Function to get audio file name
+function extractFilenameFromURL(url: string): string {
+  const parts = url.split('/');
+  return parts[parts.length - 1];
+}
+
+// Function to download MP3 file from URL
+async function downloadMP3(url: string, destinationPath: string): Promise<void> {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok ) {
+      throw new Error(`Failed to download MP3: HTTP Error ${response.status}`);
+    }
+    if (response === null || response.body === null) {
+      throw new Error(`Failed to download MP3: Response is null`);
+    }
+    const fileStream = fs.createWriteStream(destinationPath);
+    await new Promise((resolve, reject) => {
+      response.body!.pipe(fileStream);
+      response.body!.on("error", reject);
+      fileStream.on("finish", resolve);
+    });
+  } catch (error) {
+    console.error("Error downloading MP3:", error);
+    throw error; // Re-throw to allow for error handling where the function is called
+  }
+}
 
 
-
-
-export async function textToAudio() {
-  // return [generationId, audioUrl];
+// Function to save subtitles content as an .srt file
+function saveSubtitles(subtitlesContent: string, subtitlesFilePath: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+      fs.writeFile(subtitlesFilePath, subtitlesContent, 'utf8', (err) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
+      });
+  });
 }
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {
@@ -27,13 +114,57 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
 }
 
 export async function getScript(): Promise<ScriptData[]> {
-  return script;
+  // TODO forward error if not initialized (for now we just return the notional script)
+  let script = projectData.getProjectScript();
+  if (script.length !== 0) {
+    return script
+  }
+
+  const reportPath = getTextReportPath();
+  
+  if (fs.existsSync(reportPath)) {
+    const report = await readFile(reportPath, "utf-8");
+    script = await generateScript(projectData.getProjectTopic().topic, report)
+    await setScript(script)
+    return script
+  } else {
+    // Alex what does your watch code do??
+    throw Error("report does not exits")
+  }
+
 }
+
+export async function setScript(script: ScriptData[]): Promise<void> {
+  projectData.setProjectScript(script);
+}
+
 export async function getTopics(): Promise<Topic[]> {
-  return topics;
+  const proj_data = projectData.getProjectTopics()
+  if (proj_data.length !== 0) {
+    return proj_data
+  }
+
+  const reportPath = getTextReportPath();
+  
+  if (fs.existsSync(reportPath)) {
+    const report = await readFile(reportPath, "utf-8");
+    const topics = await generateTopics(report);
+    projectData.setProjectTopics(topics);
+    return topics
+  } else {
+    return await new Promise<Topic[]>((resolve) => {
+      const watcher = watch(reportPath, { persistent: true }, async (event, filename) => {
+        if (event === 'update' && filename === reportPath) {
+          watcher.close();
+          const report = await readFile(reportPath, "utf-8");
+          resolve(generateTopics(report));
+        }
+      });
+    });
+  }
 }
 export async function setTopic(topic: Topic): Promise<void> {
-  console.log(topic);
+  projectData.setProjectTopic(topic);
 }
 export async function getAudiences(): Promise<Audience[]> {
   return audiences;
@@ -46,12 +177,13 @@ export async function getVisuals(): Promise<Visual[]> {
 }
 
 export async function setAudience(audience: Audience): Promise<void> {
-  console.log(audience);
+  projectData.setProjectAudience(audience);
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
-  console.log(voiceover);
+  console.log("setVoiceover", voiceover);
+  projectData.setProjectVoiceover(voiceover);
 }
 export async function setVisual(visuals: Visual): Promise<void> {
-  console.log(visuals);
+  projectData.setProjectVisual(visuals);
 }
 // Usage example:

@@ -1,0 +1,12 @@
+[Unit]
+Description = My SadTalker Service
+After = multi-user.target
+
+[Service]
+Type = simple
+Restart = always
+WorkingDirectory = /home/ls1221/segp/server/
+ExecStart = /home/ls1221/segp/server/sadtalker_on_start.sh
+
+[Install]
+WantedBy = multi-user.target

@@ -1,18 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { Topic, Audience, Voiceover, Visual } from './mockData/data'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))
-contextBridge.exposeInMainWorld('electronAPI', {
-  openFile: () => ipcRenderer.invoke('dialog:openFile'),
-  getTopics: () => ipcRenderer.invoke('dialog:getTopics'),
-  setTopic: (topic: Topic) => ipcRenderer.invoke('dialog:setTopic', topic),
-  setAudiences: (audience: Audience) => ipcRenderer.invoke('dialog:setAudience', audience),
-  setVoiceovers: (voiceover: Voiceover) => ipcRenderer.invoke('dialog:setVoiceover', voiceover),
-  setVisuals: (visuals: Visual) => ipcRenderer.invoke('dialog:setVisuals', visuals),
-  getScript: () => ipcRenderer.invoke('dialog:getScript'),
-  generateAvatar: (avatar: {id: string, imagePath: string}, audioPath: string) => ipcRenderer.invoke('generateAvatar', avatar, audioPath),
-})
+
 
 
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.

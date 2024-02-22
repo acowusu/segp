@@ -3,9 +3,10 @@ export interface Topic {
   summary: string;
 }
 export interface ScriptData {
-  section: string;
-  script1: string;
-  script2: string;
+  id: string; // GUID 
+  selectedScriptIndex: number; // index of the selected script
+  scriptTexts: string[];  // array of script texts
+  sectionName: string; // Name of section
 }
 
 export interface Audience {
@@ -28,4 +29,10 @@ export interface Visual {
 export interface RawReport {
   path: string;
   text: string;
+}
+
+export interface AudioInfo {
+  audioPath: string;
+  duration: number;
+  subtitlePath: string;
 }

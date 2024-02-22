@@ -1,0 +1,13 @@
+[Unit]
+Description=FastAPI LLM Server
+After=network.target
+
+[Service]
+User=alexa
+WorkingDirectory=/home/alexa/segp-1/server/experimental  
+Environment=PATH=/home/alexa/.conda/envs/bark/bin:$PATH 
+Environment=CUDA_VISIBLE_DEVICES=1
+ExecStart=/home/alexa/.conda/envs/bark/bin/python llm.py
+
+[Install]
+WantedBy=multi-user.target

@@ -33,14 +33,6 @@ const sidebarNavItems = [
     href: "/welcome/set-topic",
   },
   {
-    title: "Audience",
-    href: "/welcome/set-audience",
-  },
-  {
-    title: "Voiceover",
-    href: "/welcome/set-voiceover",
-  },
-  {
     title: "Visuals",
     href: "/welcome/set-visuals",
   },
@@ -53,8 +45,16 @@ const sidebarNavItems = [
     href: "/welcome/script-editor",
   },
   {
+    title: "Video Generator",
+    href: "/welcome/get-video",
+  },
+  {
     title: "Video Editor",
     href: "/welcome/video-editor",
+  },
+  {
+    title: "LLM Debugger",
+    href: "/welcome/debug",
   },
 ];
 
