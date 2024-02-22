@@ -10,7 +10,7 @@ export async function generateAvatar(avatar: Avatar, audioPath: string): Promise
         driven_audio: audioPath,
         source_image: avatar.sadtalkerPath,
     }
-   
+
     const reponse = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -30,7 +30,7 @@ export async function generateAvatar(avatar: Avatar, audioPath: string): Promise
 export async function getAvatars(): Promise<Avatar[]> {
     return avatars;
 }
-  
+
 export async function setAvatar(avatar: Avatar): Promise<void> {
     console.log("setAvatar", avatar);
     setProjectAvatar(avatar);
