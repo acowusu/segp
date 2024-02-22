@@ -58,8 +58,8 @@ export function getProjectAvatar(): Avatar {
   return getProjectStore().get("avatars") as Avatar;
 }
 
-export function setProjectAvatar(avatars: Avatar): void {
-  getProjectStore().set("avatars", avatars);
+export function setProjectAvatar(avatar: Avatar): void {
+  getProjectStore().set("avatars", avatar);
 }
 
 export function setProjectTopics(topics: Topic[]): void {

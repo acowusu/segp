@@ -11,10 +11,12 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+} from "./reportProcessing";
+import {
+  generateAvatar,
   getAvatars,
   setAvatar,
-} from "./reportProcessing";
-import { generateAvatar } from "./avatarGeneration";
+} from "./avatarGeneration";
 import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
 import {
