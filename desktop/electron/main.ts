@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog , screen  } from 'electron'
 import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
+import { generateAvatar } from './avatarGeneration'
 import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio} from './reportProcessing'
 // The built directory structure
 //
@@ -100,12 +101,11 @@ app && app.whenReady().then(() => {
        }
     }
   })
+  ipcMain.handle('generateAvatar', async (_, avatar, audioPath) => {
+    const avatarUrl = await generateAvatar(avatar, audioPath)
+    return avatarUrl
+  })
 
-  // handler for textToAudio function
-  ipcMain.handle('textToAudio', async (_, text) => {
-    const audioInfo = await textToAudio(text);
-    return audioInfo;
-  });
 
   createWindow()
 

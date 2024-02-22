@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
+import { AudioInfo } from '../../electron/mockData/data';
 
-interface AudioInfo {
-  audioPath: string;
-  duration: number;
-  text: string;
-}
 
 // AudioGenerator passes an array of a script and returns an array of AudioInfo
 
@@ -16,7 +12,7 @@ export const AudioGenerator: React.FC = () => {
 
   const generateAudio = async (script: string[]) => {
     try {
-      const audioInfoList: AudioInfo[] = await window.electronAPI.textToAudio(script);
+      const audioInfoList = await window.api.textToAudio(script);
       setAudioInfoList(audioInfoList);
     } catch (error) {
       console.error('Error generating audio:', error);

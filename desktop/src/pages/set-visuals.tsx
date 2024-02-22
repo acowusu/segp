@@ -25,6 +25,13 @@ import {
 import { Audience, Voiceover, Avatar } from "../../electron/mockData/data";
 import { useCallback, useEffect, useState } from "react";
 
+const avatarList = [
+  {label: "Default Man", avatarUrl: "big-person.png"}, 
+  {label: "Lebron James", avatarUrl: "lebron.png"},
+  {label: "Messi", avatarUrl: "messi.png"},
+  {label: "Obama", avatarUrl: "obama.png"},
+];
+
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
   subtitles: z.boolean().default(false).optional(),
