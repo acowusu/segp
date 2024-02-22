@@ -11,6 +11,7 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+  fetchImages,
 } from "./reportProcessing";
 import {
   generateAvatar,
@@ -61,6 +62,7 @@ const api = {
   prepareMp4Blob,
   getAvatars,
   setAvatar,
+  fetchImages,
 };
 export default api;
 
