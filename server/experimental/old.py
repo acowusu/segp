@@ -1,13 +1,22 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any, AsyncGenerator, Dict, TypedDict, Union
+from typing import Any
+from typing import AsyncGenerator
+from typing import Dict
+from typing import TypedDict
+from typing import Union
 
 import bentoml
 import torch
-from bentoml import Service, diffusers_simple
-from bentoml.io import JSON, Image, Multipart, Text
-from diffusers import StableDiffusionImg2ImgPipeline, StableDiffusionPipeline
+from bentoml import diffusers_simple
+from bentoml import Service
+from bentoml.io import Image
+from bentoml.io import JSON
+from bentoml.io import Multipart
+from bentoml.io import Text
+from diffusers import StableDiffusionImg2ImgPipeline
+from diffusers import StableDiffusionPipeline
 from openllm import LLM
 from torch import autocast
 

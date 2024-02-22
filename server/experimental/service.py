@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any, AsyncGenerator, Dict, TypedDict, Union
+from typing import Any
+from typing import AsyncGenerator
+from typing import Dict
+from typing import TypedDict
+from typing import Union
 
 from bentoml import Service
-from bentoml.io import JSON, Text
+from bentoml.io import JSON
+from bentoml.io import Text
 from openllm import LLM
 
 # llm = LLM("HuggingFaceH4/zephyr-7b-alpha", backend="vllm")

@@ -1,8 +1,11 @@
 import requests
 import scipy
 import torch
-from flask import Flask, jsonify, request
-from transformers import AutoProcessor, BarkModel
+from flask import Flask
+from flask import jsonify
+from flask import request
+from transformers import AutoProcessor
+from transformers import BarkModel
 
 headers = {"Authorization": "Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
 STT_API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large"
