@@ -1,38 +1,50 @@
-import { useEffect, useState } from "react";
-import { SetVisuals } from "../pages/set-visuals";
-import { SetTopic } from "../pages/set-topic";
-import { ScriptEditor } from "../pages/script-editor";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "../components/ui/carousel"
-import React from "react";
+// import {  Outlet } from "react-router-dom";
+// import { useLocation } from 'react-router-dom';
 
-// const carouselItems = [
-//   {
-//     title: "Settings",
-//     href: "/welcome/set-visuals",
-//   },
-//   {
-//     title: "Topic generation",
-//     href: "/welcome/set-topic",
-//   },
-//   {
-//     title: "Script",
-//     href: "/welcome/script-editor",
-//   },
-// ];
+// {/* <Link to="/">Home</Link> */}
+
+// export function WelcomeLayout() {
+//   const location = useLocation();
+
+//   return (
+//     <div>
+//       {/* A "layout route" is a good place to put markup you want to
+//           share across all the pages on your site, like navigation. */}
+
+//       <code className=" text-center	 text-pink-700 monospace">{location.pathname}</code>
+
+//       {/* An <Outlet> renders whatever child route is currently active,
+//           so you can think about this <Outlet> as a placeholder for
+//           the child routes we defined above. */}
+//       <Outlet />
+//     </div>
+//   );
+// }
+
+import { Outlet } from "react-router-dom";
+
+import { Separator } from "../components/ui/separator";
+import { SidebarNav } from "../components/ui/sidebar-nav";
+import { useEffect, useState } from "react";
+
+const sidebarNavItems = [
+  {
+    title: "Visuals",
+    href: "/welcome/set-visuals",
+  },
+  {
+    title: "Topic",
+    href: "/welcome/set-topic",
+  },
+  {
+    title: "Script",
+    href: "/welcome/script-editor",
+  },
+
+];
 
 export function WelcomeLayout() {
   const [projectName, setProjectName] = useState("");
-
-  const [api, setApi] = React.useState<CarouselApi>()
-  
-
 
   useEffect(() => {
     const fetchProjectName = async () => {
@@ -46,32 +58,11 @@ export function WelcomeLayout() {
 
     fetchProjectName();
   }, []);
-
-  const carouselItems = [
-    <SetVisuals nextSlide={api?.scrollNext!}/>, 
-    <SetTopic />,
-    <ScriptEditor />
-  ];
-
- return (
-  <div>
-
-  <Carousel setApi={setApi}>
-  <CarouselContent>
-    {carouselItems.map((component, index) => (
-      <div key={index} className='h-screen w-screen p-16 overflow-auto no-scrollbar'>
-        <CarouselItem key={index}>
-          {component}
-        </CarouselItem>
+  return (
+    <>
+      <div className=" space-y-6 p-10 pb-16 md:block">
+        <Outlet />
       </div>
-    ))}
-  </CarouselContent>
-  <CarouselPrevious/>
-  <CarouselNext />
-</Carousel>
-    hit there
-    <button onClick={() => console.log(api?.canScrollNext())}>
-    akjsdhkjashdkjahsd</button>    
-  </div>
+    </>
   );
 }

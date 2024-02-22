@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import type { ScriptData, Topic } from "./mockData/data";
+import { getProjectAudience, getProjectLength, getProjectTopic } from "./projectData";
 
 
 
@@ -12,7 +13,7 @@ export const generateTextFromLLM = async (
     params.append("prompt", `[INST] ${prompt} [/INST] `);
     params.append("temperature", "0.7");
     // console.log(systemPrompt, userPromp, temperature);
-    const url = "https://iguana.alexo.uk/generate";
+    const url = "https://iguana.alexo.uk/v3/generate";
 
     const options = {
         method: "POST",
@@ -54,12 +55,7 @@ export const generateTextFromLLM = async (
 
 //  Here are the topics mentioned in the article you provided: 
 
-const TOPICS_SYS = `
-Below is some information.
-Find me a list of topics from this information which you could create an informative video out of (as well as an overview topic). 
-For this video, you can use general knowledge, but you should aim to use only information which is supplied in the information. If there is information which conflicts with your knowledge, assume that the information provided is right:
 
-`
 
 const TOPICS_FORMAT = `
 Format the response as a json list following this schema:
@@ -103,6 +99,8 @@ Format the stuff above as a json list following this schema:
   }
 ]
 </EXAMPLE>
+
+Make sure that the different variations of scripts are not section names. make sure they they are in the scriptText section.
 `
 
 
@@ -134,6 +132,15 @@ export const generateScript = async (topic: string, report:string): Promise<Scri
 
 
 const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
+
+    const projectLength = getProjectLength()
+
+    const TOPICS_SYS = `
+    Below is some information.
+    Find me a list of topics from this information which you could create an informative ${projectLength} minute video out of. In the result, also return an overview of the entirety of the information. 
+    For this video, you can use general knowledge, but you should aim to use only information which is supplied in the information. If there is information which conflicts with your knowledge, assume that the information provided is right:
+    `
+
     const prompt = TOPICS_SYS + report + TOPICS_FORMAT
 
     let result = await generateTextFromLLM(prompt);
@@ -183,16 +190,15 @@ The response should look something like this:
 
 const generateScriptInternal =async (topic:string, report: string):Promise<ScriptData[]> => {
 
-    
+    const projectLength = getProjectLength()
+    const projectAudience = getProjectAudience()
 
     console.log("generating scripts")
-    
     // TODO set settings here 
     
-
     const SCRIPT_SYS = `
     Below is some information. 
-    Create a 2 minute script about ${topic} only using the information below. The script should be split up into as many sections as you deem necessary, where each section is a different part of the video and they should seamlessly connect together. for each section, create me 3 different scripts for that section, so that i can choose my favorite.
+    Create a ${projectLength} minute script about ${topic} for an audience of ${projectAudience} only using the information below. The script should be split up into as many sections as you deem necessary, where each section is a different part of the video and they should seamlessly connect together. for each section, create me 3 or more completely different scripts for that section, so that i can choose my favorite.
     `
 
     let prompt = SCRIPT_SYS + report + SCRIPTS_FORMAT;
@@ -207,10 +213,11 @@ const generateScriptInternal =async (topic:string, report: string):Promise<Scrip
 
     try {
         let scripts = JSON.parse(result)
-        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}) => {
-            return {...script, id: "TODO", selectedScriptIndex: 1} as ScriptData
+
+        let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}, index: number) => {
+            return {...script, id: String(index), selectedScriptIndex: 1, sectionImageLookup: []} as ScriptData
         })
-        return addedInfoScripts;
+        return generateImageLookup(addedInfoScripts);
         // let scripts = mock
     } catch (e) {
         const prompt = result + REFORMAT
@@ -223,10 +230,11 @@ const generateScriptInternal =async (topic:string, report: string):Promise<Scrip
         console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
 
         let scripts = JSON.parse(regenerated_result)
+        
         let addedInfoScripts = scripts.map((script: {sectionName: string; scriptTexts: string[]}, index: number) => {
-            return {...script, id: String(index), selectedScriptIndex: 1} as ScriptData
+            return {...script, id: String(index), selectedScriptIndex: 1, sectionImageLookup: []} as ScriptData
         })
-        return addedInfoScripts;
+        return generateImageLookup(addedInfoScripts);
     }
     
         
@@ -234,4 +242,36 @@ const generateScriptInternal =async (topic:string, report: string):Promise<Scrip
     
 }
 
+const generateImageLookup =async (data: ScriptData[]):Promise<ScriptData[]> => {
+
+    const mappedPromises = data.map(async (scriptData) => {
+        const IMAGE_SYS = `Return me a list of keyword which best summarises the script below. These should be easy to find an image of. return me only the list of keywords, in the form of ["keyword", "keuword2"...]`;
+        
+        let prompt = IMAGE_SYS + scriptData.scriptTexts[0];
+        
+        let result = await generateTextFromLLM(prompt);
+        
+        result = result.substring(prompt.length + 16, result.length-1);
+        
+        const openBracketIndex = result.indexOf('[') - 1;
+        const closeBracketIndex = result.indexOf(']') + 1;
+        
+        result = result.substring(openBracketIndex + 1, closeBracketIndex);
+        
+        console.log(result);
+        
+        try {
+            const imageLookups = JSON.parse(result) as string[]
+            
+            return {...scriptData, sectionImageLookup: imageLookups}
+            
+        } catch(e) {
+            console.log("DID NOT WORK")    
+            return scriptData        
+        }
+    });
+    
+    return await Promise.all(mappedPromises);
+    
+}
 

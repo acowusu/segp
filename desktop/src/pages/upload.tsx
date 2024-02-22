@@ -12,6 +12,7 @@ import {
 import { synchronized } from "../lib/utils";
 import { OpenProject } from "../components/upload/open-project";
 import { CreateProject } from "../components/upload/create-project";
+import { getProjectScript, getProjectTopics } from "../../electron/projectData";
 
 export const Upload: React.FC = () => {
   const navigate = useNavigate();
@@ -58,7 +59,10 @@ export const Upload: React.FC = () => {
         error: "Error",
       });
     }
-    navigate("setupProject");
+
+
+    navigate("/welcome/set-visuals");
+    
     setDisabledNext(true);
   };
 

@@ -13,10 +13,31 @@ import {
 } from "../components/ui/card";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Topic } from "../../electron/mockData/data";
+import { quantum } from 'ldrs'
+
+
+const LoadingTopics = () => {
+  quantum.register()
+  return (
+    <div className="flex flex-col gap-8 items-center justify-center">
+      <h1 className="text-2xl font-bold p-4">Please wait while we generate your scripts</h1>
+      <l-quantum
+        size="100"
+        speed="3" 
+        color="red" 
+      ></l-quantum>
+    </div>
+  ) 
+}
+
+
+
 export const SetTopic: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic>({} as Topic);
+  const [loadingTopics, setLoadingTopics] = useState(true)
+
   
   const setTopic = useCallback(async (topic :Topic) => {
     if (topic !== undefined) {
@@ -31,13 +52,14 @@ export const SetTopic: React.FC = () => {
         setTopic(data);
       }).catch((e) => {
         console.log(e);
-      }))
+      })).finally(() => setLoadingTopics(false))
   }, [setTopic]);
   const setScript = async () => {
     navigate("/welcome/script-editor");
   };
   return (
     <div className="flex items-center justify-center mt-4">
+      {loadingTopics ? <LoadingTopics /> : 
       <FramelessCard >
         <CardHeader>
           <CardTitle>Select Topic</CardTitle>
@@ -76,10 +98,9 @@ export const SetTopic: React.FC = () => {
           </ScrollArea>
         </CardContent>
         <CardFooter className="flex justify-between ">
-          <Button variant="outline">Back</Button>
           <Button onClick={setScript}>Next</Button>
         </CardFooter>
-      </FramelessCard>
+      </FramelessCard> }
     </div>
   );
 };

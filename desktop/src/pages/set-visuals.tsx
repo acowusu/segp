@@ -25,6 +25,7 @@ import {
 import { Audience, Voiceover } from "../../electron/mockData/data";
 import { useCallback, useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
@@ -35,7 +36,7 @@ const formSchema = z.object({
   voiceover: z
     .string({ required_error: "Please Select an Voiceover" })
     .default("").optional(),
-  videoLength: z
+  videoLength: z.coerce
   .number({ required_error: "Please Select a video length" })
   .default(1).optional(),
 });
@@ -52,7 +53,9 @@ const defaultValues: () => Promise<Partial<FormValues>> = async () => {
   }
 };
 
-export function SetVisuals({nextSlide}: {nextSlide: ((jump?: boolean | undefined) => void)}) {
+export function SetVisuals() {
+  const navigate = useNavigate();
+
   const [audienceItems, setAudienceItems] = useState<Audience[]>([]);
   const [selectedAudience, setSelectedAudience] = useState<Audience>(
     {} as Audience
@@ -129,7 +132,6 @@ export function SetVisuals({nextSlide}: {nextSlide: ((jump?: boolean | undefined
     window.api.setProjectHasSubtitles(data.subtitles || false);
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
-    nextSlide()
   }, [audienceItems, setAudience, setVoiceover, voiceoverItems])
 
   const {watch,handleSubmit }  = form
@@ -155,7 +157,7 @@ export function SetVisuals({nextSlide}: {nextSlide: ((jump?: boolean | undefined
               <FormItem>
                 <FormLabel>Video Length</FormLabel>
                 <FormControl>
-                  <Input placeholder="1" {...field} />
+                  <Input type="number" placeholder="1" {...field} />
                 </FormControl>
                 <FormDescription>
                   Select Video Length
@@ -277,7 +279,7 @@ export function SetVisuals({nextSlide}: {nextSlide: ((jump?: boolean | undefined
             showSubtitle={subtitles}
           />
 
-          <Button type="submit">Generate Topics</Button>
+          <Button onClick={() => navigate("/welcome/set-topic")}>Generate Topics</Button>
         </form>
       </Form>
     </>

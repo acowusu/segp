@@ -76,6 +76,8 @@ export const ScriptEditor: React.FC = () => {
   const setScript = async () => {
     // navigate("/welcome/set-audience");
     await window.api.setScript(items);
+    // START PIPELINE
+
   };
   const selectTopic = async () => {
     navigate("/welcome/set-topic");

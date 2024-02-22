@@ -7,6 +7,7 @@ export interface ScriptData {
   selectedScriptIndex: number; // index of the selected script
   scriptTexts: string[];  // array of script texts
   sectionName: string; // Name of section
+  sectionImageLookup: string[]; // what to lookup for an image
 }
 
 export interface ScriptSelections {
