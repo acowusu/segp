@@ -3,7 +3,7 @@ import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
 import { generateAvatar } from './avatarGeneration'
-import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio} from './reportProcessing'
+import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio, fetchImages} from './reportProcessing'
 // The built directory structure
 //
 // ├─┬─┬ dist
