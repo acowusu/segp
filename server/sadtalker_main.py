@@ -19,7 +19,7 @@ class SadTalker(BaseModel):
     source_image: Annotated[str, Form()]
 
 
-app = FastAPI(root="/v4")
+app = FastAPI(root_path="/v4")
 
 
 @app.get("/")
