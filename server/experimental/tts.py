@@ -24,7 +24,8 @@ async def generate_audio(request: Request):
     if not script:
         return Response("Missing 'script' field in request", status_code=400)
 
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+    with tempfile.NamedTemporaryFile(suffix=".wav",
+                                     delete=False) as temp_audio_file:
         tts.tts_to_file(text=script, file_path=temp_audio_file)
 
         # Approximate duration
@@ -38,7 +39,10 @@ async def generate_audio(request: Request):
             path=temp_audio_file.name,
             filename="generated_audio.wav",  # Set a desired filename
             media_type="audio/wav",
-            headers={"Content-Disposition": "inline", "Audio-Duration": str(duration)},
+            headers={
+                "Content-Disposition": "inline",
+                "Audio-Duration": str(duration)
+            },
         )
 
     return response

@@ -35,19 +35,20 @@ class GenerateInput(TypedDict):
             prompt="What is time?",
             stream=False,
             sampling_params={"temperature": 0.73},
-        )
-    ),
+        )),
     output=Text(content_type="text/event-stream"),
 )
-async def generate(request: GenerateInput) -> Union[AsyncGenerator[str, None], str]:
+async def generate(
+        request: GenerateInput) -> Union[AsyncGenerator[str, None], str]:
     n = request["sampling_params"].pop("n", 1)
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * n
 
-    generator = llm.generate_iterator(
-        request["prompt"], request_id=request_id, n=n, **request["sampling_params"]
-    )
+    generator = llm.generate_iterator(request["prompt"],
+                                      request_id=request_id,
+                                      n=n,
+                                      **request["sampling_params"])
 
     async def streamer() -> AsyncGenerator[str, None]:
         async for request_output in generator:

@@ -77,20 +77,21 @@ async def login(
 
 
 @app.post("/login/")
-async def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
+async def login(username: Annotated[str, Form()], password: Annotated[str,
+                                                                      Form()]):
     return {"username": username}
 
 
 @app.post("/generate")
-async def generate(
-    prompt: Annotated[str, Form()], temperature: Annotated[float, Form()]
-):
+async def generate(prompt: Annotated[str, Form()],
+                   temperature: Annotated[float, Form()]):
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * 1
 
-    generator = llm.generate_iterator(
-        prompt, request_id=request_id, n=1, temperature=temperature
-    )
+    generator = llm.generate_iterator(prompt,
+                                      request_id=request_id,
+                                      n=1,
+                                      temperature=temperature)
 
     async def streamer() -> AsyncGenerator[str, None]:
         async for request_output in generator:
@@ -113,9 +114,10 @@ async def generate(
     request_id = f"tinyllm-{uuid.uuid4().hex}"
     previous_texts = [[]] * 1
     prompt = f"[INST] <<SYS>>{instructions}<</SYS>>{prompt}[/INST]"
-    generator = llm.generate_iterator(
-        prompt, request_id=request_id, n=1, temperature=temperature
-    )
+    generator = llm.generate_iterator(prompt,
+                                      request_id=request_id,
+                                      n=1,
+                                      temperature=temperature)
 
     async def streamer() -> AsyncGenerator[str, None]:
         async for request_output in generator:

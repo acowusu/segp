@@ -34,7 +34,6 @@ from typing_extensions import Annotated
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
 os.environ["HF_HOME"] = "/hf"
 
-
 # bentoml.diffusers.import_model(
 #     "anything-v3",
 #     "Linaqruf/anything-v3.0",
