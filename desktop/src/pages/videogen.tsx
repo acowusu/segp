@@ -13,7 +13,7 @@ import {
   CardTitle,
   FramelessCard,
 } from "../components/ui/card";
-import { ScriptData } from "../../electron/mockData/data";
+import { AudioInfo, ScriptData } from "../../electron/mockData/data";
 const WIDTH = 1920;
 const HEIGHT = 1080;
 
@@ -24,16 +24,88 @@ type ChosenAsset = {
 };
 
 const dummyImages: ChosenAsset[] = [
-  { src: "./example-min.jpg", duration: 5 },
-  { src: "./example2-min.jpg", duration: 5 },
-  { src: "./example3-min.jpg", duration: 7 },
+  { src: "./example-min.jpg", duration: 2 },
+  { src: "./example2-min.jpg", duration: 2 },
+  { src: "./example3-min.jpg", duration: 2 },
 ];
 
-const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 17 }];
+const dummyImages2 = [
+  { src: "/home/kup/code/segp/project/Gas Fees0.jpg", duration: 2 },
+  { src: "/home/kup/code/segp/project/Ethereum0.jpg", duration: 2 },
+  { src: "/home/kup/code/segp/project/protocol0.jpg", duration: 2 },
+];
+
+const dummySubs: ChosenAsset[] = [
+  { src: "hello", duration: 2 },
+  { src: "these are ", duration: 2 },
+  { src: "dummy subtitles", duration: 2 },
+];
+const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 6 }];
 
 // Dummy generator before the types are hashed out
 export const VideoGeneratorDummy: React.FC = () => {
-  return <VideoGenerator chosenImages={dummyImages} chosenAudio={dummyAudio} />;
+  return (
+    <VideoGenerator
+      chosenImages={dummyImages}
+      chosenAudio={dummyAudio}
+      chosenSubs={dummySubs}
+    />
+  );
+};
+
+export const VideoGeneratorBridge: React.FC = () => {
+  const [chosenImages, setChosenImages] = useState<ChosenAsset[]>([]);
+  const [chosenAudio, setChosenAudio] = useState<ChosenAsset[]>([]);
+  const [chosenSubs, setChosenSubs] = useState<ChosenAsset[]>([]);
+
+  useEffect(() => {
+    window.api.getScript().then((scriptData: ScriptData[]) => {
+      const imgTopics: string[] = scriptData.map((data: ScriptData) => {
+        return data.sectionImageLookup?.[0] || "Topic not found";
+      }); // if it exists get the first
+
+      // Set Chosen Images
+      console.log(`topics: ${imgTopics}`);
+      window.api.fetchImages(imgTopics).then((topicImages: string[][]) => {
+        const imgAssets: ChosenAsset[] = topicImages.map(
+          (imgSrcs: string[]) => {
+            // console.log(`images: ${imgSrcs[0]}`);
+            return { src: imgSrcs[0], duration: 5 };
+          }
+        );
+        for (const asset of imgAssets) {
+          console.log(`imgASsets: ${asset.src}, ${asset.duration}`);
+        }
+        setChosenImages(imgAssets);
+      });
+
+      // subtitles are extracted per section and put in a list
+      const subTexts: string[] = scriptData.map((data) => {
+        return data.scriptTexts[data.selectedScriptIndex];
+      });
+
+      // Set Chosen Audio and Subs
+      window.api.textToAudio(subTexts).then((infos: AudioInfo[]) => {
+        const auds: ChosenAsset[] = [];
+        const subs: ChosenAsset[] = [];
+        for (const info of infos) {
+          auds.push({ src: info.audioPath, duration: info.duration });
+          subs.push({ src: info.subtitlePath, duration: info.duration });
+        }
+        setChosenAudio(auds);
+        setChosenSubs(subs);
+      });
+      // });
+    });
+  }, []);
+
+  return (
+    <VideoGenerator
+      chosenImages={chosenImages}
+      chosenAudio={chosenAudio}
+      chosenSubs={chosenSubs}
+    />
+  );
 };
 
 /** TODOs:
@@ -41,8 +113,10 @@ export const VideoGeneratorDummy: React.FC = () => {
  */
 export const VideoGenerator: React.FC<{
   chosenImages: ChosenAsset[];
-  chosenAudio: ChosenAsset[] /* settings: ? */;
-}> = ({ chosenImages, chosenAudio }) => {
+  chosenAudio: ChosenAsset[];
+  chosenSubs: ChosenAsset[];
+  /* settings: ? */
+}> = ({ chosenImages, chosenAudio, chosenSubs }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
   const [videoURL, setVideoURL] = useState<string>();
@@ -95,33 +169,29 @@ export const VideoGenerator: React.FC<{
     start = 0;
 
     // Add the Subtitle Layers
-    window.api.getScript().then((subtitles: ScriptData[]) => {
-      start = 0;
-      console.log("Started subtitles");
-      subtitles.map((subtitle: ScriptData) => {
-        const subtitleLayer = new SubtitleText({
-          startTime: start,
-          duration: 10, // TODO: change so that this reflects the duration of the actual section
-          text: subtitle.scriptTexts[subtitle.selectedScriptIndex],
-          x: 0, // default: 0
-          y: 0, // default: 0
-          // width: WIDTH/2, // default: null (full width)
-          // height: 120, // default: null (full height)
-          opacity: 1, // default: 1
-          color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
-          font: "100px sans-serif", // default: '10px sans-serif'
-          textX: WIDTH / 2, // default: 0
-          textY: HEIGHT, // default: 0
-          textAlign: "center", // default: 'left'
-          textBaseline: "alphabetic", // default: 'alphabetic'
-          textDirection: "ltr", // default: 'ltr'
-          background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
-        });
-
-        start += 10;
-        movieRef.current!.addLayer(subtitleLayer); // must exist here
-        console.log("Finsihed subtitles");
+    chosenSubs.map((sub: ChosenAsset) => {
+      const subtitleLayer = new SubtitleText({
+        startTime: start,
+        duration: sub.duration, // TODO: change so that this reflects the duration of the actual section
+        text: sub.src,
+        x: 0, // default: 0
+        y: 0, // default: 0
+        // width: WIDTH/2, // default: null (full width)
+        // height: 120, // default: null (full height)
+        opacity: 1, // default: 1
+        color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
+        font: "100px sans-serif", // default: '10px sans-serif'
+        textX: WIDTH / 2, // default: 0
+        textY: HEIGHT, // default: 0
+        textAlign: "center", // default: 'left'
+        textBaseline: "alphabetic", // default: 'alphabetic'
+        textDirection: "ltr", // default: 'ltr'
+        background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
       });
+
+      start += sub.duration;
+      movie.addLayer(subtitleLayer); // must exist here
+      console.log("Finsihed subtitles");
     });
 
     // Add the Audio layers

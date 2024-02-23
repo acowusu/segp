@@ -48,9 +48,8 @@ export function getProjectScript(): ScriptData[] {
     
     return selections.length === 0 
             ? [] 
-            : selections[0].script as ScriptData[];
+            : selections[selections.length - 1].script as ScriptData[];// gets the last one for testing as this has the optional field for promtps
 }
-
 
 export function getProjectTopics(): Topic[] {
   return getProjectStore().get("topics", []) as Topic[];
