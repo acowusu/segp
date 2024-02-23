@@ -139,6 +139,29 @@ export const generateScript = async (topic: string, report: string): Promise<Scr
 }
 
 
+const REFORMAT_TOPICS = `
+Format the stuff above as a json list following this schema:
+<SCHEMA>
+{
+  topic: string;
+  summary: string;
+}
+</SCHEMA>
+<EXAMPLE>
+[
+  {
+      "topic": "Overview of Deep Convolutional Neural Networks",
+      "summary": "An introduction to deep convolutional neural networks, their significance in image classification, and their revolutionary impact on computer vision."
+  },
+  {
+      "topic": "The ImageNet Challenge: Revolutionizing Object Recognition",
+      "summary": "Exploring the role of the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) in advancing neural network research and object recognition technologies."
+  }
+]
+</EXAMPLE>
+`
+
+
 const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
 
     const projectLength = getProjectLength()
@@ -165,21 +188,50 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
     console.log("--------------------------------------------------");
     console.log(result);
     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
-    let topics = JSON.parse(result)
-    if (isNotList) {
-        topics = [topics]
-    }
-    if (hasNoObjects) {
-        topics = topics.map(
-            (s: string) => {
-                return {
-                    topic: s,
-                    summary: "",
+    try {
+        let topics = JSON.parse(result)
+        if (isNotList) {
+            topics = [topics]
+        }
+        if (hasNoObjects) {
+            topics = topics.map(
+                (s: string) => {
+                    return {
+                        topic: s,
+                        summary: "",
+                    }
                 }
-            }
-        )
+            )
+        }
+        return topics
+
+    } catch(e) {
+        const prompt = result + REFORMAT_TOPICS
+        let regenerated_result = await generateTextFromLLM(prompt);
+
+        regenerated_result = regenerated_result.substring(prompt.length + 16, regenerated_result.length - 1)
+
+        console.log("--------------------------------------------------");
+        console.log(regenerated_result);
+        console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
+        let regened_topics = JSON.parse(regenerated_result)
+        if (isNotList) {
+            regened_topics = [regened_topics]
+        }
+        if (hasNoObjects) {
+            regened_topics = regened_topics.map(
+                (s: string) => {
+                    return {
+                        topic: s,
+                        summary: "",
+                    }
+                }
+            )
+        }
+        return regened_topics
+
     }
-    return topics
+
 
 
 }
