@@ -1,4 +1,4 @@
-import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar } from "./mockData/data";
+import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar, ScriptSelections } from "./mockData/data";
 import { getProjectStore } from "./store";
 
 export function getProjectTopic(): Topic {
