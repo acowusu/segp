@@ -16,6 +16,8 @@ import {
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Topic } from "../../electron/mockData/data";
 import { quantum } from 'ldrs'
+import { toast } from "sonner";
+
 
 
 const LoadingTopics = () => {
@@ -48,8 +50,17 @@ export const SetTopic: React.FC = () => {
     }
   }, []);
   useEffect( () => {
-    window.api.getTopics().then((data) => {
+    const promise = window.api.getTopics()
+    toast.promise(promise, {
+      loading: "Loading topics...",
+      success: () => {
+        return `Topics have been loaded.`;
+      },
+      error: "Error",
+    })
+    promise.then((data:Topic[]) => {
       setItems(data);
+      console.log("Got topics", data);
     }).then(() => window.api.getProjectTopic().then((data) => {
         setTopic(data);
       }).catch((e) => {
@@ -97,7 +108,7 @@ export const SetTopic: React.FC = () => {
                 </button>
               ))}
               {items.length === 0 && Array.from({ length: 5 }).map((_, index) => (
-                        <Skeleton key={index} className="h-16 flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all" />
+                  <Skeleton key={index} className="h-16 flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all" />
                ))}
             </div>
           </ScrollArea>

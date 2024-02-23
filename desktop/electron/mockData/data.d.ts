@@ -7,7 +7,10 @@ export interface ScriptData {
   selectedScriptIndex: number; // index of the selected script
   scriptTexts: string[];  // array of script texts
   sectionName: string; // Name of section
-  sectionImageLookup?: string[]; // what to lookup for an image
+  scriptAudio?: string; // path to audio file
+  scriptDuration?: number; // duration of audio file
+  scriptMedia?: string; // path to media file
+  scriptPrompt?: string; // path to prompt file
 }
 
 export interface ScriptSelections {
