@@ -188,6 +188,10 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
     console.log("--------------------------------------------------");
     console.log(result);
     console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
+    const openBracketIndex = result.indexOf('[') - 1;
+    const closeBracketIndex = result.indexOf(']') + 1;
+    
+    result = result.substring(openBracketIndex + 1, closeBracketIndex);
     try {
         let topics = JSON.parse(result)
         if (isNotList) {
@@ -210,7 +214,11 @@ const generateTopicsInternal =async (report:string):Promise<Topic[]> => {
         let regenerated_result = await generateTextFromLLM(prompt);
 
         regenerated_result = regenerated_result.substring(prompt.length + 16, regenerated_result.length - 1)
-
+        const openBracketIndex = result.indexOf('[') - 1;
+        const closeBracketIndex = result.indexOf(']') + 1;
+        
+        result = result.substring(openBracketIndex + 1, closeBracketIndex);
+        
         console.log("--------------------------------------------------");
         console.log(regenerated_result);
         console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -256,7 +264,7 @@ const generateScriptInternal = async (topic: string, report: string): Promise<Sc
 
     const projectLength = getProjectLength()
     const projectAudience = getProjectAudience()
-
+    
     console.log("generating scripts")
     // TODO set settings here 
     
@@ -265,11 +273,11 @@ const generateScriptInternal = async (topic: string, report: string): Promise<Sc
     Create a ${projectLength} minute script about ${topic} for an audience of ${projectAudience} only using the information below. The script should be split up into as many sections as you deem necessary, where each section is a different part of the video and they should seamlessly connect together. for each section, create me 3 or more completely different scripts for that section, so that i can choose my favorite.
     `
 
-    const prompt = SCRIPT_SYS + report + SCRIPTS_FORMAT;
-    console.log(prompt)
-    let result = await generateTextFromLLM(prompt);
-
-    result = result.substring(prompt.length + 16, result.length - 1)
+    const prompt = "[INST] " + SCRIPT_SYS + report + SCRIPTS_FORMAT + " [/INST] \`\`\`json\n[";
+    
+    let result = await generateTextFromLLM(prompt, true);
+ 
+    result = result.substring(prompt.length - 1, result.length - 3)
 
     console.log("--------------------------------------------------");
     console.log(result);
@@ -277,11 +285,7 @@ const generateScriptInternal = async (topic: string, report: string): Promise<Sc
 
     try {
 
-        const doesNotFinish = !result.includes("]", result.lastIndexOf('}',))
-        // Find last occurence of } and delete everything after it. Finally add a ] to the end
-        if (doesNotFinish) {
-            result = result.substring(0, result.lastIndexOf("}") + 1) + "]"
-        }
+        
         const scripts = JSON.parse(result) as ScriptData[]
         const addedInfoScripts = scripts.map((script: { sectionName: string; scriptTexts: string[] }, i: number) => {
             return { ...script, id: `${i}-${performance.now().toString(16)}`, selectedScriptIndex: 1 } as ScriptData
@@ -289,10 +293,14 @@ const generateScriptInternal = async (topic: string, report: string): Promise<Sc
         return generateImageLookup(addedInfoScripts);
         // let scripts = mock
     } catch (e) {
-        const prompt = result + REFORMAT
-        let regenerated_result = await generateTextFromLLM(prompt);
+        const prompt = "[INST] " + result + REFORMAT + " [/INST] \`\`\`json\n[";
+    
+        let regenerated_result = await generateTextFromLLM(prompt, true);
+ 
+        regenerated_result = regenerated_result.substring(prompt.length - 1, regenerated_result.lastIndexOf(']' + 1))
+        console.log(prompt)
 
-        regenerated_result = regenerated_result.substring(prompt.length + 16, regenerated_result.length - 1)
+        
 
         console.log("--------------------------------------------------");
         console.log(regenerated_result);
