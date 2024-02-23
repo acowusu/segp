@@ -70,6 +70,37 @@ export async function downloadFile(url: URL | RequestInfo, fileDirectory: string
 }
 
 
+// Takes in an array of prompts for images and returns an array of array of filepaths to the images
+export async function fetchImages(prompts: Array<string>): Promise<Array<Array<string>>> {
+
+  const imageFilePaths: Array<Array<string>> = [];
+  const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI'];
+  
+  for (const prompt of prompts) {
+    const unsplashAccessKey = unsplashAccessKeys.shift()
+    const unsplashEndpoint = `https://api.unsplash.com/search/photos?per_page=5&query=${prompt}&client_id=${unsplashAccessKey}`;
+    const unsplashResponse = await fetch(unsplashEndpoint);
+    const unsplashData = await unsplashResponse.json();
+
+    const unsplashPhotos = unsplashData.results.map((photo: { urls: { regular: string } }) => photo.urls.regular);
+    const promptFilePaths: Array<string> = [];
+
+    for (let i = 0; i < unsplashPhotos.length; i++) {
+      const imageUrl = unsplashPhotos[i];
+      const filename = `${prompt}${i}.jpg`;
+      const response = await downloadFile(imageUrl, getProjectPath(), { method: 'GET' }, filename);
+      promptFilePaths.push(response.destination);
+    }
+    imageFilePaths.push(promptFilePaths);
+    if (unsplashAccessKey !== undefined) {
+      unsplashAccessKeys.push(unsplashAccessKey);
+    }
+  }
+  console.log(imageFilePaths);
+  return imageFilePaths;
+}
+
+
 // Takes in an array of strings and returns an array of AudioInfo
 export async function textToAudio(script: ScriptData): Promise<ScriptData> {
   console.log("textToAudio", script.scriptTexts);

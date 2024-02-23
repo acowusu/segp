@@ -41,3 +41,10 @@ export interface AudioInfo {
   subtitlePath: string;
 }
 declare module 'dataurl'
+
+export interface Avatar {
+  id: string;
+  name: string;
+  imagePath: string;
+  sadtalkerPath: string;
+}

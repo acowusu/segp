@@ -12,7 +12,13 @@ import {
   getVoiceovers,
   textToAudio,
   toDataURL,
+  fetchImages,
 } from "./reportProcessing";
+import {
+  generateAvatar,
+  getAvatars,
+  setAvatar,
+} from "./avatarGeneration";
 import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
 import {
@@ -45,6 +51,7 @@ const api = {
   getProjectPath,
   textToAudio,
   getIsDev,
+  generateAvatar,
   getLastProject,
   ...projectData,
   toDataURL,
@@ -57,6 +64,9 @@ const api = {
   writeBlob,
   webmBLobToMp4,
   prepareMp4Blob,
+  getAvatars,
+  setAvatar,
+  fetchImages,
 };
 export default api;
 
