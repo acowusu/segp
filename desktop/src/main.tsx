@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { MemoryRouter } from "react-router-dom";
 import { Promisified } from './promisify.ts'
@@ -11,11 +11,11 @@ window.api =  new Proxy<Promisified<IAPI>>({} as Promisified<IAPI>, {
   get: (_, property) => (...args: any[]) => window.ipcRenderer.invoke("api:generic", { property, args }) as Promisified<any>
 })
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  </React.StrictMode>,
+  // </React.StrictMode>,
 )
 
 // Remove Preload scripts loading

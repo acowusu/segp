@@ -29,7 +29,7 @@ import {
 } from "./setup";
 import { getProjectName, getProjectPath, getIsDev, getLastProject} from "./metadata";
 import * as projectData from "./projectData"
-import {generateTextFromLLM, generateTopics} from "./server"
+import {generateTextFromLLM, generateTopics, generateOpenJourneyPrompt, generateOpenJourneyImage} from "./server"
 const api = {
   loadReport,
   getScript,
@@ -54,6 +54,8 @@ const api = {
   getLastProject,
   ...projectData,
   generateTextFromLLM,
+  generateOpenJourneyImage,
+  generateOpenJourneyPrompt,
   generateTopics,
   // Add your API methods here
   convertWebmToMp4,
