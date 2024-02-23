@@ -64,7 +64,6 @@ export function SetVisuals() {
   const [selectedVoiceover, setSelectedVoiceover] = useState<Voiceover>(
     {} as Voiceover
   );
-  const [selectedLength, setSelectedLength] = useState<number>(1);
 
   const setAudience = useCallback(async (audience: Audience) => {
     if (audience !== undefined) {
@@ -78,12 +77,7 @@ export function SetVisuals() {
       window.api.setVoiceover(voiceover);
     }
   }, []);
-  const setLength = useCallback(async (length: number) => {
-    if (length !== undefined) {
-      setSelectedLength(length);
-      window.api.setLength(length);
-    }
-  }, []);
+
   useEffect(() => {
     window.api
       .getVoiceovers()

@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import type { ScriptData, Topic } from "./mockData/data";
-import { getProjectAudience, getProjectLength, getProjectTopic } from "./projectData";
+import { getProjectAudience, getProjectLength } from "./projectData";
 
 
 
