@@ -57,7 +57,7 @@ export async function downloadFile(url: URL | RequestInfo, fileDirectory: string
   if (res === null || res.body === null) {
     throw new Error(`Failed to download file: Response is null`);
   }
-  if (!fs.existsSync(fileDirectory)) await mkdir(fileDirectory); //Optional if you already have downloads directory
+  if (!fs.existsSync(fileDirectory)) await mkdir(fileDirectory);
 
   if (fileName == undefined) {
     // Guess the file extension from the content type
@@ -117,11 +117,14 @@ export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
     })
 
     const duration = parseFloat(headers.get("audio-duration")!);
-    audioInfoArray.push({ audioPath: destination, duration, subtitlePath: text });
+    const location = parseFloat(headers.get("media-location")!);
+    audioInfoArray.push({ audioPath: destination, duration, subtitlePath: text, location });
 
   }
   return audioInfoArray;
 }
+
+
 
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {
@@ -154,9 +157,11 @@ export async function getTopics(): Promise<Topic[]> {
   if (proj_data.length !== 0) {
     return proj_data
   }
-
+  console.log("Getting topics ")
   const report = await getReportText();
+  console.log("Got report")
   const topics = await generateTopics(report);
+  console.log("Got topics")
   projectData.setProjectTopics(topics);
   return topics
 

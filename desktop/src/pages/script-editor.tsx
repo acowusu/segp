@@ -15,7 +15,12 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { ScriptData } from "../../electron/mockData/data";
-import { PlusIcon} from '@radix-ui/react-icons'
+import { UpdateIcon} from '@radix-ui/react-icons'
+import { Skeleton } from "../components/ui/skeleton";
+import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
 
 
 const LoadingScripts = () => {
@@ -53,6 +58,38 @@ export const ScriptEditor: React.FC = () => {
     console.log
     setShowOtherDrafts(!showOtherDrafts);
   };
+
+  const genAiImage = async (script: ScriptData, userInitiated?:boolean) => {
+    if( script.scriptMedia === undefined || userInitiated) {
+      const imgPrompt = window.api.generateOpenJourneyPrompt(script);
+      
+      toast.promise(imgPrompt, {
+        loading: `Generating Image Prompt for ${script.sectionName}`,
+        success: (imgPrompt)=>`Image Prompt Generated: ${( imgPrompt)}`,
+        error: "Error"
+      })
+      console.log(await imgPrompt);
+      const img =  window.api.generateOpenJourneyImage(await imgPrompt);
+      toast.promise(img, {
+        loading: `Generating Image for ${script.sectionName}`,
+        success:(img)=> `Image Generated: ${ img}`,
+        error: "Error"
+      })
+      const resolvedPrompt = await imgPrompt;
+      const imgPath = await img;
+      console.log(imgPath);
+      setItems(items.map( (item) => {
+        if(item.id === script.id){
+          item.scriptMedia = imgPath;
+          item.scriptPrompt= resolvedPrompt;
+        }
+        return item;
+      }))
+      await window.api.setScript(items);
+    }else{
+      console.log("Media already exists");
+    }
+  }
   const updateScriptSelection = (e: React.MouseEvent, item: ScriptData, index: number) => {
 
     e.stopPropagation();
@@ -77,7 +114,7 @@ export const ScriptEditor: React.FC = () => {
     navigate("/welcome/set-audience");
     await window.api.setScript(items);
   };
-  const updateScriptText = (e: React.FormEvent, index: number, id: string) => {
+  const updateScriptText = async (e: React.FormEvent, index: number, id: string) => {
     const target = e.target as HTMLInputElement;
     setItems(items.map((script) => {
       if(script.id === id){
@@ -85,6 +122,17 @@ export const ScriptEditor: React.FC = () => {
       }
       return script;
     }))
+    await window.api.setScript(items);
+  }
+  const updatePromptText = async (e: React.FormEvent, id: string) => {
+    const target = e.target as HTMLInputElement;
+    setItems(items.map((script) => {
+      if(script.id === id){
+        script.scriptPrompt = target.value;
+      }
+      return script;
+    }))
+    await window.api.setScript(items);
   }
   return (
     <div className="flex items-center justify-center mt-4">
@@ -98,10 +146,13 @@ export const ScriptEditor: React.FC = () => {
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
                   <Reorder.Item key={item.id} value={item} className="mb-4">
+                    <div className="flex flex-row gap-2  ">
+
+                    
                     <div
                       key={item.id}
                       className={cn(
-                        "flex flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
+                        "flex grow flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
                         selectedScript.id === item.id &&
                           " border-2 border-sky-500",
                         selectedScript.id !== item.id &&
@@ -133,10 +184,10 @@ export const ScriptEditor: React.FC = () => {
                             </div>
                           ))}
                           
-                          <div className="p-2 overflow-hidden border h-20 rounded-lg  hover:border-dashed hover:border-sky-500">
+                          {/* <div className="p-2 overflow-hidden border h-20 rounded-lg  hover:border-dashed hover:border-sky-500">
                             <PlusIcon className="w-8 h-8 text-secondary hover:text-sky-500 m-auto" />
                            <p className="text-center">Add new draft</p>
-                          </div>
+                          </div> */}
                         </div>
                       )}
                       <div className="flex w-full flex-col gap-1">
@@ -159,6 +210,48 @@ export const ScriptEditor: React.FC = () => {
                               }
                         {}
                       </div>
+                      
+                    </div>
+                    <div>
+                  
+                    </div>
+                    <div className="flex-col grow-0 max-w-48  min-w-48  w-48 ">
+                    {
+                       (
+                        <>
+                      {item.scriptMedia !== undefined ? (
+                        <Popover>
+                        <PopoverTrigger asChild>
+                        <img src={`local:///${item.scriptMedia}`} alt="script media" className="w-48 aspect-video object-cover rounded-lg" />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="grid gap-4">
+                            <div className="space-y-2">
+                              <h4 className="font-medium leading-none">Modify Image</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Customize the prompt for this image
+                              </p>
+                            </div>
+                            { item.scriptPrompt && (<ContentEditable
+                                    html={item.scriptPrompt}
+                                    disabled={false}
+                                    onChange={(e)=>{updatePromptText(e, item.id)}}
+                                    className="w-full min-h-20 border rounded-lg p-2 overflow-y-auto	 focus:outline-none"
+                                  />)}
+                            <Button onClick={()=>genAiImage(item, true)}><UpdateIcon/></Button>
+
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                        ) : (
+                        <Skeleton className="aspect-video	   flex align-center items-center	justify-center flex-col relative inset-y-0 right-0 w-48	">
+                      <Button onClick={()=>genAiImage(item, true)}><UpdateIcon/></Button>
+                      </Skeleton>
+                      )}
+                      </>
+                    )
+                    }
+                    </div>
                     </div>
                   </Reorder.Item>
                 ))}
