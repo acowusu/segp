@@ -279,7 +279,7 @@ export function SetVisuals() {
             showSubtitle={subtitles}
           />
 
-          <Button onClick={() => navigate("/welcome/set-topic")}>Generate Topics</Button>
+          <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
         </form>
       </Form>
     </>

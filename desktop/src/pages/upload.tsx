@@ -61,7 +61,7 @@ export const Upload: React.FC = () => {
     }
 
 
-    navigate("/welcome/set-visuals");
+    navigate("/set-visuals");
     
     setDisabledNext(true);
   };

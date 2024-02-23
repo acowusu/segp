@@ -24,7 +24,9 @@ export function Layout() {
       )}
       <ThemeToggle className="z-10  fixed bottom-5 right-5 " />
       <Toaster />
-      <Outlet />
+      <div className="p-16">
+        <Outlet />
+      </div>
     </ScrollArea>
   );
 }

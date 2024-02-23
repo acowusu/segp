@@ -55,7 +55,7 @@ export const SetTopic: React.FC = () => {
       })).finally(() => setLoadingTopics(false))
   }, [setTopic]);
   const setScript = async () => {
-    navigate("/welcome/script-editor");
+    navigate("/script-editor");
   };
   return (
     <div className="flex items-center justify-center mt-4">

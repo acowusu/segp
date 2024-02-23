@@ -9,7 +9,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setTopic: (topic: Topic) => ipcRenderer.invoke('dialog:setTopic', topic),
   setAudiences: (audience: Audience) => ipcRenderer.invoke('dialog:setAudience', audience),
   setVoiceovers: (voiceover: Voiceover) => ipcRenderer.invoke('dialog:setVoiceover', voiceover),
-  setLength: (length: number) => ipcRenderer.invoke('dialog:setLength', length),
   setVisuals: (visuals: Visual) => ipcRenderer.invoke('dialog:setVisuals', visuals),
   getScript: () => ipcRenderer.invoke('dialog:getScript')
 

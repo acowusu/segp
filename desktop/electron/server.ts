@@ -236,10 +236,7 @@ const generateScriptInternal =async (topic:string, report: string):Promise<Scrip
         })
         return generateImageLookup(addedInfoScripts);
     }
-    
         
-    
-    
 }
 
 const generateImageLookup =async (data: ScriptData[]):Promise<ScriptData[]> => {

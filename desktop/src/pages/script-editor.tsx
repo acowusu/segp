@@ -74,13 +74,14 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    // navigate("/welcome/set-audience");
+    // navigate("/set-audience");
     await window.api.setScript(items);
     // START PIPELINE
 
+    // put ur stuff here 
   };
   const selectTopic = async () => {
-    navigate("/welcome/set-topic");
+    navigate("/set-topic");
   };
   const updateScriptText = (e: React.FormEvent, index: number, id: string) => {
     const target = e.target as HTMLInputElement;
