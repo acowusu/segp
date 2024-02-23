@@ -40,6 +40,7 @@ export interface AudioInfo {
   duration: number;
   subtitlePath: string;
 }
+declare module 'dataurl'
 
 export interface Avatar {
   id: string;

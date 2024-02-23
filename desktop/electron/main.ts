@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog , screen, protocol, net } from 'ele
 import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
+
 import { generateAvatar } from './avatarGeneration'
 import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio, fetchImages} from './reportProcessing'
 // The built directory structure
