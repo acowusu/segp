@@ -67,7 +67,7 @@ export const Upload: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <Tabs defaultValue="open" className="w-[400px] ">
+      <Tabs defaultValue="open" className="min-w-[400px] ">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger onClick={() => setIsExistingProject(true)} value="open">
             Open Project

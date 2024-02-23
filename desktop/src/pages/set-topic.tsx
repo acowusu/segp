@@ -3,6 +3,8 @@ import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { Skeleton } from "../components/ui/skeleton"
+
 import {
   FramelessCard,
   CardContent,
@@ -94,6 +96,9 @@ export const SetTopic: React.FC = () => {
                   </div>
                 </button>
               ))}
+              {items.length === 0 && Array.from({ length: 5 }).map((_, index) => (
+                        <Skeleton key={index} className="h-16 flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all" />
+               ))}
             </div>
           </ScrollArea>
         </CardContent>

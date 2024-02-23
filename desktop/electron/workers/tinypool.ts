@@ -2,9 +2,9 @@ import fs from "fs";
 import { mkdir, readFile } from "node:fs/promises";
 import { sep } from "path";
 import { PNG } from "pngjs";
-import { extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
-
-
+import {extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
+import { ffmpegPath } from "../binUtils";
+import promiseSpawn from '@npmcli/promise-spawn'
 export const add =  ({ a, b }: { a: number, b: number }) => {
     return a + b
 }
@@ -12,7 +12,7 @@ export const multiply =  ({ a, b }: { a: number, b: number }) => {
     return a * b
 }
 
-
+// import { worker_convertWebmToMp4 } from "./worker";
 
 export interface ImageData {
   data: Uint8ClampedArray;
@@ -20,6 +20,24 @@ export interface ImageData {
   height: number;
 }
 
+export const convertWebmToMp4 = async ({
+  webm,
+  mp4,
+}: {
+  webm: string;
+  mp4: string;
+}): Promise<void> => {
+  let result;
+  try {
+    result = await promiseSpawn(ffmpegPath, ["-i", `${webm}`, "-y", `${mp4}`], {
+      stdio: ["pipe", 1, 2],
+    });
+  } catch (error) {
+    console.error('failed!', error)
+
+  }
+  console.log('ok!', result)
+};
 
 export const extractTextFromPDF = async ({
   filePath,projectPath

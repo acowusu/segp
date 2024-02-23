@@ -1,4 +1,4 @@
-import { Audience, ScriptData, ScriptSelections, Topic, Visual, Voiceover } from "./mockData/data";
+import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar } from "./mockData/data";
 import { getProjectStore } from "./store";
 
 export function getProjectTopic(): Topic {
@@ -58,6 +58,18 @@ export function getProjectScript(): ScriptData[] {
 export function getProjectTopics(): Topic[] {
   return getProjectStore().get("topics", []) as Topic[];
 }
+
+export function getProjectAvatar(): Avatar {
+  if (!getProjectStore().has("avatars")) {
+    throw new Error("Selected avatar not set");
+  }
+  return getProjectStore().get("avatars") as Avatar;
+}
+
+export function setProjectAvatar(avatar: Avatar): void {
+  getProjectStore().set("avatars", avatar);
+}
+
 export function setProjectTopics(topics: Topic[]): void {
   getProjectStore().set("topics", topics);
 }

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { OverlayPreview } from "../components/custom/overlay-preview";
 import { Button } from "../components/ui/button";
+import { AvatarFrame } from "../components/custom/avatarFrame";
 import {
   Form,
   FormControl,
@@ -22,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Audience, Voiceover } from "../../electron/mockData/data";
+import { Audience, Voiceover, Avatar } from "../../electron/mockData/data";
 import { useCallback, useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +40,7 @@ const formSchema = z.object({
   videoLength: z.coerce
   .number({ required_error: "Please Select a video length" })
   .default(1).optional(),
+  avatarSelection: z.string().default("").optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -50,6 +52,7 @@ const defaultValues: () => Promise<Partial<FormValues>> = async () => {
     audience: ( await window.api.getProjectAudience().catch(()=>({name:""}))).name!,
     voiceover: (await window.api.getProjectVoiceover().catch(()=>({id:""}))).id!,
     videoLength: await window.api.getProjectLength(),
+    avatarSelection: (await window.api.getProjectAvatar().catch(()=>({id:""}))).id!,
   }
 };
 
@@ -64,6 +67,10 @@ export function SetVisuals() {
   const [selectedVoiceover, setSelectedVoiceover] = useState<Voiceover>(
     {} as Voiceover
   );
+  const [avatarItems, setAvatarItems] = useState<Avatar[]>([]);
+  const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(
+    {} as Avatar
+  );
 
   const setAudience = useCallback(async (audience: Audience) => {
     if (audience !== undefined) {
@@ -75,6 +82,12 @@ export function SetVisuals() {
     if (voiceover !== undefined) {
       setSelectedVoiceover(voiceover);
       window.api.setVoiceover(voiceover);
+    }
+  }, []);
+  const setAvatar = useCallback(async (avatar: Avatar) => {
+    if (avatar !== undefined) {
+      setSelectedAvatar(avatar);
+      window.api.setAvatar(avatar);
     }
   }, []);
 
@@ -114,19 +127,38 @@ export function SetVisuals() {
       );
   }, [setAudience]);
 
+  useEffect(() => {
+    window.api
+      .getAvatars()
+      .then((data) => {
+        setAvatarItems(data);
+      })
+      .then(() =>
+        window.api
+          .getProjectAvatar()
+          .then((data) => {
+            setAvatar(data);
+          })
+          .catch((e) => {
+            console.log(e);
+          })
+      );
+  }, [setAvatar]);
   // const navigate = useNavigate();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
 
-  const  onSubmit = useCallback((data: FormValues) =>  {
+  const onSubmit = useCallback((data: FormValues) =>  {
     console.log(data);
     window.api.setProjectHasAvatar(data.avatar || false);
     window.api.setProjectHasSubtitles(data.subtitles || false);
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
-  }, [audienceItems, setAudience, setVoiceover, voiceoverItems])
+    setAvatar(avatarItems.find(item => item.id === data.avatarSelection)!)
+
+  }, [audienceItems, setAudience, setVoiceover, voiceoverItems, avatarItems, setAvatar])
 
   const {watch,handleSubmit }  = form
   useEffect(() => {
@@ -134,7 +166,7 @@ export function SetVisuals() {
     const subscription = watch(() => handleSubmit(onSubmit)())
     return () => subscription.unsubscribe();
 }, [watch, handleSubmit,  onSubmit]);
-  const { avatar, subtitles } = form.watch();
+  const { avatar, subtitles, avatarSelection } = form.watch();
   return (
     <>
       <h1 className="text-4xl font-bold pb-8">
@@ -190,6 +222,28 @@ export function SetVisuals() {
                 </FormItem>
               )}
             />
+            {avatar && (
+              <div className="grid grid-cols-3 gap-4 overflow-auto no-scrollbar p-2 border-t-2 border-black">
+              {avatarItems.map((avatar, index) => (
+                <FormField
+                  key={index}
+                  control={form.control}
+                  name="avatarSelection"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl> 
+                          <AvatarFrame 
+                            isSelected={avatarSelection===avatar.id} 
+                            label={avatar.name} 
+                            imagePath={avatar.imagePath} 
+                            onClick={() => field.onChange(avatar.id)}/>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              ))}
+              </div>
+            )}
             <FormField
               control={form.control}
               name="voiceover"
@@ -266,12 +320,12 @@ export function SetVisuals() {
           </div>
           <h3 className="text-lg font-medium">Preview</h3>
 
-          <OverlayPreview
-            backgroundUrl={"example2-min.jpg"}
-            avatarUrl={"big-person.png"}
-            showAvatar={avatar}
-            showSubtitle={subtitles}
-          />
+        <OverlayPreview
+          backgroundUrl={"example2-min.jpg"}
+          avatarUrl={selectedAvatar.imagePath ?? "big-person.png"}
+          showAvatar={avatar}
+          showSubtitle={subtitles}
+        />
 
           <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
         </form>

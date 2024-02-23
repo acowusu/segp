@@ -10,7 +10,6 @@ import { SetTopic } from "./pages/set-topic";
 import { ScriptEditor } from "./pages/script-editor";
 import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
-
 function App() {
   // const [count, setCount] = useState(0);
 
