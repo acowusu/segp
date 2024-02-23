@@ -33,7 +33,7 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
       }, // default: null (full width)
       destHeight: (_element: etro.EtroObject, time: number) => {
         return lerp(HEIGHT, HEIGHT*1.2, time, section.scriptDuration!)
-      }, 
+      },
       x: 0, // default: 0
       y: 0, // default: 0
       sourceWidth:WIDTH,
