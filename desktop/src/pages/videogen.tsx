@@ -88,7 +88,7 @@ export const VideoGeneratorBridge: React.FC = () => {
       }
       setChosenImages(imgs);
       setChosenAudio(auds);
-      setChosenAudio(subs);
+      setChosenSubs(subs);
     });
   }, []);
 
