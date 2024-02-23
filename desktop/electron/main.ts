@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog , screen, protocol, net } from 'ele
 import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
-import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio} from './reportProcessing'
+import { extractTextFromPDF, getScript, getTopics, setTopic} from './reportProcessing'
 // The built directory structure
 //
 // ├─┬─┬ dist

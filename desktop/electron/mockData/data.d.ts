@@ -40,3 +40,4 @@ export interface AudioInfo {
   duration: number;
   subtitlePath: string;
 }
+declare module 'dataurl'

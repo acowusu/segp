@@ -11,6 +11,7 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+  toDataURL,
 } from "./reportProcessing";
 import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
@@ -46,6 +47,7 @@ const api = {
   getIsDev,
   getLastProject,
   ...projectData,
+  toDataURL,
   generateTextFromLLM,
   generateOpenJourneyImage,
   generateOpenJourneyPrompt,

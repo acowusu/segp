@@ -9,7 +9,6 @@ import type {
   Topic,
   Visual,
   Voiceover,
-  AudioInfo,
 } from "./mockData/data";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
@@ -19,7 +18,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import watch from "node-watch"
 import fs from "fs";
 import path from "path";
-
+import dataurl from "dataurl";
 /**
  * Retrieves the text content of a report. 
  * If the report file does not exist, 
@@ -72,29 +71,38 @@ export async function downloadFile(url: URL | RequestInfo, fileDirectory: string
 
 
 // Takes in an array of strings and returns an array of AudioInfo
-export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
+export async function textToAudio(script: ScriptData): Promise<ScriptData> {
+  console.log("textToAudio", script.scriptTexts);
+  console.log("textToAudio", script.selectedScriptIndex);
 
-  const audioInfoArray: AudioInfo[] = [];
+  const { destination, headers } = await downloadFile('https://iguana.alexo.uk/v0/generate_audio', getProjectPath(), {
+    method: 'POST',
+    body: JSON.stringify({ script: script.scriptTexts[script.selectedScriptIndex] }),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
 
-  for (const text of textArray) {
-    const postData = new FormData();
-    postData.append('script', text);
+  const duration = parseFloat(headers.get("audio-duration")!);
+  // Used with sadtalker
+  // const location = parseFloat(headers.get("media-location")!); 
+  script.scriptAudio = destination;
+  script.scriptDuration = duration;
 
-    const { destination, headers } = await downloadFile('https://iguana.alexo.uk/v0/generate_audio', getProjectPath(), {
-      method: 'POST',
-      body: postData,
-    })
+  return script
 
-    const duration = parseFloat(headers.get("audio-duration")!);
-    const location = parseFloat(headers.get("media-location")!);
-    audioInfoArray.push({ audioPath: destination, duration, subtitlePath: text, location });
-
-  }
-  return audioInfoArray;
 }
 
 
-
+export const toDataURL = (filePath:string):Promise<string> => {
+  const songPromise = new Promise((resolve, reject) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) { reject(err); }
+      resolve(dataurl.convert({ data, mimetype: 'audio/wav' }));
+    });
+  });
+  return songPromise as Promise<string>;
+};
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {
   const { text } = await (pool!.run({ filePath, projectPath: getProjectPath() }, { name: 'extractTextFromPDF' }) as Promise<{ text: string; images: ImageData[]; }>)
