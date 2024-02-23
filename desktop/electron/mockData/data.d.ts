@@ -7,8 +7,6 @@ export interface ScriptData {
   selectedScriptIndex: number; // index of the selected script
   scriptTexts: string[];  // array of script texts
   sectionName: string; // Name of section
-  // sectionImageLookup?: string[];
-
   scriptAudio?: string; // path to audio file
   scriptDuration?: number; // duration of audio file
   scriptMedia?: string; // path to media file
@@ -16,10 +14,6 @@ export interface ScriptData {
 
 }
 
-// export interface ScriptSelection {
-//   topic: string,
-//   script: ScriptData[],
-// }
 
 export interface Audience {
   name: string;

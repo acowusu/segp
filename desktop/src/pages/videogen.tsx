@@ -53,6 +53,10 @@ export const VideoGeneratorDummy: React.FC = () => {
   );
 };
 
+/**
+ * TODO:
+ *  -> Handle errors bettter insteda of dummy strings
+ */
 export const VideoGeneratorBridge: React.FC = () => {
   const [chosenImages, setChosenImages] = useState<ChosenAsset[]>([]);
   const [chosenAudio, setChosenAudio] = useState<ChosenAsset[]>([]);
@@ -60,44 +64,75 @@ export const VideoGeneratorBridge: React.FC = () => {
 
   useEffect(() => {
     window.api.getScript().then((scriptData: ScriptData[]) => {
-      const imgTopics: string[] = scriptData.map((data: ScriptData) => {
-        return data.sectionImageLookup?.[0] || "Topic not found";
-      }); // if it exists get the first
+      const imgs: ChosenAsset[] = [];
+      const auds: ChosenAsset[] = [];
+      const subs: ChosenAsset[] = [];
+      for (const data of scriptData) {
+        const dur = data.scriptDuration ?? 5;
 
-      // Set Chosen Images
-      console.log(`topics: ${imgTopics}`);
-      window.api.fetchImages(imgTopics).then((topicImages: string[][]) => {
-        const imgAssets: ChosenAsset[] = topicImages.map(
-          (imgSrcs: string[]) => {
-            // console.log(`images: ${imgSrcs[0]}`);
-            return { src: imgSrcs[0], duration: 5 };
-          }
-        );
-        for (const asset of imgAssets) {
-          console.log(`imgASsets: ${asset.src}, ${asset.duration}`);
-        }
-        setChosenImages(imgAssets);
-      });
-
-      // subtitles are extracted per section and put in a list
-      const subTexts: string[] = scriptData.map((data) => {
-        return data.scriptTexts[data.selectedScriptIndex];
-      });
-
-      // Set Chosen Audio and Subs
-      window.api.textToAudio(subTexts).then((infos: AudioInfo[]) => {
-        const auds: ChosenAsset[] = [];
-        const subs: ChosenAsset[] = [];
-        for (const info of infos) {
-          auds.push({ src: info.audioPath, duration: info.duration });
-          subs.push({ src: info.subtitlePath, duration: info.duration });
-        }
-        setChosenAudio(auds);
-        setChosenSubs(subs);
-      });
-      // });
+        // Add To Images
+        imgs.push({
+          src: data.scriptMedia ?? "Script Media Not Available",
+          duration: dur,
+        });
+        // Add To Audio
+        auds.push({
+          src: data.scriptAudio ?? "Script Audio Not Available",
+          duration: dur,
+        });
+        // Add To Subtitles
+        subs.push({
+          src: data.scriptTexts[data.selectedScriptIndex],
+          duration: dur,
+        });
+      }
+      setChosenImages(imgs);
+      setChosenAudio(auds);
+      setChosenAudio(subs);
     });
   }, []);
+
+  // Keep for ref for now old version without he script interface
+  // useEffect(() => {
+  //   window.api.getScript().then((scriptData: ScriptData[]) => {
+  //     const imgTopics: string[] = scriptData.map((data: ScriptData) => {
+  //       return data.sectionImageLookup?.[0] || "Topic not found";
+  //     }); // if it exists get the first
+
+  //     // Set Chosen Images
+  //     console.log(`topics: ${imgTopics}`);
+  //     window.api.fetchImages(imgTopics).then((topicImages: string[][]) => {
+  //       const imgAssets: ChosenAsset[] = topicImages.map(
+  //         (imgSrcs: string[]) => {
+  //           // console.log(`images: ${imgSrcs[0]}`);
+  //           return { src: imgSrcs[0], duration: 5 };
+  //         }
+  //       );
+  //       for (const asset of imgAssets) {
+  //         console.log(`imgASsets: ${asset.src}, ${asset.duration}`);
+  //       }
+  //       setChosenImages(imgAssets);
+  //     });
+
+  //     // subtitles are extracted per section and put in a list
+  //     const subTexts: string[] = scriptData.map((data) => {
+  //       return data.scriptTexts[data.selectedScriptIndex];
+  //     });
+
+  //     // Set Chosen Audio and Subs
+  //     window.api.textToAudio(subTexts).then((infos: AudioInfo[]) => {
+  //       const auds: ChosenAsset[] = [];
+  //       const subs: ChosenAsset[] = [];
+  //       for (const info of infos) {
+  //         auds.push({ src: info.audioPath, duration: info.duration });
+  //         subs.push({ src: info.subtitlePath, duration: info.duration });
+  //       }
+  //       setChosenAudio(auds);
+  //       setChosenSubs(subs);
+  //     });
+  //     // });
+  //   });
+  // }, []);
 
   return (
     <VideoGenerator
