@@ -59,9 +59,9 @@ export const ScriptEditor: React.FC = () => {
     setShowOtherDrafts(!showOtherDrafts);
   };
 
-  const genAiImage = async (script: ScriptData, userInitiated?:boolean) => {
+  const genAiImage = async (script: ScriptData, userInitiated?:boolean, force?:boolean) => {
     if( script.scriptMedia === undefined || userInitiated) {
-      const imgPrompt = window.api.generateOpenJourneyPrompt(script);
+      const imgPrompt = (force || !script.scriptPrompt )?  window.api.generateOpenJourneyPrompt(script): Promise.resolve(script.scriptPrompt);
       
       toast.promise(imgPrompt, {
         loading: `Generating Image Prompt for ${script.sectionName}`,

@@ -7,151 +7,126 @@ import etro from "etro";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { SubtitleText } from "../lib/subtitle-layer";
-import {
-  CardContent,
-  CardHeader,
-  CardTitle,
-  FramelessCard,
-} from "../components/ui/card";
-import { AudioInfo, ScriptData } from "../../electron/mockData/data";
+import { ScriptData } from "../../electron/mockData/data";
+import { MagicWandIcon, PlayIcon } from "@radix-ui/react-icons";
+import { toast } from "sonner";
 const WIDTH = 1920;
 const HEIGHT = 1080;
-
-type ChosenAsset = {
-  src: string;
-  duration: number;
-  text?: string;
-};
-
-const dummyImages: ChosenAsset[] = [
-  { src: "./example-min.jpg", duration: 2 },
-  { src: "./example2-min.jpg", duration: 2 },
-  { src: "./example3-min.jpg", duration: 2 },
-];
-
-const dummyImages2 = [
-  { src: "/home/kup/code/segp/project/Gas Fees0.jpg", duration: 2 },
-  { src: "/home/kup/code/segp/project/Ethereum0.jpg", duration: 2 },
-  { src: "/home/kup/code/segp/project/protocol0.jpg", duration: 2 },
-];
-
-const dummySubs: ChosenAsset[] = [
-  { src: "hello", duration: 2 },
-  { src: "these are ", duration: 2 },
-  { src: "dummy subtitles", duration: 2 },
-];
-const dummyAudio: ChosenAsset[] = [{ src: "./daniel1.mp3", duration: 6 }];
-
-// Dummy generator before the types are hashed out
-export const VideoGeneratorDummy: React.FC = () => {
-  return (
-    <VideoGenerator
-      chosenImages={dummyImages}
-      chosenAudio={dummyAudio}
-      chosenSubs={dummySubs}
-    />
-  );
-};
-
-/**
- * TODO:
- *  -> Handle errors bettter insteda of dummy strings
- */
-export const VideoGeneratorBridge: React.FC = () => {
-  const [chosenImages, setChosenImages] = useState<ChosenAsset[]>([]);
-  const [chosenAudio, setChosenAudio] = useState<ChosenAsset[]>([]);
-  const [chosenSubs, setChosenSubs] = useState<ChosenAsset[]>([]);
-
-  useEffect(() => {
-    window.api.getScript().then((scriptData: ScriptData[]) => {
-      const imgs: ChosenAsset[] = [];
-      const auds: ChosenAsset[] = [];
-      const subs: ChosenAsset[] = [];
-      for (const data of scriptData) {
-        const dur = data.scriptDuration ?? 5;
-
-        // Add To Images
-        imgs.push({
-          src: data.scriptMedia ?? "Script Media Not Available",
-          duration: dur,
-        });
-        // Add To Audio
-        auds.push({
-          src: data.scriptAudio ?? "Script Audio Not Available",
-          duration: dur,
-        });
-        // Add To Subtitles
-        subs.push({
-          src: data.scriptTexts[data.selectedScriptIndex],
-          duration: dur,
-        });
-      }
-      setChosenImages(imgs);
-      setChosenAudio(auds);
-      setChosenSubs(subs);
+function lerp(a: number, b: number, t: number, p: number) {
+  return a + (b - a) * (t / p);
+}
+function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
+  let start = 0;
+  sections.forEach((section: ScriptData) => {
+    if (!section.scriptMedia) throw new Error("No media found");
+    if (!section.scriptDuration) throw new Error("No duration found");
+    const layer = new etro.layer.Image({
+      startTime: start,
+      duration: section.scriptDuration,
+      source: "local:///" + section.scriptMedia,
+      destX: (_element: etro.EtroObject, time: number) => {
+        return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
+      }, // default: 0
+      destY: (_element: etro.EtroObject, time: number) => {
+        return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
+      }, // default: 0
+      destWidth: (_element: etro.EtroObject, time: number) => {
+        return lerp(WIDTH, WIDTH * 1.2, time, section.scriptDuration!);
+      }, // default: null (full width)
+      destHeight: (_element: etro.EtroObject, time: number) => {
+        return lerp(HEIGHT, HEIGHT * 1.2, time, section.scriptDuration!);
+      },
+      x: 0, // default: 0
+      y: 0, // default: 0
+      sourceWidth: WIDTH,
+      sourceHeight: HEIGHT,
+      opacity: 1, // default: 1
     });
-  }, []);
+    console.log("adding layer", layer);
+    start += section.scriptDuration;
+    movie.layers.push(layer);
+  });
+}
 
-  // Keep for ref for now old version without he script interface
-  // useEffect(() => {
-  //   window.api.getScript().then((scriptData: ScriptData[]) => {
-  //     const imgTopics: string[] = scriptData.map((data: ScriptData) => {
-  //       return data.sectionImageLookup?.[0] || "Topic not found";
-  //     }); // if it exists get the first
+function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
+  let start = 0;
+  sections.forEach((section: ScriptData) => {
+    if (!section.scriptMedia) throw new Error("No media found");
+    if (!section.scriptDuration) throw new Error("No duration found");
+    const layer = new SubtitleText({
+      startTime: start,
+      duration: section.scriptDuration,
+      text: section.scriptTexts[section.selectedScriptIndex],
+      x: 0, // default: 0
+      y: 0, // default: 0
+      opacity: 1, // default: 1
+      color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
+      font: "100px sans-serif", // default: '10px sans-serif'
+      textX: WIDTH / 2, // default: 0
+      textY: HEIGHT, // default: 0
+      textAlign: "center", // default: 'left'
+      textBaseline: "alphabetic", // default: 'alphabetic'
+      textDirection: "ltr", // default: 'ltr'
+      background: new etro.Color(0, 0, 0, 0.0), // default: null (transparent)
+    });
+    movie.layers.push(layer);
+    console.log("adding layer", layer);
 
-  //     // Set Chosen Images
-  //     console.log(`topics: ${imgTopics}`);
-  //     window.api.fetchImages(imgTopics).then((topicImages: string[][]) => {
-  //       const imgAssets: ChosenAsset[] = topicImages.map(
-  //         (imgSrcs: string[]) => {
-  //           // console.log(`images: ${imgSrcs[0]}`);
-  //           return { src: imgSrcs[0], duration: 5 };
-  //         }
-  //       );
-  //       for (const asset of imgAssets) {
-  //         console.log(`imgASsets: ${asset.src}, ${asset.duration}`);
-  //       }
-  //       setChosenImages(imgAssets);
-  //     });
+    start += section.scriptDuration;
+  });
+}
 
-  //     // subtitles are extracted per section and put in a list
-  //     const subTexts: string[] = scriptData.map((data) => {
-  //       return data.scriptTexts[data.selectedScriptIndex];
-  //     });
+async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
+  let start = 0;
+  console.log("adding audio layers", sections);
+  for (const section of sections) {
+    if (!section.scriptAudio) throw new Error("No media found");
+    if (!section.scriptDuration) throw new Error("No duration found");
+    const layer = new etro.layer.Audio({
+      startTime: start,
+      duration: section.scriptDuration,
+      source: await window.api.toDataURL(section.scriptAudio),
+      sourceStartTime: 0, // default: 0
+      muted: false, // default: false
+      volume: 1, // default: 1
+      playbackRate: 1, //default: 1
+    });
+    movie.layers.push(layer);
+    console.log("adding layer", layer);
 
-  //     // Set Chosen Audio and Subs
-  //     window.api.textToAudio(subTexts).then((infos: AudioInfo[]) => {
-  //       const auds: ChosenAsset[] = [];
-  //       const subs: ChosenAsset[] = [];
-  //       for (const info of infos) {
-  //         auds.push({ src: info.audioPath, duration: info.duration });
-  //         subs.push({ src: info.subtitlePath, duration: info.duration });
-  //       }
-  //       setChosenAudio(auds);
-  //       setChosenSubs(subs);
-  //     });
-  //     // });
-  //   });
-  // }, []);
-
-  return (
-    <VideoGenerator
-      chosenImages={chosenImages}
-      chosenAudio={chosenAudio}
-      chosenSubs={chosenSubs}
-    />
-  );
+    start += section.scriptDuration;
+  }
+}
+const generateAudio = async () => {
+  try {
+    const initial = await window.api.getScript();
+    const result = [];
+    for (const section of initial) {
+      // if (section.scriptAudio) {
+      //   result.push(section);
+      //   continue;
+      // }
+      const modified = window.api.textToAudio(section);
+      toast.promise(modified, {
+        loading: `Generating audio for ${section.sectionName}...`,
+        success: (newSection) => {
+          return `Audio has been generated for ${section.sectionName}. ${newSection.scriptAudio} has been saved.`;
+        },
+        error: "Error generating audio for section: " + section.sectionName,
+      });
+      const resolvedModified = await modified;
+      result.push(resolvedModified);
+    }
+    window.api.setScript(result);
+  } catch (error) {
+    console.error("Error generating audio:", error);
+  }
 };
 
 /** TODOs:
  * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
  */
-export const VideoGenerator: React.FC<{
-  chosenImages: ChosenAsset[];
-  chosenAudio: ChosenAsset[];
-  chosenSubs: ChosenAsset[];
-  /* settings: ? */
-}> = ({ chosenImages, chosenAudio, chosenSubs }) => {
+export const VideoGenerator: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
   const [videoURL, setVideoURL] = useState<string>();
@@ -160,20 +135,34 @@ export const VideoGenerator: React.FC<{
   const [isDownloadStarted, setIsDownloadStarted] = useState<boolean>(false);
   const [generationProgress, setGenerationProgress] = useState<number>(0);
   const [currentProcess, setCurrentProcess] = useState<string>("");
-
-  const [webmBlob, setWebmBlob] = useState<Blob>();
-
-  useEffect(() => {
-    if (!canvasRef.current) return; //null canvas ref
+  const [isMp4Ready, setIsMp4Ready] = useState<boolean>(false);
+  const [currentState, setCurrentState] = useState<string>("initial");
+  // this is now used to store the mp4 blob
+  const [videoBlob, setVideoBlob] = useState<Blob>();
+  const [script, setScript] = useState<ScriptData[]>([]);
+  const updateScript = async () => {
+    window.api.getScript().then(async (script) => {
+      setScript(script);
+    });
+  };
+  // useEffect(() => {
+  //   setupPlayer();
+  // }, []);
+  const setupPlayer = async () => {
+    if (canvasRef.current == undefined) {
+      console.log("canvas is null");
+      return;
+    }
+    if (movieRef.current != undefined) {
+      console.log("movieRef is not null");
+      return;
+    }
     const canvas = canvasRef.current;
-
-    // Create the movie
     const movie = new etro.Movie({
       canvas: canvas,
       repeat: false,
       background: etro.parseColor("#ccc"),
     });
-
     canvas.width = 1920;
     canvas.height = 1080;
 
@@ -200,34 +189,30 @@ export const VideoGenerator: React.FC<{
 
       movie.addLayer(layer);
     });
-
-    start = 0;
-
-    // Add the Subtitle Layers
-    chosenSubs.map((sub: ChosenAsset) => {
-      const subtitleLayer = new SubtitleText({
-        startTime: start,
-        duration: sub.duration, // TODO: change so that this reflects the duration of the actual section
-        text: sub.src,
-        x: 0, // default: 0
-        y: 0, // default: 0
-        // width: WIDTH/2, // default: null (full width)
-        // height: 120, // default: null (full height)
-        opacity: 1, // default: 1
-        color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
-        font: "100px sans-serif", // default: '10px sans-serif'
-        textX: WIDTH / 2, // default: 0
-        textY: HEIGHT, // default: 0
-        textAlign: "center", // default: 'left'
-        textBaseline: "alphabetic", // default: 'alphabetic'
-        textDirection: "ltr", // default: 'ltr'
-        background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
-      });
-
-      start += sub.duration;
-      movie.addLayer(subtitleLayer); // must exist here
-      console.log("Finsihed subtitles");
+    const subtitleLayer = new SubtitleText({
+      startTime: 0,
+      duration: 20,
+      text: (_element: etro.EtroObject, time: number) => {
+        return Math.round(time) % 2 === 0
+          ? "Lorem ipsum dolor sit amet, ct dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum"
+          : "World";
+      },
+      x: 0, // default: 0
+      y: 0, // default: 0
+      // width: WIDTH/2, // default: null (full width)
+      // height: 120, // default: null (full height)
+      opacity: 1, // default: 1
+      color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
+      font: "100px sans-serif", // default: '10px sans-serif'
+      textX: WIDTH / 2, // default: 0
+      textY: HEIGHT, // default: 0
+      textAlign: "center", // default: 'left'
+      textBaseline: "alphabetic", // default: 'alphabetic'
+      textDirection: "ltr", // default: 'ltr'
+      background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
     });
+    movie.addLayer(subtitleLayer);
+    start = 0;
 
     // Add the Audio layers
     chosenAudio.map((aud: ChosenAsset) => {
@@ -244,7 +229,8 @@ export const VideoGenerator: React.FC<{
       movie.addLayer(layer);
     });
     movieRef.current = movie;
-  }, [chosenAudio, chosenImages]);
+    console.log("movieRef", movieRef.current);
+  };
 
   const downloadAsMp4 = async () => {
     setCurrentProcess("Selecting the path to download Mp4...");
@@ -285,8 +271,36 @@ export const VideoGenerator: React.FC<{
       }
     });
   };
+
+  const generateEtro = async () => {
+    setCurrentProcess("Starting");
+    setCurrentState("etro");
+    await generateAudio();
+
+    const interval = setInterval(() => {
+      setGenerationProgress((prev) => {
+        if (prev < 95) return prev + 0.1;
+        clearInterval(interval);
+        return prev;
+      });
+    }, 50);
+    await updateScript();
+    console.log("script", script);
+    await setupPlayer();
+    console.log("Movie should be setup", movieRef.current);
+
+    setIsVideoReady(true); // change the display
+    setCurrentProcess("Done");
+    setGenerationProgress(0);
+    setCurrentState("playback");
+  };
+
   const generateVideo = async () => {
     setCurrentProcess("Starting");
+    const makeMp4Blob = (buff: ArrayBuffer) => {
+      setVideoBlob(new Blob([buff], { type: "video/mp4" }));
+      setIsMp4Ready(true);
+    };
 
     setGenerationProgress(10);
 
@@ -320,85 +334,91 @@ export const VideoGenerator: React.FC<{
     setGenerationProgress(100);
     setCurrentProcess("Done generating the video");
     // start the mp4 conversion here
+    setCurrentProcess("Converting to mp4");
+    console.log("starting the mp4 conversion");
+    const buff = await newBlob.arrayBuffer();
+    setGenerationProgress(70);
+    interval = setInterval(() => {
+      setGenerationProgress((prev) => {
+        if (prev < 90) return prev + 0.1;
+        clearInterval(interval);
+        return prev;
+      });
+    }, 50);
+    setCurrentProcess("Post processing mp4");
+    const mp4 = await window.api.prepareMp4Blob(buff);
+    clearInterval(interval);
+    setGenerationProgress(90);
+    setCurrentProcess("Finishing up");
+    console.log("got the mp4 data back making blob");
+
+    makeMp4Blob(mp4);
+    console.log("mp4 conversion done");
+    setGenerationProgress(100);
+    // setVideoBlob(newBlob);
+    setCurrentProcess("Done");
+    console.log("recording complete");
     setIsVideoReady(true); // change the display
   };
 
   return (
-    <div className="flex items-center justify-center flex-col gap-2">
-      <FramelessCard>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-center ">
-            Video Generation
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center gap-4">
-            {!isVideoReady ? (
-              <>
-                <Button
-                  variant="outline"
-                  className="flex items-center justify-center"
-                  onClick={() => {
-                    movieRef.current?.play();
-                  }}
-                >
-                  Play
-                </Button>
-                <Button
-                  className="flex items-center justify-center "
-                  onClick={() => {
-                    setIsGenerateClicked(true);
-                    console.log("video creation started");
-                    setTimeout(() => {
-                      console.log("generating");
-                      generateVideo();
-                    }, 1000);
-                  }}
-                >
-                  Create Video
-                </Button>
-              </>
-            ) : !isDownloadStarted ? (
-              <Button
-                onClick={() => {
-                  console.log("mp4 download clicked");
-                  downloadAsMp4();
-                }}
-              >
-                Download Video
-              </Button>
-            ) : (
-              <div className="w-full flex align-center  items-center justify-center flex-col">
-                <Progress value={generationProgress} className="w-5/6 mb-1" />
-                <p className=" text-yellow-400">{currentProcess}</p>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center justify-center gap-2 flex-col mt-4">
-            {isVideoReady ? (
-              <div>
-                <video
-                  className="rounded-md w-full mb-4 flex align-center items-centerjustify-center flex-col gap-2"
-                  width="640"
-                  height="360"
-                  controls
-                >
-                  <source src={videoURL} type="video/webm" />
-                </video>
-              </div>
-            ) : isGenerateClicked ? (
-              <>
-                <Skeleton className="aspect-video w-full h-96  flex align-center items-center justify-center flex-col">
-                  <Progress value={generationProgress} className="w-5/6 mb-1" />
-                  <p className="text-yellow-400">{currentProcess}</p>
-                </Skeleton>
-              </>
-            ) : (
-              <canvas className="w-full rounded_md" ref={canvasRef}></canvas>
-            )}
-          </div>
-        </CardContent>
-      </FramelessCard>
+    <div>
+      <h1> Video Generation </h1>
+      {isVideoReady ? (
+        <div>
+          <video width="640" height="360" controls>
+            <source src={videoURL} type="video/webm" />
+          </video>
+          <Button
+            disabled={!isMp4Ready}
+            onClick={() => {
+              console.log("mp4 download clicked");
+              downloadVideo();
+            }}
+          >
+            Download Mp4
+          </Button>
+        </div>
+      ) : (
+        <div>
+          {isGenerateClicked ? (
+            <>
+              <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+                <Progress value={generationProgress} className="w-5/6 mt-4" />
+                <p className="text-yellow-400">{currentProcess}</p>
+              </Skeleton>
+            </>
+          ) : (
+            <canvas className="w-full mb-4 " ref={canvasRef}></canvas>
+          )}
+
+          <Button
+            onClick={() => {
+              setIsGenerateClicked(true);
+              console.log("video creation started");
+              setTimeout(() => {
+                console.log("generating");
+                generateVideo();
+              }, 1000);
+            }}
+          >
+            create video
+          </Button>
+          <Button
+            className="ml-4"
+            onClick={() => {
+              movieRef.current?.play();
+            }}
+          >
+            Play
+          </Button>
+          {isGenerateClicked ? (
+            <p className="text-yellow-400"> Generating...</p>
+          ) : (
+            ""
+          )}
+        </div>
+      )}
     </div>
   );
 };

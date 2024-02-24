@@ -150,10 +150,10 @@ const generateTopicsInternal = async (report: string): Promise<Topic[]> => {
     // const mini_report = processed.substring(0, 1000)
     const prompt = TOPICS_SYS + report + TOPICS_FORMAT
 
-    console.log(prompt)
+    // console.log(prompt)
     let result = await generateTextFromLLM(prompt);
 
-    result = result.substring(prompt.length + 16, result.length - 1)
+    result = result.substring(prompt.length , result.length - 1)
 
     const isNotList = !result.includes("[")
     const hasNoObjects = !result.includes("{")

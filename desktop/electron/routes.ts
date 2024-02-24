@@ -11,6 +11,7 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+  toDataURL,
   fetchImages,
 } from "./reportProcessing";
 import {
@@ -53,6 +54,7 @@ const api = {
   generateAvatar,
   getLastProject,
   ...projectData,
+  toDataURL,
   generateTextFromLLM,
   generateOpenJourneyImage,
   generateOpenJourneyPrompt,
