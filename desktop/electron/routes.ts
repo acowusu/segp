@@ -19,7 +19,7 @@ import {
   getAvatars,
   setAvatar,
 } from "./avatarGeneration";
-import { webmDataToMp4File } from "./videoProcessing";
+import { webmDataToMp4File, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
 import {
   getDirectory,
@@ -64,6 +64,7 @@ const api = {
   getAvatars,
   setAvatar,
   fetchImages,
+  prepareMp4Blob,
 };
 export default api;
 
