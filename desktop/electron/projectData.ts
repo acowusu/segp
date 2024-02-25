@@ -43,12 +43,7 @@ export function getProjectVisual(): Visual {
 }
 
 export function getProjectScript(): ScriptData[] {
-    const selections =  getProjectStore().get("script_selections", []) as ScriptSelection[];
-    console.log(`available scripts = ${selections.length}`)
-    
-    return selections.length === 0 
-            ? [] 
-            : selections[selections.length - 1].script as ScriptData[];// gets the last one for testing as this has the optional field for promtps
+    return getProjectStore().get("script_selections", []) as ScriptData[];
 }
 
 export function getProjectTopics(): Topic[] {
