@@ -1,8 +1,0 @@
-appId: com.example.myapp
-productName: My App
-mac:
-  category: your.app.category
-win:
-  target: nsis
-linux:
-  target: AppImage
