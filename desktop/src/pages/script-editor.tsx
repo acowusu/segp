@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { ScriptData } from "../../electron/mockData/data";
-import { UpdateIcon} from '@radix-ui/react-icons'
+import { UpdateIcon, Cross2Icon} from '@radix-ui/react-icons'
 import { Skeleton } from "../components/ui/skeleton";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
@@ -49,16 +49,20 @@ export const ScriptEditor: React.FC = () => {
   const [loadingScripts, setLoadingScripts] = useState(true)
 
   useEffect(() => {
-    window.api.getScript().then((data) => {
-      setItems(data);
-    }).finally(() => {setLoadingScripts(false)});
+    window.api.getScript().then(setItems).finally(() => {setLoadingScripts(false)});
   }, []);
   const handleShowDrafts = (e: { stopPropagation: () => void; }) => {
     e.stopPropagation();
     console.log
     setShowOtherDrafts(!showOtherDrafts);
   };
+  
+  const handleDeleteCurrent = async(e: { stopPropagation: () => void; }) => {
+    e.stopPropagation();
+    setItems(items.filter((item) => item.id !== selectedScript.id));
+    await window.api.setScript(items);
 
+  };
   const genAiImage = async (script: ScriptData, userInitiated?:boolean, force?:boolean) => {
     if( script.scriptMedia === undefined || userInitiated) {
       const imgPrompt = (force || !script.scriptPrompt )?  window.api.generateOpenJourneyPrompt(script): Promise.resolve(script.scriptPrompt);
@@ -140,6 +144,12 @@ export const ScriptEditor: React.FC = () => {
       <FramelessCard>
         <CardHeader>
           <CardTitle>Script Editor</CardTitle>
+          <p><Badge variant={"secondary"} 
+            onClick={()=>toast.promise(window.api.getScript(true).then(setItems), {
+              loading: `Regenerating script...`,
+              success: `Done`,
+              error: (e)=>`Error regenerating script: ${e}` 
+            })}>Refresh</Badge></p>
         </CardHeader>
         <CardContent className="h-4/6">
             <div className="flex flex-col gap-2 p-4 pt-0">
@@ -162,16 +172,16 @@ export const ScriptEditor: React.FC = () => {
                     >
                       <div
                         className={cn(
-                          "ml-auto text-xs",
+                          " text-xs flex justify-between w-full items-center",
                           selectedScript.id === item.id
-                            ? "text-foreground"
-                            : "text-muted-foreground"
-                        )}
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                          )}
                       >
+                          <Badge variant={selectedScript.id === item.id  ? "destructive":"secondary"} onClick={handleDeleteCurrent}><Cross2Icon></Cross2Icon></Badge>
                         {/* View Other Drafts */}
-                        {selectedScript.id === item.id ? (                        
                         <Badge variant={showOtherDrafts && selectedScript.id === item.id  ? "cloud":"secondary"} onClick={handleShowDrafts}>View Other Drafts</Badge>
-                        ) : null}
+                        
                       </div>
                       {(selectedScript.id === item.id && showOtherDrafts )&& (
                         <div className="grid md:grid-cols-3 gap-4 w-full">
