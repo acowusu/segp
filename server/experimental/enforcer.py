@@ -52,7 +52,7 @@ generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 app = FastAPI(root_path="/v3")
 
 topics = """ {
-    
+
             "type": "array",
             "items": {
                 "type": "object",
@@ -63,7 +63,7 @@ topics = """ {
             },
             "min": 3,
             "max": 5
-        
+
     }
 """
 

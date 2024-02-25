@@ -79,7 +79,7 @@ svc = bentoml.Service("anything_v3", runners=[anything_v3_runner])
 def txt2img(input_data):
     """
 
-    :param input_data: 
+    :param input_data:
 
     """
     images, _ = anything_v3_runner.run(**input_data)

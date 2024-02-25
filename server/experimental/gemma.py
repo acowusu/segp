@@ -19,7 +19,7 @@ model_id = "google/gemma-7b-it"
 # model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 tokenizer = AutoTokenizer.from_pretrained(model_id, use_auth_token=True)
 topics = """ {
-    
+
             "type": "array",
             "items": {
                 "type": "object",
@@ -30,7 +30,7 @@ topics = """ {
             },
             "min": 3,
             "max": 5
-        
+
     }
 """
 

@@ -34,7 +34,7 @@ model = outlines.models.transformers(
 #     # Required for batching example
 #     tokenizer.pad_token_id = tokenizer.eos_token_id
 topics = """ {
-    
+
             "type": "array",
             "items": {
                 "type": "object",
@@ -45,7 +45,7 @@ topics = """ {
             },
             "min": 3,
             "max": 5
-        
+
     }
 """
 
