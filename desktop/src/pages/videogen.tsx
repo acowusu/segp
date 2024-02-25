@@ -135,6 +135,60 @@ const generateAudio = async () => {
   }
 };
 
+const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
+  let start = 0;
+  for (const section of sections) {
+    if (!section.avatarVideoUrl) throw new Error("No avatarURL found");
+    if (!section.scriptDuration) throw new Error("No duration found");
+    const layer = new etro.layer.Video({
+      startTime: start,
+      duration: section.scriptDuration,
+      source: section.avatarVideoUrl,
+      destX: 0, // default: 0
+      destY: 0, // default: 0
+      destWidth: WIDTH, // default: null (full width)
+      destHeight: HEIGHT, // default: null (full height)
+      x: 0, // default: 0
+      y: 0, // default: 0
+      opacity: 1, // default: 1
+    });
+    movie.layers.push(layer);
+    console.log("adding layer", layer);
+
+    start += section.scriptDuration;
+  }
+};
+
+const generateAvatarSections = async () => {
+  if (!window.api.getProjectHasAvatar()) {
+    console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
+    return;
+  }
+  try {
+    const initial = await window.api.getScript();
+    const result = [];
+    const avatar = await window.api.getProjectAvatar();
+    for (const section of initial) {
+      const modified = window.api.generateAvatar(section, avatar);
+      console.log("modified");
+      toast.promise(modified, {
+        loading: `Generating avatar for ${section.sectionName}...`,
+        success: (_) => {
+          return `Avatar has been generated for ${section.sectionName}. `;
+        },
+        error: "Error generating avatar for section: " + section.sectionName,
+      });
+      const resolvedModified = await modified;
+      result.push(resolvedModified);
+    }
+    console.log("Updating Script with Avatar");
+    window.api.setScript(result);
+    console.log("Avatar Generation Complete");
+  } catch (error) {
+    console.error("Error generating avatar:", error);
+  }
+};
+
 /** TODOs:
  * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
  */
@@ -154,6 +208,7 @@ export const VideoGenerator: React.FC = () => {
   const [script, setScript] = useState<ScriptData[]>([]);
   const updateScript = async () => {
     window.api.getScript().then(async (script) => {
+      console.log("updating script");
       setScript(script);
     });
   };
@@ -181,19 +236,8 @@ export const VideoGenerator: React.FC = () => {
     console.log("setting up player", movie);
     const script = await window.api.getScript();
     await addAudioLayers(script, movie);
-    // const backing = await window.api.getProjectBackingTrack();
-    // const backingLayer = new etro.layer.Audio({
-    //   startTime: 0,
-    //   duration: backing.audioDuration,
-    //   source: await window.api.toDataURL(backing.audioSrc),
-    //   sourceStartTime: 0, // default: 0
-    //   muted: false, // default: false
-    //   volume: 0.5, // default: 1
-    //   playbackRate: 1, //default: 1
-    // });
-    // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
-    addSubtitleLayers(script, movie);
+    // addSubtitleLayers(script, movie);
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);
   };
@@ -255,6 +299,26 @@ export const VideoGenerator: React.FC = () => {
     setCurrentState("etro");
     await generateAudio();
     console.log("audio generated backing should exist");
+    const mock = [
+      {
+        id: "1",
+        sectionName: "Section 1",
+        scriptTexts: ["Hello World"],
+        selectedScriptIndex: 0,
+        sadTalkerPath: "/www/sadtalker_assets/driven_audio/1.wav",
+        scriptDuration: 4,
+      },
+      // {
+      //   "id": "2",
+      //   "sectionName": "Section 2",
+      //   "scriptTexts": ["Hello World"],
+      //   "selectedScriptIndex": 0,
+      //   "sadTalkerPath": "/www/sadtalker_assets/driven_audio/1.wav",
+      //   "scriptDuration": 4,
+      // }
+    ];
+    window.api.setProjectScript(mock);
+    await generateAvatarSections();
 
     const interval = setInterval(() => {
       setGenerationProgress((prev) => {
