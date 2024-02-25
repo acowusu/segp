@@ -22,15 +22,18 @@ tokenizer = AutoTokenizer.from_pretrained(model_id, use_auth_token=True)
 
 
 class Sentence(BaseModel):
+    """ """
     text: str  # The spoken text of the sentence
 
 
 class ScriptSection(BaseModel):
+    """ """
     title: str
     sentences: List[Sentence]
 
 
 class Script(BaseModel):
+    """ """
     sections: List[ScriptSection]
 
 
