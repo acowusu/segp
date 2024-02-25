@@ -5,6 +5,7 @@ import { pool } from "./pool";
 import { generateTopics, generateScript } from "./server"
 import type {
   Audience,
+  BackingTrack,
   ScriptData,
   Topic,
   Visual,
@@ -123,7 +124,18 @@ export async function textToAudio(script: ScriptData): Promise<ScriptData> {
   return script
 
 }
+export async function generateBackingTrack(prompt: string, duration: number): Promise<BackingTrack> {
 
+  const { destination } = await downloadFile('https://iguana.alexo.uk/v6/generate_audio', getProjectPath(), {
+    method: 'POST',
+    body: JSON.stringify({ script: prompt,duration:duration }), 
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  return {audioSrc:destination, audioDuration:duration}
+
+}
 
 export const toDataURL = (filePath:string):Promise<string> => {
   const songPromise = new Promise((resolve, reject) => {
@@ -140,16 +152,16 @@ export async function extractTextFromPDF(filePath: string): Promise<string> {
   return text
 }
 
-export async function getScript(): Promise<ScriptData[]> {
+export async function getScript(force?:boolean): Promise<ScriptData[]> {
   // TODO forward error if not initialized (for now we just return the notional script)
   let script = projectData.getProjectScript();
-  if (script.length !== 0) {
+  if (script.length !== 0 && !force) {
     return script
   }
 
 
   const report = await getReportText();
-  script = await generateScript(projectData.getProjectTopic().topic, report)
+  script = await generateScript(report, projectData.getProjectTopic())
   await setScript(script)
   return script
 
@@ -160,9 +172,9 @@ export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);
 }
 
-export async function getTopics(): Promise<Topic[]> {
+export async function getTopics(force?:boolean): Promise<Topic[]> {
   const proj_data = projectData.getProjectTopics()
-  if (proj_data.length !== 0) {
+  if (proj_data.length !== 0 && !force) {
     return proj_data
   }
   console.log("Getting topics ")
