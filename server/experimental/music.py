@@ -26,7 +26,9 @@ model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-larg
 
 # model     = model.to(device)
 # processor = processor.to(device)
-
+@app.get("/status")
+async def status():
+    return {"status": "ok"}
 @app.post("/generate_audio")
 async def generate_audio(request: Request):
     request_body = await request.json()
