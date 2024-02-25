@@ -26,7 +26,9 @@ model = AudioGen.get_pretrained('facebook/audiogen-medium')##.to(device)
 
 # model     = model.to(device)
 # processor = processor.to(device)
-
+@app.get("/status")
+async def status():
+    return {"status": "ok"}
 @app.post("/generate_audio")
 async def generate_audio(request: Request):
     request_body = await request.json()
