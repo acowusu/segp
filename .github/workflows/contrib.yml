@@ -1,5 +1,5 @@
 name: "Test"
-on: pull_request_target
+on: workflow_dispatch
 
 jobs:
   echo-input:
@@ -14,6 +14,7 @@ jobs:
           python-version: '3.10' 
       - run: pip install git-fame
       - run: npm install execa
+      - run: cat package.json
       - uses: actions/github-script@v7
         with:
           script: |
@@ -21,9 +22,9 @@ jobs:
             const { stdout } = await execa('git-fame', ['--format=md', '--incl "(.ts|.tsx|.py|.service|.html|.md|.patch)"'])
 
             console.log(stdout)
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: stdout
-            })
+            # github.rest.issues.createComment({
+            #   issue_number: context.issue.number,
+            #   owner: context.repo.owner,
+            #   repo: context.repo.repo,
+            #   body: stdout
+            # })
