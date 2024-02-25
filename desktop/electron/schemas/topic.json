@@ -1,0 +1,31 @@
+{
+  "title": "Script",
+  "type": "object",
+  "properties": {
+    "topics": {
+      "title": "Topics",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Topic"
+      }
+    }
+  },
+  "required": ["topics"],
+  "definitions": {
+    "Topic": {
+      "title": "Topic",
+      "type": "object",
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "subtitle": {
+          "title": "Subtitle",
+          "type": "string"
+        }
+      },
+      "required": ["title", "subtitle"]
+    }
+  }
+}
