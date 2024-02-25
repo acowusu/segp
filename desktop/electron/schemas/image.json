@@ -1,0 +1,7 @@
+{
+  "title": "Prompt",
+  "type": "string",
+  "required": [
+    "Prompt"
+  ]
+}
