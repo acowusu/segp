@@ -3,29 +3,26 @@
 
 
 import json
-import uvicorn
-import numpy as np
-import pandas as pd
-import bentoml
-from bentoml.io import NumpyNdarray, JSON
-from pydantic import BaseModel
-from fastapi.responses import StreamingResponse
-from io import BytesIO
-from typing import Any, AsyncGenerator, Dict, TypedDict, Union
-from fastapi import FastAPI, Form, Response
-from openllm import LLM
-from typing import Any, AsyncGenerator, Dict, TypedDict, Union
-import torch
-import bentoml
-from bentoml.io import Image, JSON, Multipart
-from typing_extensions import Annotated
-import uuid
-
 # llm = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq', dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
 # dataautogpt3/ProteusV0.2
 # LDA
 # Bert Topic
 import os
+import uuid
+from io import BytesIO
+from typing import Any, AsyncGenerator, Dict, TypedDict, Union
+
+import bentoml
+import numpy as np
+import pandas as pd
+import torch
+import uvicorn
+from bentoml.io import JSON, Image, Multipart, NumpyNdarray
+from fastapi import FastAPI, Form, Response
+from fastapi.responses import StreamingResponse
+from openllm import LLM
+from pydantic import BaseModel
+from typing_extensions import Annotated
 
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
 os.environ["HF_HOME"] = "/hf"

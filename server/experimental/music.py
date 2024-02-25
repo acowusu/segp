@@ -1,15 +1,16 @@
-import scipy
-from transformers import pipeline
-from fastapi.responses import FileResponse
-from transformers import AutoProcessor, MusicgenForConditionalGeneration
-import torch
-import wave
-import tempfile
-import uvicorn
-from fastapi import FastAPI, Request, Response
-from turtle import st
 import io
 import os
+import tempfile
+import wave
+from turtle import st
+
+import scipy
+import torch
+import uvicorn
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import FileResponse
+from transformers import (AutoProcessor, MusicgenForConditionalGeneration,
+                          pipeline)
 
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
 os.environ["HF_HOME"] = "/hf"

@@ -1,17 +1,18 @@
-import scipy
-from fastapi.responses import FileResponse
-import time
-from audiocraft.data.audio import audio_write
-from audiocraft.models import AudioGen
-import torchaudio
-import torch
-import wave
-import tempfile
-import uvicorn
-from fastapi import FastAPI, Request, Response
-from turtle import st
 import io
 import os
+import tempfile
+import time
+import wave
+from turtle import st
+
+import scipy
+import torch
+import torchaudio
+import uvicorn
+from audiocraft.data.audio import audio_write
+from audiocraft.models import AudioGen
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import FileResponse
 
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
 os.environ["HF_HOME"] = "/hf"

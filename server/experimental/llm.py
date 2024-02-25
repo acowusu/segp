@@ -1,9 +1,11 @@
 from dataclasses import Field
-from fastapi import FastAPI, Form
-from typing_extensions import Annotated
-import uvicorn
+
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+import uvicorn
+from fastapi import FastAPI, Form
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig)
+from typing_extensions import Annotated
 
 model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 tokenizer = AutoTokenizer.from_pretrained(model_id)

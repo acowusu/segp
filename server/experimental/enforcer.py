@@ -1,22 +1,18 @@
-from pydantic import BaseModel
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    BitsAndBytesConfig,
-    pipeline,
-)
 import json
+import os
 from dataclasses import Field
 from typing import List
-from fastapi import FastAPI, Form
-from typing_extensions import Annotated
-import uvicorn
+
 import torch
-import os
+import uvicorn
+from fastapi import FastAPI, Form
 from lmformatenforcer import JsonSchemaParser
-from lmformatenforcer.integrations.transformers import (
-    build_transformers_prefix_allowed_tokens_fn,
-)
+from lmformatenforcer.integrations.transformers import \
+    build_transformers_prefix_allowed_tokens_fn
+from pydantic import BaseModel
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig, pipeline)
+from typing_extensions import Annotated
 
 os.environ["HF_HOME"] = "/hf"
 

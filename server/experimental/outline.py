@@ -1,14 +1,16 @@
 import json
-import outlines
-from jsonformer.main import Jsonformer
-from jsonformer.format import highlight_values
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-from dataclasses import Field
-from fastapi import FastAPI, Form
-from typing_extensions import Annotated
-import uvicorn
-import torch
 import os
+from dataclasses import Field
+
+import outlines
+import torch
+import uvicorn
+from fastapi import FastAPI, Form
+from jsonformer.format import highlight_values
+from jsonformer.main import Jsonformer
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig)
+from typing_extensions import Annotated
 
 # os.environ['HF_HOME'] = '/hf'
 
