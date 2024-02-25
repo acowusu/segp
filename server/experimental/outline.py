@@ -5,11 +5,13 @@ from dataclasses import Field
 import outlines
 import torch
 import uvicorn
-from fastapi import FastAPI, Form
+from fastapi import FastAPI
+from fastapi import Form
 from jsonformer.format import highlight_values
 from jsonformer.main import Jsonformer
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig)
+from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer
+from transformers import BitsAndBytesConfig
 from typing_extensions import Annotated
 
 # os.environ['HF_HOME'] = '/hf'

@@ -11,7 +11,9 @@ import torchaudio
 import uvicorn
 from audiocraft.data.audio import audio_write
 from audiocraft.models import AudioGen
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
+from fastapi import Request
+from fastapi import Response
 from fastapi.responses import FileResponse
 
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf

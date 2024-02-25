@@ -5,13 +5,16 @@ from typing import List
 
 import torch
 import uvicorn
-from fastapi import FastAPI, Form
+from fastapi import FastAPI
+from fastapi import Form
 from lmformatenforcer import JsonSchemaParser
 from lmformatenforcer.integrations.transformers import \
     build_transformers_prefix_allowed_tokens_fn
 from pydantic import BaseModel
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig, pipeline)
+from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer
+from transformers import BitsAndBytesConfig
+from transformers import pipeline
 from typing_extensions import Annotated
 
 os.environ["HF_HOME"] = "/hf"

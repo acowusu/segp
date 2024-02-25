@@ -7,10 +7,13 @@ from turtle import st
 import scipy
 import torch
 import uvicorn
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
+from fastapi import Request
+from fastapi import Response
 from fastapi.responses import FileResponse
-from transformers import (AutoProcessor, MusicgenForConditionalGeneration,
-                          pipeline)
+from transformers import AutoProcessor
+from transformers import MusicgenForConditionalGeneration
+from transformers import pipeline
 
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
 os.environ["HF_HOME"] = "/hf"
