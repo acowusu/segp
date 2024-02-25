@@ -10,8 +10,9 @@ from fastapi import FastAPI, Request, Response
 from turtle import st
 import io
 import os
+
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
-os.environ['HF_HOME'] = '/hf'
+os.environ["HF_HOME"] = "/hf"
 # from fastapi.responses import StreamingResponse
 
 
@@ -22,8 +23,9 @@ app = FastAPI(root_path="/v6")
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 processor = AutoProcessor.from_pretrained("facebook/musicgen-large")
-model = MusicgenForConditionalGeneration.from_pretrained(
-    "facebook/musicgen-large").to(device)
+model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-large").to(
+    device
+)
 
 # model     = model.to(device)
 # processor = processor.to(device)
@@ -53,10 +55,11 @@ async def generate_audio(request: Request):
     ).to(device)
     outputs = model.generate(**inputs, max_new_tokens=duration)
 
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_audio_file:
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
         sampling_rate = model.config.audio_encoder.sampling_rate
         scipy.io.wavfile.write(
-            temp_audio_file, rate=sampling_rate, data=outputs[0, 0].cpu().numpy())
+            temp_audio_file, rate=sampling_rate, data=outputs[0, 0].cpu().numpy()
+        )
 
         # Approximate duration
         # with wave.open(temp_audio_file, "r") as wav_file:
@@ -72,11 +75,12 @@ async def generate_audio(request: Request):
             headers={
                 "Content-Disposition": "inline",
                 # "Audio-Duration": str(duration),
-                "Media-location": str(temp_audio_file.name)
-            }
+                "Media-location": str(temp_audio_file.name),
+            },
         )
 
     return response
+
 
 # 8890
 if __name__ == "__main__":

@@ -1,5 +1,10 @@
 from pydantic import BaseModel
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    BitsAndBytesConfig,
+    pipeline,
+)
 import json
 from dataclasses import Field
 from typing import List
@@ -9,8 +14,11 @@ import uvicorn
 import torch
 import os
 from lmformatenforcer import JsonSchemaParser
-from lmformatenforcer.integrations.transformers import build_transformers_prefix_allowed_tokens_fn
-os.environ['HF_HOME'] = '/hf'
+from lmformatenforcer.integrations.transformers import (
+    build_transformers_prefix_allowed_tokens_fn,
+)
+
+os.environ["HF_HOME"] = "/hf"
 
 model_id = "google/gemma-7b-it"
 # model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
@@ -31,16 +39,13 @@ class Script(BaseModel):
 
 
 quantization_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_compute_dtype=torch.float16
+    load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16
 )
 model = AutoModelForCausalLM.from_pretrained(
-    model_id,
-    device_map="auto",
-    quantization_config=quantization_config
+    model_id, device_map="auto", quantization_config=quantization_config
 )
 
-generator = pipeline('text-generation', model=model, tokenizer=tokenizer)
+generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
 app = FastAPI(root_path="/v3")
 
@@ -62,15 +67,26 @@ topics = """ {
 
 
 @app.post("/generate")
-async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float, Form()], max_new_tokens: Annotated[int, Form()] = 8192, max_string_token_length: Annotated[int, Form()] = 100, schema: Annotated[str, Form()] = topics):
+async def generate(
+    prompt: Annotated[str, Form()],
+    temperature: Annotated[float, Form()],
+    max_new_tokens: Annotated[int, Form()] = 8192,
+    max_string_token_length: Annotated[int, Form()] = 100,
+    schema: Annotated[str, Form()] = topics,
+):
     parser = JsonSchemaParser(Script.schema())
-    prefix_function = build_transformers_prefix_allowed_tokens_fn(
-        tokenizer, parser)
+    prefix_function = build_transformers_prefix_allowed_tokens_fn(tokenizer, parser)
 
-    output_dict = generator(prompt, prefix_allowed_tokens_fn=prefix_function,
-                            max_new_tokens=max_new_tokens, temperature=temperature, max_length=max_string_token_length)
-    output = output_dict[0]['generated_text'][len(prompt):]
+    output_dict = generator(
+        prompt,
+        prefix_allowed_tokens_fn=prefix_function,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        max_length=max_string_token_length,
+    )
+    output = output_dict[0]["generated_text"][len(prompt) :]
     return {"response": json.loads(output)}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8893)

@@ -20,13 +20,15 @@ import bentoml
 from bentoml.io import Image, JSON, Multipart
 from typing_extensions import Annotated
 import uuid
+
 # llm = LLM(model_id="TheBloke/Mistral-7B-Instruct-v0.1-AWQ", quantization='awq', dtype='half', gpu_memory_utilization=.95, max_model_len=8192,  backend="vllm")
 # dataautogpt3/ProteusV0.2
 # LDA
 # Bert Topic
 import os
+
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
-os.environ['HF_HOME'] = '/hf'
+os.environ["HF_HOME"] = "/hf"
 
 
 # bentoml.diffusers.import_model(
@@ -66,8 +68,7 @@ anything_v3_runner.init_local()
 #     resources={"cpu": "2"},
 #     traffic={"timeout": 10},
 # )
-svc = bentoml.Service("anything_v3",
-                      runners=[anything_v3_runner])
+svc = bentoml.Service("anything_v3", runners=[anything_v3_runner])
 
 
 @svc.api(input=JSON(), output=Image())
@@ -80,12 +81,21 @@ fastapi_app = FastAPI(root_path="/v2")
 svc.mount_asgi_app(fastapi_app)
 
 
-@fastapi_app.post(
-    "/image"
-)
-async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotated[str, Form()] = "",  width: Annotated[int, Form()] = 1920,  height: Annotated[int, Form()] = 1080,   num_inference_steps: Annotated[int, Form()] = 100):
-    images = anything_v3_runner.run(prompt=prompt, width=width, height=height,
-                                    negative_prompt=negative_prompt, num_inference_steps=num_inference_steps)
+@fastapi_app.post("/image")
+async def predict_async(
+    prompt: Annotated[str, Form()],
+    negative_prompt: Annotated[str, Form()] = "",
+    width: Annotated[int, Form()] = 1920,
+    height: Annotated[int, Form()] = 1080,
+    num_inference_steps: Annotated[int, Form()] = 100,
+):
+    images = anything_v3_runner.run(
+        prompt=prompt,
+        width=width,
+        height=height,
+        negative_prompt=negative_prompt,
+        num_inference_steps=num_inference_steps,
+    )
     print(images[0][0])
     filtered_image = BytesIO()
     images[0][0].save(filtered_image, "JPEG")
@@ -96,6 +106,7 @@ async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotat
 @fastapi_app.get("/status")
 async def status():
     return {"status": "ok"}
+
 
 if __name__ == "__main__":
     uvicorn.run(fastapi_app, host="0.0.0.0", port=8892)

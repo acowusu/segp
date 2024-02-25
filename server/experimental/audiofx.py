@@ -12,8 +12,9 @@ from fastapi import FastAPI, Request, Response
 from turtle import st
 import io
 import os
+
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
-os.environ['HF_HOME'] = '/hf'
+os.environ["HF_HOME"] = "/hf"
 # from fastapi.responses import StreamingResponse
 
 # You'll need to install Coqui TTS: pip install TTS
@@ -22,7 +23,7 @@ app = FastAPI(root_path="/v7")
 # synthesiser = pipeline("text-to-audio", "facebook/musicgen-large")
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-model = AudioGen.get_pretrained('facebook/audiogen-medium')  # .to(device)
+model = AudioGen.get_pretrained("facebook/audiogen-medium")  # .to(device)
 
 # model     = model.to(device)
 # processor = processor.to(device)
@@ -48,9 +49,10 @@ async def generate_audio(request: Request):
 
     wav = model.generate([script])  # generates 3 samples.
 
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_audio_file:
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
         scipy.io.wavfile.write(
-            temp_audio_file, rate=model.sample_rate, data=wav[0, 0].cpu().numpy())
+            temp_audio_file, rate=model.sample_rate, data=wav[0, 0].cpu().numpy()
+        )
 
         # audio_write(temp_audio_file.name, wav[0].cpu(), model.sample_rate, strategy="loudness", loudness_compressor=True)
 
@@ -61,11 +63,12 @@ async def generate_audio(request: Request):
             headers={
                 "Content-Disposition": "inline",
                 # "Audio-Duration": str(duration),
-                "Media-location": str(temp_audio_file.name)
-            }
+                "Media-location": str(temp_audio_file.name),
+            },
         )
 
     return response
+
 
 # 8890
 if __name__ == "__main__":

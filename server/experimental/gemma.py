@@ -8,7 +8,8 @@ from typing_extensions import Annotated
 import uvicorn
 import torch
 import os
-os.environ['HF_HOME'] = '/hf'
+
+os.environ["HF_HOME"] = "/hf"
 
 model_id = "google/gemma-7b-it"
 # model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
@@ -31,13 +32,10 @@ topics = """ {
 
 
 quantization_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_compute_dtype=torch.float16
+    load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16
 )
 model = AutoModelForCausalLM.from_pretrained(
-    model_id,
-    device_map="auto",
-    quantization_config=quantization_config
+    model_id, device_map="auto", quantization_config=quantization_config
 )
 
 
@@ -45,7 +43,13 @@ app = FastAPI(root_path="/v3")
 
 
 @app.post("/generate")
-async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float, Form()], max_new_tokens: Annotated[int, Form()] = 8192, max_string_token_length: Annotated[int, Form()] = 100, schema: Annotated[str, Form()] = topics):
+async def generate(
+    prompt: Annotated[str, Form()],
+    temperature: Annotated[float, Form()],
+    max_new_tokens: Annotated[int, Form()] = 8192,
+    max_string_token_length: Annotated[int, Form()] = 100,
+    schema: Annotated[str, Form()] = topics,
+):
     # inputs = tokenizer(prompt, return_tensors="pt").to(0)
     schema = json.loads(schema)
     topicBuilder = Jsonformer(
@@ -64,6 +68,7 @@ async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float,
     json_data = highlight_values(output)
     # print(topicBuilder.get_prompt())
     return {"response": output}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8893)
