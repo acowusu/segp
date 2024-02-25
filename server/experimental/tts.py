@@ -1,4 +1,5 @@
 import io
+from turtle import st
 from fastapi import FastAPI, Request, Response
 # from fastapi.responses import StreamingResponse
 import uvicorn
@@ -38,7 +39,8 @@ async def generate_audio(request: Request):
             media_type="audio/wav",
             headers={
                 "Content-Disposition": "inline",
-                "Audio-Duration": str(duration) 
+                "Audio-Duration": str(duration),
+                "Media-location": str(temp_audio_file.name)
             }
         )
 
