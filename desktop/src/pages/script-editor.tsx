@@ -56,7 +56,7 @@ export const ScriptEditor: React.FC = () => {
     console.log
     setShowOtherDrafts(!showOtherDrafts);
   };
-  
+
   const handleDeleteCurrent = async(e: { stopPropagation: () => void; }) => {
     e.stopPropagation();
     setItems(items.filter((item) => item.id !== selectedScript.id));
@@ -144,12 +144,12 @@ export const ScriptEditor: React.FC = () => {
       <FramelessCard>
         <CardHeader>
           <CardTitle>Script Editor</CardTitle>
-          <p><Badge variant={"secondary"} 
+          <div><Badge variant={"secondary"} 
             onClick={()=>toast.promise(window.api.getScript(true).then(setItems), {
               loading: `Regenerating script...`,
               success: `Done`,
               error: (e)=>`Error regenerating script: ${e}` 
-            })}>Refresh</Badge></p>
+            })}>Refresh</Badge></div>
         </CardHeader>
         <CardContent className="h-4/6">
             <div className="flex flex-col gap-2 p-4 pt-0">
