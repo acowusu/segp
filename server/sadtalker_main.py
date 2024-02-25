@@ -82,8 +82,8 @@ async def animate_portrait(sadtalker: SadTalker):
         if not is_valid_image_extension(sadtalker.source_image):
             raise HTTPException(status_code=400,
                                 detail="Invalid source_image extension")
-
-        os.chdir("./SadTalker")
+        
+        os.chdir("/home/ls1221/segp/server/SadTalker")
         results_dir = "/www/sadtalker_results/"
         command = [
             "python3",
@@ -97,7 +97,7 @@ async def animate_portrait(sadtalker: SadTalker):
             "--result_dir",
             results_dir,
         ]
-        subprocess.run(command, check=True, capture_output=True, shell=False)
+        subprocess.run(command, check=True)
 
         # get the last from results
         results = sorted(os.listdir(results_dir))
