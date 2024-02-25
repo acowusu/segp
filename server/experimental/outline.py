@@ -65,5 +65,8 @@ async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float,
     output = generator(prompt)
     return {"response": output}
 
+@app.get("/status")
+async def status():
+    return {"status": "ok"}
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8893)
