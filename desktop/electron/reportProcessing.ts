@@ -116,7 +116,8 @@ export async function textToAudio(script: ScriptData): Promise<ScriptData> {
 
   const duration = parseFloat(headers.get("audio-duration")!);
   // Used with sadtalker
-  // const location = parseFloat(headers.get("media-location")!); 
+  const location = headers.get("media-location")!; 
+  script.sadTalkerPath = location;
   script.scriptAudio = destination;
   script.scriptDuration = duration;
 
