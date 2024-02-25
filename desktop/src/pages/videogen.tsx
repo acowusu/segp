@@ -59,7 +59,7 @@ function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
       y: 0, // default: 0
       opacity: 1, // default: 1
       color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
-      font: "100px sans-serif", // default: '10px sans-serif'
+      font: "50px sans-serif", // default: '10px sans-serif'
       textX: WIDTH / 2, // default: 0
       textY: HEIGHT, // default: 0
       textAlign: "center", // default: 'left'
@@ -101,10 +101,10 @@ const generateAudio = async () => {
     const initial = await window.api.getScript();
     const result = [];
     for (const section of initial) {
-      // if (section.scriptAudio) {
-      //   result.push(section);
-      //   continue;
-      // }
+      if (section.scriptAudio) {
+        result.push(section);
+        continue;
+      }
       const modified = window.api.textToAudio(section);
       toast.promise(modified, {
         loading: `Generating audio for ${section.sectionName}...`,
@@ -116,7 +116,19 @@ const generateAudio = async () => {
       const resolvedModified = await modified;
       result.push(resolvedModified);
     }
-    window.api.setScript(result);
+    // const length = result.reduce((acc, val) => {
+    //   return acc + val.scriptDuration!;
+    // }, 0);
+    // const track =  window.api.generateBackingTrack("inspiring emotionally charged uplidting corportate music vocals tones",length/2 )
+    // toast.promise(track, {
+    //   loading: `Generating backing track...`,
+    //   success: (newSection) => {
+    //     return `Backing track has been generated. ${newSection.audioSrc} has been saved.`;
+    //   },
+    //   error: (error)=>`Error generating backing track <em>${error}</em>` ,
+    // });
+    // await window.api.setProjectBackingTrack(await track);
+    await window.api.setScript(result);
   } catch (error) {
     console.error("Error generating audio:", error);
   }
@@ -168,8 +180,19 @@ export const VideoGenerator: React.FC = () => {
     console.log("setting up player", movie);
     const script = await window.api.getScript()
     await addAudioLayers(script, movie);
+    // const backing = await window.api.getProjectBackingTrack();
+    // const backingLayer = new etro.layer.Audio({
+    //   startTime: 0,
+    //   duration: backing.audioDuration,
+    //   source: await window.api.toDataURL(backing.audioSrc),
+    //   sourceStartTime: 0, // default: 0
+    //   muted: false, // default: false
+    //   volume: 0.5, // default: 1
+    //   playbackRate: 1, //default: 1
+    // });
+    // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
-    // addSubtitleLayers(script, movie);
+    addSubtitleLayers(script, movie);
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);
   };
@@ -189,6 +212,7 @@ export const VideoGenerator: React.FC = () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
     await generateAudio();
+    console.log("audio generated backing should exist");
 
     const interval = setInterval(() => {
       setGenerationProgress((prev) => {
@@ -334,7 +358,7 @@ export const VideoGenerator: React.FC = () => {
           </Button>
         </>
       )}
-  {currentState === "rendering" && ( <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+  {(currentState === "rendering" || currentState === "etro") && ( <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
             <Progress value={generationProgress} className="w-5/6 mt-4" />
             <p className="text-yellow-400">{currentProcess}</p>
           </Skeleton>)}

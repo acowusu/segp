@@ -48,3 +48,8 @@ export interface Avatar {
   imagePath: string;
   sadtalkerPath: string;
 }
+
+export interface BackingTrack {
+  audioSrc: string; // path to audio file
+  audioDuration: number; // duration of audio file
+}

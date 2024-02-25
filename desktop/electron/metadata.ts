@@ -18,6 +18,8 @@ export function getDatabasePath(): string {
   return getProjectStore().get("databasePath") as string;
 }
 
+
+
 export function getLastProject(): string {
   return userStore.get("lastProject") as string;
 }
