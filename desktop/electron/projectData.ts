@@ -1,4 +1,4 @@
-import { Audience, ScriptData, Topic, Visual, Voiceover } from "./mockData/data";
+import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar, BackingTrack } from "./mockData/data";
 import { getProjectStore } from "./store";
 
 export function getProjectTopic(): Topic {
@@ -50,6 +50,18 @@ export function getProjectScript(): ScriptData[] {
 export function getProjectTopics(): Topic[] {
   return getProjectStore().get("topics", []) as Topic[];
 }
+
+export function getProjectAvatar(): Avatar {
+  if (!getProjectStore().has("avatars")) {
+    throw new Error("Selected avatar not set");
+  }
+  return getProjectStore().get("avatars") as Avatar;
+}
+
+export function setProjectAvatar(avatar: Avatar): void {
+  getProjectStore().set("avatars", avatar);
+}
+
 export function setProjectTopics(topics: Topic[]): void {
   getProjectStore().set("topics", topics);
 }
@@ -77,4 +89,14 @@ export function setProjectVisual(visual: Visual): void {
 
 export function setProjectScript(script: ScriptData[]): void {
     getProjectStore().set("script", script);
+}
+
+export function getProjectBackingTrack(): BackingTrack {
+  if (!getProjectStore().has("backingTrack")) {
+    throw new Error("Backing track not set");
+  }
+  return getProjectStore().get("backingTrack") as BackingTrack;
+}
+export function setProjectBackingTrack(backingTrack: BackingTrack): void {
+  getProjectStore().set("backingTrack", backingTrack);
 }

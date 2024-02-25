@@ -1,0 +1,45 @@
+{
+  "title": "Script",
+  "type": "object",
+  "properties": {
+    "sections": {
+      "title": "Sections",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ScriptSection"
+      }
+    }
+  },
+  "required": ["sections"],
+  "definitions": {
+    "ScriptSection": {
+      "title": "ScriptSection",
+      "type": "object",
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "sentences": {
+          "title": "Sentences",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Sentence"
+          }
+        }
+      },
+      "required": ["title", "sentences"]
+    },
+    "Sentence": {
+      "title": "Sentence",
+      "type": "object",
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": ["text"]
+    }
+  }
+}

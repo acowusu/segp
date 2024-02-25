@@ -1,8 +1,10 @@
-import { app, BrowserWindow, ipcMain, dialog , screen  } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog , screen, protocol, net } from 'electron'
 import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
-import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio} from './reportProcessing'
+
+import { generateAvatar } from './avatarGeneration'
+import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio, fetchImages} from './reportProcessing'
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -79,6 +81,10 @@ app && app.on('activate', () => {
 })
 
 app && app.whenReady().then(() => {
+  protocol.handle('local', (request) =>{
+    console.log( request.url.slice('local:///'.length))
+    return net.fetch("file:///" + request.url.slice('local:///'.length))
+  })
   ipcMain.handle('dialog:openFile', handleFileOpen)
   ipcMain.handle('dialog:getTopics', getTopics)
   ipcMain.handle('dialog:getScript', getScript)
@@ -99,6 +105,10 @@ app && app.whenReady().then(() => {
           hint: `have you defined ${property} in ./electron/routes.ts?`
        }
     }
+  })
+  ipcMain.handle('generateAvatar', async (_, avatar, audioPath) => {
+    const avatarUrl = await generateAvatar(avatar, audioPath)
+    return avatarUrl
   })
 
 

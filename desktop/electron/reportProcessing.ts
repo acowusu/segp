@@ -1,136 +1,170 @@
 // import { Worker } from "worker_threads";
 import { getProjectPath, getTextReportPath } from "./metadata";
-import { app } from 'electron';
 import audiences from "./mockData/audiences.json";
-import {pool } from "./pool";
-import {generateTopics, generateScript} from "./server"
+import { pool } from "./pool";
+import { generateTopics, generateScript } from "./server"
 import type {
   Audience,
+  BackingTrack,
   ScriptData,
   Topic,
   Visual,
   Voiceover,
-  AudioInfo,
 } from "./mockData/data";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
 import voiceovers from "./mockData/voiceovers.json";
 import * as projectData from "./projectData";
-import {  readFile } from "node:fs/promises";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
 import watch from "node-watch"
 import fs from "fs";
-import fetch from "node-fetch";
-// Takes in an array of strings and returns an array of AudioInfo
-export async function textToAudio(textArray: string[]): Promise<AudioInfo[]> {
+import path from "path";
+import dataurl from "dataurl";
+/**
+ * Retrieves the text content of a report. 
+ * If the report file does not exist, 
+ * the function will wait for the file to be created.
+ * 
+ * @returns A promise that resolves to the report text.
+ */
+export async function getReportText(): Promise<string> {
+  const reportPath = getTextReportPath();
 
-    const audioInfoArray: AudioInfo[] = [];
-
-    for (const text of textArray) {
-      const postData = new FormData();
-      postData.append('script', text);
-
-      const response = await fetch('https://iguana.alexo.uk/tts/', {
-          method: 'POST',
-          body: postData,
+  if (fs.existsSync(reportPath)) {
+    const report = await readFile(reportPath, "utf-8");
+    return report
+  } else {
+    return await new Promise<string>((resolve) => {
+      const watcher = watch(getProjectPath(), { persistent: true }, async (event, filename) => {
+        console.log("Event", event, filename, reportPath)
+        if (event === 'update' && filename === reportPath && fs.existsSync(reportPath)) {
+          watcher.close();
+          const report = await readFile(reportPath, "utf-8");
+          resolve(report);
+        }
       });
-
-      if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      // Get audio link
-      const responseData = await response.json();
-      const audioLink: string = 'https://iguana.alexo.uk' + responseData.audio_link;
-
-      // Get audio duration 
-      const duration = responseData.duration;
-
-      // Create audio file path
-      const audioFilePath = app.getAppPath() + '/public/audio/' + extractFilenameFromURL(audioLink);
-      
-      try {
-        await downloadMP3(audioLink, audioFilePath);
-        console.log('MP3 file downloaded successfully.');
-
-        const subtitlesFilePath = audioFilePath.replace('.mp3', '.srt');
-        await saveSubtitles(responseData.subtitles, subtitlesFilePath);
-        console.log('Subtitles saved successfully.');
-
-        audioInfoArray.push({ audioPath: audioFilePath, duration, subtitlePath: subtitlesFilePath });
-      } catch (error) {
-        console.error('Error downloading MP3 file:', error);
-      }
-      
-    }
-    return audioInfoArray;
-}
-
-// Function to get audio file name
-function extractFilenameFromURL(url: string): string {
-  const parts = url.split('/');
-  return parts[parts.length - 1];
-}
-
-// Function to download MP3 file from URL
-async function downloadMP3(url: string, destinationPath: string): Promise<void> {
-  try {
-    const response = await fetch(url);
-
-    if (!response.ok ) {
-      throw new Error(`Failed to download MP3: HTTP Error ${response.status}`);
-    }
-    if (response === null || response.body === null) {
-      throw new Error(`Failed to download MP3: Response is null`);
-    }
-    const fileStream = fs.createWriteStream(destinationPath);
-    await new Promise((resolve, reject) => {
-      response.body!.pipe(fileStream);
-      response.body!.on("error", reject);
-      fileStream.on("finish", resolve);
     });
-  } catch (error) {
-    console.error("Error downloading MP3:", error);
-    throw error; // Re-throw to allow for error handling where the function is called
   }
+
 }
 
 
-// Function to save subtitles content as an .srt file
-function saveSubtitles(subtitlesContent: string, subtitlesFilePath: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-      fs.writeFile(subtitlesFilePath, subtitlesContent, 'utf8', (err) => {
-          if (err) {
-              reject(err);
-          } else {
-              resolve();
-          }
-      });
+export async function downloadFile(url: URL | RequestInfo, fileDirectory: string, fetchOptions?: RequestInit, fileName?: string) {
+  const res = await fetch(url, fetchOptions);
+  if (!res.ok) {
+    throw new Error(`Failed to download file: HTTP Error ${res.status}`);
+  }
+  if (res === null || res.body === null) {
+    throw new Error(`Failed to download file: Response is null`);
+  }
+  if (!fs.existsSync(fileDirectory)) await mkdir(fileDirectory);
+
+  if (fileName == undefined) {
+    // Guess the file extension from the content type
+    fileName = performance.now().toString(16) + '.' + res.headers.get('content-type')!.split('/')[1]
+  }
+  const destination = path.resolve(fileDirectory, fileName);
+  const buffer = Buffer.from(await res.arrayBuffer())
+  await writeFile(destination, buffer)
+  const headers = new Map(res.headers.entries())
+  return { destination, headers }
+}
+
+
+// Takes in an array of prompts for images and returns an array of array of filepaths to the images
+export async function fetchImages(prompts: Array<string>): Promise<Array<Array<string>>> {
+
+  const imageFilePaths: Array<Array<string>> = [];
+  const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI'];
+  
+  for (const prompt of prompts) {
+    const unsplashAccessKey = unsplashAccessKeys.shift()
+    const unsplashEndpoint = `https://api.unsplash.com/search/photos?per_page=5&query=${prompt}&client_id=${unsplashAccessKey}`;
+    const unsplashResponse = await fetch(unsplashEndpoint);
+    const unsplashData = await unsplashResponse.json();
+
+    const unsplashPhotos = unsplashData.results.map((photo: { urls: { regular: string } }) => photo.urls.regular);
+    const promptFilePaths: Array<string> = [];
+
+    for (let i = 0; i < unsplashPhotos.length; i++) {
+      const imageUrl = unsplashPhotos[i];
+      const filename = `${prompt}${i}.jpg`;
+      const response = await downloadFile(imageUrl, getProjectPath(), { method: 'GET' }, filename);
+      promptFilePaths.push(response.destination);
+    }
+    imageFilePaths.push(promptFilePaths);
+    if (unsplashAccessKey !== undefined) {
+      unsplashAccessKeys.push(unsplashAccessKey);
+    }
+  }
+  console.log(imageFilePaths);
+  return imageFilePaths;
+}
+
+
+// Takes in an array of strings and returns an array of AudioInfo
+export async function textToAudio(script: ScriptData): Promise<ScriptData> {
+  console.log("textToAudio", script.scriptTexts);
+  console.log("textToAudio", script.selectedScriptIndex);
+
+  const { destination, headers } = await downloadFile('https://iguana.alexo.uk/v0/generate_audio', getProjectPath(), {
+    method: 'POST',
+    body: JSON.stringify({ script: script.scriptTexts[script.selectedScriptIndex] }),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+
+  const duration = parseFloat(headers.get("audio-duration")!);
+  // Used with sadtalker
+  // const location = parseFloat(headers.get("media-location")!); 
+  script.scriptAudio = destination;
+  script.scriptDuration = duration;
+
+  return script
+
+}
+export async function generateBackingTrack(prompt: string, duration: number): Promise<BackingTrack> {
+
+  const { destination } = await downloadFile('https://iguana.alexo.uk/v6/generate_audio', getProjectPath(), {
+    method: 'POST',
+    body: JSON.stringify({ script: prompt,duration:duration }), 
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  return {audioSrc:destination, audioDuration:duration}
+
+}
+
+export const toDataURL = (filePath:string):Promise<string> => {
+  const songPromise = new Promise((resolve, reject) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) { reject(err); }
+      resolve(dataurl.convert({ data, mimetype: 'audio/wav' }));
+    });
   });
-}
+  return songPromise as Promise<string>;
+};
 
 export async function extractTextFromPDF(filePath: string): Promise<string> {
-  const {text} = await (pool!.run({filePath, projectPath: getProjectPath()},  { name: 'extractTextFromPDF' }) as Promise<{ text: string; images: ImageData[]; }>)
+  const { text } = await (pool!.run({ filePath, projectPath: getProjectPath() }, { name: 'extractTextFromPDF' }) as Promise<{ text: string; images: ImageData[]; }>)
   return text
 }
 
-export async function getScript(): Promise<ScriptData[]> {
+export async function getScript(force?:boolean): Promise<ScriptData[]> {
   // TODO forward error if not initialized (for now we just return the notional script)
   let script = projectData.getProjectScript();
-  if (script.length !== 0) {
+  if (script.length !== 0 && !force) {
     return script
   }
 
-  const reportPath = getTextReportPath();
-  
-  if (fs.existsSync(reportPath)) {
-    const report = await readFile(reportPath, "utf-8");
-    script = await generateScript(projectData.getProjectTopic().topic, report)
-    await setScript(script)
-    return script
-  } else {
-    // Alex what does your watch code do??
-    throw Error("report does not exits")
-  }
+
+  const report = await getReportText();
+  script = await generateScript(report, projectData.getProjectTopic())
+  await setScript(script)
+  return script
+
 
 }
 
@@ -138,30 +172,19 @@ export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);
 }
 
-export async function getTopics(): Promise<Topic[]> {
+export async function getTopics(force?:boolean): Promise<Topic[]> {
   const proj_data = projectData.getProjectTopics()
-  if (proj_data.length !== 0) {
+  if (proj_data.length !== 0 && !force) {
     return proj_data
   }
+  console.log("Getting topics ")
+  const report = await getReportText();
+  console.log("Got report")
+  const topics = await generateTopics(report);
+  console.log("Got topics")
+  projectData.setProjectTopics(topics);
+  return topics
 
-  const reportPath = getTextReportPath();
-  
-  if (fs.existsSync(reportPath)) {
-    const report = await readFile(reportPath, "utf-8");
-    const topics = await generateTopics(report);
-    projectData.setProjectTopics(topics);
-    return topics
-  } else {
-    return await new Promise<Topic[]>((resolve) => {
-      const watcher = watch(reportPath, { persistent: true }, async (event, filename) => {
-        if (event === 'update' && filename === reportPath) {
-          watcher.close();
-          const report = await readFile(reportPath, "utf-8");
-          resolve(generateTopics(report));
-        }
-      });
-    });
-  }
 }
 export async function setTopic(topic: Topic): Promise<void> {
   projectData.setProjectTopic(topic);

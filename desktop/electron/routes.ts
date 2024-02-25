@@ -11,7 +11,15 @@ import {
   setVoiceover,
   getVoiceovers,
   textToAudio,
+  toDataURL,
+  fetchImages,
+  generateBackingTrack,
 } from "./reportProcessing";
+import {
+  generateAvatar,
+  getAvatars,
+  setAvatar,
+} from "./avatarGeneration";
 import { convertWebmToMp4, writeBlob, webmBLobToMp4, prepareMp4Blob } from "./videoProcessing";
 // Import your API methods here
 import {
@@ -23,7 +31,8 @@ import {
 } from "./setup";
 import { getProjectName, getProjectPath, getIsDev, getLastProject} from "./metadata";
 import * as projectData from "./projectData"
-import {generateTextFromLLM, generateTopics} from "./server"
+import {generateTextFromLLM, generateTopics, generateOpenJourneyPrompt, generateOpenJourneyImage} from "./server"
+import {getServiceStatus, launchService, shutdownService} from "./status"
 const api = {
   loadReport,
   getScript,
@@ -32,6 +41,9 @@ const api = {
   setTopic,
   getAudiences,
   setAudience,
+  getServiceStatus,
+  launchService,
+  shutdownService,
   setVisual,
   getVisuals,
   setVoiceover,
@@ -41,18 +53,26 @@ const api = {
   createProject,
   openProject,
   getProjectName,
+  generateBackingTrack,
   getProjectPath,
   textToAudio,
   getIsDev,
+  generateAvatar,
   getLastProject,
   ...projectData,
+  toDataURL,
   generateTextFromLLM,
+  generateOpenJourneyImage,
+  generateOpenJourneyPrompt,
   generateTopics,
   // Add your API methods here
   convertWebmToMp4,
   writeBlob,
   webmBLobToMp4,
   prepareMp4Blob,
+  getAvatars,
+  setAvatar,
+  fetchImages,
 };
 export default api;
 

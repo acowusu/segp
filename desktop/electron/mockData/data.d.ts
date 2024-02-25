@@ -7,6 +7,10 @@ export interface ScriptData {
   selectedScriptIndex: number; // index of the selected script
   scriptTexts: string[];  // array of script texts
   sectionName: string; // Name of section
+  scriptAudio?: string; // path to audio file
+  scriptDuration?: number; // duration of audio file
+  scriptMedia?: string; // path to media file
+  scriptPrompt?: string; // path to prompt file
 }
 
 export interface Audience {
@@ -35,4 +39,22 @@ export interface AudioInfo {
   audioPath: string;
   duration: number;
   subtitlePath: string;
+}
+declare module 'dataurl'
+
+export interface Avatar {
+  id: string;
+  name: string;
+  imagePath: string;
+  sadtalkerPath: string;
+}
+
+export interface BackingTrack {
+  audioSrc: string; // path to audio file
+  audioDuration: number; // duration of audio file
+}
+interface Status {
+  url: string;
+  name: string;
+  status: string;
 }

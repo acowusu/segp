@@ -2,7 +2,7 @@ import fs from "fs";
 import { mkdir, readFile } from "node:fs/promises";
 import { sep } from "path";
 import { PNG } from "pngjs";
-import { getDocumentProxy, getResolvedPDFJS } from "unpdf";
+import {extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
 import { ffmpegPath } from "../binUtils";
 import promiseSpawn from '@npmcli/promise-spawn'
 export const add =  ({ a, b }: { a: number, b: number }) => {
@@ -37,6 +37,25 @@ export const convertWebmToMp4 = async ({
 
   }
   console.log('ok!', result)
+};
+
+export const extractTextFromPDF = async ({
+  filePath,projectPath
+}: {
+  filePath: string;
+  projectPath:string
+}): Promise<{ text: string; images: ImageData[]; }> => {
+    console.log("# Loading document from disk", filePath);
+    const buffer = await readFile(filePath);
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+
+    const { totalPages, text } = await extractText(pdf, { mergePages: true });
+    const images = [];
+    // console.log("# Extracting images 1");
+    for (let i = 1; i < totalPages; i++) {
+        images.push(...(await extractImagesFromPDF({ filePath, pageNumber:i, projectPath })));
+    }
+    return {text: text as string, images};
 };
 
 export const extractImagesFromPDF = async ({ filePath, pageNumber, projectPath }: { filePath: string, pageNumber: number, projectPath: string }) => {

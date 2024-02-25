@@ -15,6 +15,8 @@ import {
 } from "../components/ui/card";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Topic } from "../../electron/mockData/data";
+import { toast } from "sonner";
+import { Badge } from "../components/ui/badge";
 export const SetTopic: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Topic[]>([]);
@@ -27,8 +29,17 @@ export const SetTopic: React.FC = () => {
     }
   }, []);
   useEffect( () => {
-    window.api.getTopics().then((data) => {
+    const promise = window.api.getTopics()
+    toast.promise(promise, {
+      loading: "Loading topics...",
+      success: () => {
+        return `Topics have been loaded.`;
+      },
+      error: "Error",
+    })
+    promise.then((data:Topic[]) => {
       setItems(data);
+      console.log("Got topics", data);
     }).then(() => window.api.getProjectTopic().then((data) => {
         setTopic(data);
       }).catch((e) => {
@@ -45,6 +56,14 @@ export const SetTopic: React.FC = () => {
           <CardTitle>Select Topic</CardTitle>
           <CardDescription>
             These topics were identified in the report provided.
+            <br className="mb-4" />
+            <Badge variant={"secondary"}  className="mt-2 cursor-pointer"
+            onClick={()=>toast.promise(window.api.getTopics(true).then(setItems), {
+              loading: `Regenerating topics...`,
+              success: `Done`,
+              error: (e)=>`Error Regenerating: ${e}` 
+            })}>Refresh</Badge>
+
           </CardDescription>
         </CardHeader>
         <CardContent className="h-4/6">
@@ -75,7 +94,7 @@ export const SetTopic: React.FC = () => {
                 </button>
               ))}
               {items.length === 0 && Array.from({ length: 5 }).map((_, index) => (
-                        <Skeleton key={index} className="h-16 flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all" />
+                  <Skeleton key={index} className="h-16 flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all" />
                ))}
             </div>
           </ScrollArea>
