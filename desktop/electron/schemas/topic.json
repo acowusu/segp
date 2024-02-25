@@ -10,9 +10,7 @@
       }
     }
   },
-  "required": [
-    "topics"
-  ],
+  "required": ["topics"],
   "definitions": {
     "Topic": {
       "title": "Topic",
@@ -27,10 +25,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "title",
-        "subtitle"
-      ]
+      "required": ["title", "subtitle"]
     }
   }
 }

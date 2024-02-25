@@ -10,9 +10,7 @@
       }
     }
   },
-  "required": [
-    "sections"
-  ],
+  "required": ["sections"],
   "definitions": {
     "ScriptSection": {
       "title": "ScriptSection",
@@ -30,10 +28,7 @@
           }
         }
       },
-      "required": [
-        "title",
-        "sentences"
-      ]
+      "required": ["title", "sentences"]
     },
     "Sentence": {
       "title": "Sentence",
@@ -44,9 +39,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "text"
-      ]
+      "required": ["text"]
     }
   }
 }
