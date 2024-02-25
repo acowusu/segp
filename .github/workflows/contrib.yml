@@ -17,7 +17,6 @@ jobs:
         with:
           script: |
             const execa = await import('execa')
-
             const { stdout } = await execa('git-fame', ['--format=md', '--incl "(.ts|.tsx|.py|.service|.html|.md|.patch)"'])
 
             console.log(stdout)
