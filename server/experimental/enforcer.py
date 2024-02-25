@@ -40,12 +40,10 @@ class Script(BaseModel):
     sections: List[ScriptSection]
 
 
-quantization_config = BitsAndBytesConfig(
-    load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16
-)
+quantization_config = BitsAndBytesConfig(load_in_4bit=True,
+                                         bnb_4bit_compute_dtype=torch.float16)
 model = AutoModelForCausalLM.from_pretrained(
-    model_id, device_map="auto", quantization_config=quantization_config
-)
+    model_id, device_map="auto", quantization_config=quantization_config)
 
 generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
@@ -77,7 +75,8 @@ async def generate(
     schema: Annotated[str, Form()] = topics,
 ):
     parser = JsonSchemaParser(Script.schema())
-    prefix_function = build_transformers_prefix_allowed_tokens_fn(tokenizer, parser)
+    prefix_function = build_transformers_prefix_allowed_tokens_fn(
+        tokenizer, parser)
 
     output_dict = generator(
         prompt,
@@ -86,7 +85,7 @@ async def generate(
         temperature=temperature,
         max_length=max_string_token_length,
     )
-    output = output_dict[0]["generated_text"][len(prompt) :]
+    output = output_dict[0]["generated_text"][len(prompt):]
     return {"response": json.loads(output)}
 
 

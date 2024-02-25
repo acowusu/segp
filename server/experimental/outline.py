@@ -19,9 +19,8 @@ from typing_extensions import Annotated
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 # model_id = "google/gemma-7b-it"
 
-quantization_config = BitsAndBytesConfig(
-    load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16
-)
+quantization_config = BitsAndBytesConfig(load_in_4bit=True,
+                                         bnb_4bit_compute_dtype=torch.float16)
 
 model = outlines.models.transformers(
     "mistralai/Mixtral-8x7B-Instruct-v0.1",
@@ -49,7 +48,6 @@ topics = """ {
     }
 """
 
-
 # quantization_config = BitsAndBytesConfig(
 #     load_in_4bit=True,
 #     bnb_4bit_compute_dtype=torch.float16
@@ -59,7 +57,6 @@ topics = """ {
 #     device_map="auto",
 #     quantization_config=quantization_config
 #     )
-
 
 app = FastAPI(root_path="/v3")
 

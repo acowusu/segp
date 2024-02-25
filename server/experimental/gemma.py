@@ -34,14 +34,10 @@ topics = """ {
     }
 """
 
-
-quantization_config = BitsAndBytesConfig(
-    load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16
-)
+quantization_config = BitsAndBytesConfig(load_in_4bit=True,
+                                         bnb_4bit_compute_dtype=torch.float16)
 model = AutoModelForCausalLM.from_pretrained(
-    model_id, device_map="auto", quantization_config=quantization_config
-)
-
+    model_id, device_map="auto", quantization_config=quantization_config)
 
 app = FastAPI(root_path="/v3")
 

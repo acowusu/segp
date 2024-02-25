@@ -52,10 +52,11 @@ async def generate_audio(request: Request):
 
     wav = model.generate([script])  # generates 3 samples.
 
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
-        scipy.io.wavfile.write(
-            temp_audio_file, rate=model.sample_rate, data=wav[0, 0].cpu().numpy()
-        )
+    with tempfile.NamedTemporaryFile(suffix=".wav",
+                                     delete=False) as temp_audio_file:
+        scipy.io.wavfile.write(temp_audio_file,
+                               rate=model.sample_rate,
+                               data=wav[0, 0].cpu().numpy())
 
         # audio_write(temp_audio_file.name, wav[0].cpu(), model.sample_rate, strategy="loudness", loudness_compressor=True)
 
