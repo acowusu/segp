@@ -16,7 +16,7 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const execa = require('execa')
+            const execa = await import('execa')
 
             const { stdout } = await execa('git-fame', ['--format=md', '--incl "(.ts|.tsx|.py|.service|.html|.md|.patch)"'])
 
