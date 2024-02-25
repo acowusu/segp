@@ -1,0 +1,12 @@
+[Unit]
+Description=FastAPI Audio Effect Server
+After=network.target
+
+[Service]
+User=alexa
+WorkingDirectory=/home/alexa/segp-1/server/experimental  
+Environment=PATH=/home/alexa/.conda/envs/musicenv/bin:$PATH 
+ExecStart=/home/alexa/.conda/envs/musicenv/bin/python audiofx.py
+
+[Install]
+WantedBy=multi-user.target
