@@ -13,6 +13,7 @@ import {
   textToAudio,
   toDataURL,
   fetchImages,
+  generateBackingTrack,
 } from "./reportProcessing";
 import {
   generateAvatar,
@@ -48,6 +49,7 @@ const api = {
   createProject,
   openProject,
   getProjectName,
+  generateBackingTrack,
   getProjectPath,
   textToAudio,
   getIsDev,
