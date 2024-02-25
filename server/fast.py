@@ -93,7 +93,9 @@ async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotat
     filtered_image.seek(0)
     return StreamingResponse(filtered_image, media_type="image/jpeg")
 
-
+@fastapi_app.get("/status")
+async def status():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     uvicorn.run(fastapi_app, host="0.0.0.0", port=8892)
