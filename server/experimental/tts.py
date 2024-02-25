@@ -13,9 +13,13 @@ from TTS.utils.synthesizer import Synthesizer
 from TTS.api import TTS
 app = FastAPI(root_path="/v0")
 tts = TTS(model_name="tts_models/en/jenny/jenny", progress_bar=False)
+
+
 @app.get("/status")
 async def status():
     return {"status": "ok"}
+
+
 @app.post("/generate_audio")
 async def generate_audio(request: Request):
     request_body = await request.json()
@@ -23,10 +27,9 @@ async def generate_audio(request: Request):
 
     if not script:
         return Response("Missing 'script' field in request", status_code=400)
-        
+
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_audio_file:
         tts.tts_to_file(text=script, file_path=temp_audio_file)
-
 
         # Approximate duration
         with wave.open(temp_audio_file, "r") as wav_file:
@@ -47,7 +50,7 @@ async def generate_audio(request: Request):
         )
 
     return response
-    
+
 # 8890
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8890)

@@ -1,3 +1,7 @@
+import json
+from jsonformer.main import Jsonformer
+from jsonformer.format import highlight_values
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from dataclasses import Field
 from fastapi import FastAPI, Form
 from typing_extensions import Annotated
@@ -5,15 +9,11 @@ import uvicorn
 import torch
 import os
 os.environ['HF_HOME'] = '/hf'
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-from jsonformer.format import highlight_values
-from jsonformer.main import Jsonformer
 
 model_id = "google/gemma-7b-it"
 # model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 tokenizer = AutoTokenizer.from_pretrained(model_id, use_auth_token=True)
-import json
-topics =""" {
+topics = """ {
     
             "type": "array",
             "items": {
@@ -30,16 +30,15 @@ topics =""" {
 """
 
 
-
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_compute_dtype=torch.float16
 )
 model = AutoModelForCausalLM.from_pretrained(
-    model_id, 
+    model_id,
     device_map="auto",
     quantization_config=quantization_config
-    )
+)
 
 
 app = FastAPI(root_path="/v3")

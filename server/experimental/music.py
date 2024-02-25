@@ -1,57 +1,62 @@
+import scipy
+from transformers import pipeline
+from fastapi.responses import FileResponse
+from transformers import AutoProcessor, MusicgenForConditionalGeneration
+import torch
+import wave
+import tempfile
+import uvicorn
+from fastapi import FastAPI, Request, Response
+from turtle import st
 import io
 import os
 # sudo mount -t tmpfs -o size=100000m tmpfs /hf
 os.environ['HF_HOME'] = '/hf'
-from turtle import st
-from fastapi import FastAPI, Request, Response
 # from fastapi.responses import StreamingResponse
-import uvicorn
-import tempfile
-import wave
-import torch
-from transformers import AutoProcessor, MusicgenForConditionalGeneration
 
-from fastapi.responses import FileResponse
 
 # You'll need to install Coqui TTS: pip install TTS
 app = FastAPI(root_path="/v6")
-from transformers import pipeline
-import scipy
 
 # synthesiser = pipeline("text-to-audio", "facebook/musicgen-large")
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 processor = AutoProcessor.from_pretrained("facebook/musicgen-large")
-model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-large").to(device)
+model = MusicgenForConditionalGeneration.from_pretrained(
+    "facebook/musicgen-large").to(device)
 
 # model     = model.to(device)
 # processor = processor.to(device)
+
+
 @app.get("/status")
 async def status():
     return {"status": "ok"}
+
+
 @app.post("/generate_audio")
 async def generate_audio(request: Request):
     request_body = await request.json()
     script = request_body.get("script")
     duration = request_body.get("duration")
     print(duration)
-    duration  =int(duration) * model.config.audio_encoder.frame_rate
+    duration = int(duration) * model.config.audio_encoder.frame_rate
     print(duration)
     if not script:
         return Response("Missing 'script' field in request", status_code=400)
-    
+
     # music = synthesiser(script, forward_params={"do_sample": True})
     inputs = processor(
-    text=[script],
-    padding=True,
-    return_tensors="pt",
-).to(device)
+        text=[script],
+        padding=True,
+        return_tensors="pt",
+    ).to(device)
     outputs = model.generate(**inputs, max_new_tokens=duration)
 
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_audio_file:
         sampling_rate = model.config.audio_encoder.sampling_rate
-        scipy.io.wavfile.write(temp_audio_file, rate=sampling_rate, data=outputs[0, 0].cpu().numpy())
-
+        scipy.io.wavfile.write(
+            temp_audio_file, rate=sampling_rate, data=outputs[0, 0].cpu().numpy())
 
         # Approximate duration
         # with wave.open(temp_audio_file, "r") as wav_file:
@@ -72,7 +77,7 @@ async def generate_audio(request: Request):
         )
 
     return response
-    
+
 # 8890
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8896)

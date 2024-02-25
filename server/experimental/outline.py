@@ -19,7 +19,8 @@ quantization_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.float16
 )
 
-model = outlines.models.transformers("mistralai/Mixtral-8x7B-Instruct-v0.1",model_kwargs= {"quantization_config":quantization_config}    )
+model = outlines.models.transformers(
+    "mistralai/Mixtral-8x7B-Instruct-v0.1", model_kwargs={"quantization_config": quantization_config})
 
 # model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 # tokenizer = AutoTokenizer.from_pretrained(model_id, use_auth_token=True)
@@ -64,6 +65,7 @@ async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float,
     generator = outlines.generate.json(model, schema)
     output = generator(prompt)
     return {"response": output}
+
 
 @app.get("/status")
 async def status():
