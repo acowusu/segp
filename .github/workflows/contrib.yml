@@ -26,14 +26,12 @@ jobs:
       - name: show files
         working-directory: ./segp
         run: ls -la
-      - name: Run github script
-        working-directory: ./segp
-        uses: actions/github-script@v7
+      - uses: actions/github-script@v7
         with:
           script: |
             const execa = await import('/home/runner/work/segp/segp/node_modules/execa/index.js')
             console.log(execa)
-            const  {stdout} = await execa.$` git-fame --format=md --incl "(.ts|.tsx|.py|.service|.html|.md|.patch)"`
+            const  {stdout} = await execa.$` git-fame  --format=md --incl "(.ts|.tsx|.py|.service|.html|.md|.patch)" segp`
 
             console.log(stdout)
             github.rest.issues.createComment({
