@@ -1,6 +1,7 @@
 name: "Contrib"
 on:
   pull_request:
+    types: [closed]
 
 jobs:
   echo-input:
