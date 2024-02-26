@@ -17,11 +17,11 @@ model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=quant
 app = FastAPI(root_path="/v3")
 
 @app.post("/generate")
-async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float, Form()], max_new_tokens: Annotated[int, Field(default=8192)]):
-    inputs = tokenizer(prompt, return_tensors="pt", temperature=temperature, max_new_tokens=max_new_tokens).to(0)
-    output = model.generate(**inputs, max_new_tokens=8192)
+async def generate(prompt: Annotated[str, Form()], temperature: Annotated[float, Form()], max_new_tokens: Annotated[int, Form()] = 8192):
+    inputs = tokenizer(prompt, return_tensors="pt").to(0)
+    output = model.generate(**inputs, temperature=temperature, max_new_tokens=max_new_tokens)
     json_data = (tokenizer.decode(output[0], skip_special_tokens=True))
-    return json_data
+    return {"response":json_data}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8893)

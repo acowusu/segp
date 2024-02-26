@@ -1,4 +1,5 @@
 import io
+from turtle import st
 from fastapi import FastAPI, Request, Response
 # from fastapi.responses import StreamingResponse
 import uvicorn
@@ -12,7 +13,9 @@ from TTS.utils.synthesizer import Synthesizer
 from TTS.api import TTS
 app = FastAPI(root_path="/v0")
 tts = TTS(model_name="tts_models/en/jenny/jenny", progress_bar=False)
-
+@app.get("/status")
+async def status():
+    return {"status": "ok"}
 @app.post("/generate_audio")
 async def generate_audio(request: Request):
     request_body = await request.json()
@@ -38,7 +41,8 @@ async def generate_audio(request: Request):
             media_type="audio/wav",
             headers={
                 "Content-Disposition": "inline",
-                "Audio-Duration": str(duration) 
+                "Audio-Duration": str(duration),
+                "Media-location": str(temp_audio_file.name)
             }
         )
 
