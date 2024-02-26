@@ -14,6 +14,10 @@ jobs:
           python-version: '3.10' 
       - run: pip install git-fame
       - run: npm install execa
+      - run: sudo apt-get update && sudo apt-get install jq -y
+      - run: |
+          jq '.name = "Contributions" | 
+             .type = "module" ' package.json > tmp.json && mv tmp.json package.json
       - run: cat package.json
       - uses: actions/github-script@v7
         with:
