@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: git clone https://github.com/acowusu/segp
-      - run: cd segp
+        working-directory: ./segp
       - uses: actions/setup-node@v3
         with:
           node-version: '20.x'
