@@ -150,7 +150,7 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    navigate("/welcome/set-audience");
+    navigate("/welcome/get-video");
     await window.api.setScript(items);
   };
   const updateScriptText = async (
