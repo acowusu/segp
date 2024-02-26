@@ -224,8 +224,8 @@ export const VideoGenerator: React.FC = () => {
     canvas.height = 1080;
     console.log("setting up player", movie);
     const script = await window.api.getScript()
-    // await addAudioLayers(script, movie);
-    // addImageLayers(script, movie);
+    await addAudioLayers(script, movie);
+    addImageLayers(script, movie);
     addAvatarLayers(script, movie);
     // addSubtitleLayers(script, movie);
     movieRef.current = movie;
@@ -246,26 +246,7 @@ export const VideoGenerator: React.FC = () => {
   const generateEtro = async () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
-    // await generateAudio();
-    const mock = [
-      { 
-        "id": "1",
-        "sectionName": "Section 1",
-        "scriptTexts": ["Hello World"],
-        "selectedScriptIndex": 0,
-        "sadTalkerPath": "/www/sadtalker_assets/driven_audio/1.wav",
-        "scriptDuration": 4,
-      },
-      // {
-      //   "id": "2",
-      //   "sectionName": "Section 2",
-      //   "scriptTexts": ["Hello World"],
-      //   "selectedScriptIndex": 0,
-      //   "sadTalkerPath": "/www/sadtalker_assets/driven_audio/1.wav",
-      //   "scriptDuration": 4,
-      // }
-    ];
-    window.api.setScript(mock);
+    await generateAudio();
     await generateAvatarSections();
 
     const interval = setInterval(() => {
