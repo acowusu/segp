@@ -123,18 +123,23 @@ const generateAudio = async () => {
 };
 
 const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
+  if (!window.api.getProjectHasAvatar()) {
+    console.log("No Avatar Option Selected. Skipping Avatar Layering... ");
+    return; 
+  }
   let start = 0;
   for (const section of sections) {
     if (!section.avatarVideoUrl) throw new Error("No avatarURL found");
     if (!section.scriptDuration) throw new Error("No duration found");
+    const avatar = await window.api.getProjectAvatar();
     const layer = new etro.layer.Video({
       startTime: start,
       duration: section.scriptDuration,
       source: section.avatarVideoUrl,
       destX: 0, // default: 0
       destY: 0, // default: 0
-      destWidth: WIDTH, // default: null (full width)
-      destHeight: HEIGHT, // default: null (full height)
+      destWidth: avatar.width, // default: null (full width)
+      destHeight: avatar.height, // default: null (full height)
       x: 0, // default: 0
       y: 0, // default: 0
       opacity: 1, // default: 1
@@ -157,7 +162,6 @@ const generateAvatarSections = async () => {
     const avatar = await window.api.getProjectAvatar();
     for (const section of initial) {
       const modified = window.api.generateAvatar(section, avatar);
-      console.log("modified");
       toast.promise(modified, {
         loading: `Generating avatar for ${section.sectionName}...`,
         success: (_) => {
@@ -168,9 +172,8 @@ const generateAvatarSections = async () => {
       const resolvedModified = await modified;
       result.push(resolvedModified);
     }
-    console.log("Updating Script with Avatar");
     window.api.setScript(result);
-    console.log("Avatar Generation Complete");
+    console.log("Avatar Sections Generated");
   } catch (error) {
     console.error("Error generating avatar:", error);
   }
@@ -195,8 +198,7 @@ export const VideoGenerator: React.FC = () => {
   const [videoBlob, setVideoBlob] = useState<Blob>();
   const [script, setScript] = useState<ScriptData[]>([]);
   const updateScript = async () => {
-    window.api.getScript().then(async (script) => {
-      console.log("updating script");
+    window.api.getScript().then( async (script) => {
       setScript(script);
     });
   };
@@ -221,7 +223,7 @@ export const VideoGenerator: React.FC = () => {
     canvas.width = 1920;
     canvas.height = 1080;
     console.log("setting up player", movie);
-    // const script = await window.api.getScript()
+    const script = await window.api.getScript()
     // await addAudioLayers(script, movie);
     // addImageLayers(script, movie);
     addAvatarLayers(script, movie);
@@ -263,7 +265,7 @@ export const VideoGenerator: React.FC = () => {
       //   "scriptDuration": 4,
       // }
     ];
-    window.api.setProjectScript(mock);
+    window.api.setScript(mock);
     await generateAvatarSections();
 
     const interval = setInterval(() => {

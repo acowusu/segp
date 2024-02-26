@@ -49,4 +49,6 @@ export interface Avatar {
   name: string;
   imagePath: string;
   sadtalkerPath: string;
+  width: number;
+  height: number;
 }
