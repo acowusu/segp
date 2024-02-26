@@ -43,4 +43,3 @@ jobs:
               repo: context.repo.repo,
               body: stdout
             })
---incl "(.ts|.tsx|.py|.service|.html|.md|.patch)"
