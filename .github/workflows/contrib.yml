@@ -27,7 +27,7 @@ jobs:
           script: |
             const execa = await import('/home/runner/work/segp/segp/node_modules/execa/index.js')
             console.log(execa)
-            const  {stdout} = await execa.$` git-fame --branch=main   --format=md --incl "(.ts|.tsx|.py|.service|.html|.md|.patch)"`
+            const  {stdout} = await execa.$` git-fame --format=md --incl "(.ts|.tsx|.py|.service|.html|.md|.patch)"`
 
             console.log(stdout)
             github.rest.issues.createComment({
