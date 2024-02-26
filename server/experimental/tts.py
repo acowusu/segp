@@ -1,17 +1,20 @@
 import io
-from fastapi import FastAPI, Request, Response
-# from fastapi.responses import StreamingResponse
-import uvicorn
 import tempfile
 import wave
 
+import uvicorn
+from fastapi import FastAPI
+from fastapi import Request
+from fastapi import Response
 from fastapi.responses import FileResponse
-
-# You'll need to install Coqui TTS: pip install TTS
-from TTS.utils.synthesizer import Synthesizer
 from TTS.api import TTS
+from TTS.utils.synthesizer import Synthesizer
+# from fastapi.responses import StreamingResponse
+# You'll need to install Coqui TTS: pip install TTS
+
 app = FastAPI(root_path="/v0")
 tts = TTS(model_name="tts_models/en/jenny/jenny", progress_bar=False)
+
 
 @app.post("/generate_audio")
 async def generate_audio(request: Request):
@@ -20,10 +23,10 @@ async def generate_audio(request: Request):
 
     if not script:
         return Response("Missing 'script' field in request", status_code=400)
-        
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_audio_file:
-        tts.tts_to_file(text=script, file_path=temp_audio_file)
 
+    with tempfile.NamedTemporaryFile(suffix=".wav",
+                                     delete=False) as temp_audio_file:
+        tts.tts_to_file(text=script, file_path=temp_audio_file)
 
         # Approximate duration
         with wave.open(temp_audio_file, "r") as wav_file:
@@ -38,12 +41,13 @@ async def generate_audio(request: Request):
             media_type="audio/wav",
             headers={
                 "Content-Disposition": "inline",
-                "Audio-Duration": str(duration) 
-            }
+                "Audio-Duration": str(duration)
+            },
         )
 
     return response
-    
+
+
 # 8890
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8890)

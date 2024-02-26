@@ -3,7 +3,7 @@ labels:
   owner: bentoml-team
   stage: demo
 include:
-- "service.py"
+  - "service.py"
 python:
   requirements_txt: "./requirements.txt"
 envs:
