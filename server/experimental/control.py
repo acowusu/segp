@@ -1,6 +1,7 @@
-import subprocess
-from fastapi import FastAPI, Request
 import re
+import subprocess
+
+from fastapi import FastAPI, Request
 
 app = FastAPI(root_path="/v8")
 
