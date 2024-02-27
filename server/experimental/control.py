@@ -18,7 +18,7 @@ mapping = {
     "Text to speech API": "fastapi-tts",
     "LLM API": "fastapi-llm",
     "Music API": "fastapi-music",
-    "Sound Effects API": "fastapi-audiofx"
+    "Sound Effects API": "fastapi-audiofx",
 }
 
 
@@ -34,16 +34,14 @@ async def control_service(request: Request):
 
     if command == "shutdown":
         try:
-            subprocess.run(
-                ["/usr/bin/sudo", "systemctl", "stop", service_name])
+            subprocess.run(["/usr/bin/sudo", "systemctl", "stop", service_name])
             return {"message": f"{service_name} service stopped"}
         except Exception as e:
             return {"error": f"Failed to stop service: {str(e)}"}
 
     elif command == "launch":
         try:
-            subprocess.run(
-                ["/usr/bin/sudo", "systemctl", "start", service_name])
+            subprocess.run(["/usr/bin/sudo", "systemctl", "start", service_name])
             return {"message": f"{service_name} service launched"}
         except Exception as e:
             return {"error": f"Failed to launch service: {str(e)}"}
@@ -58,7 +56,6 @@ async def get_service_status(service_name: str):
         service_name = mapping.get(service_name, service_name)
     try:
         output = subprocess.run(
-
             ["/usr/bin/sudo", "systemctl", "status", service_name],
             capture_output=True,
             text=True,
@@ -80,8 +77,9 @@ async def get_service_status(service_name: str):
 
         # Extract uptime
 
-        uptime_match = re.search(r"Active: active \(running\) since (.+?);",
-                                 output.stdout)
+        uptime_match = re.search(
+            r"Active: active \(running\) since (.+?);", output.stdout
+        )
         uptime = uptime_match.group(1) if uptime_match else None
 
         return {
@@ -96,12 +94,11 @@ async def get_service_status(service_name: str):
         }
 
     except subprocess.CalledProcessError as e:
-        return {
-            "error": f"Service not found or error checking status: {str(e)}"
-        }
+        return {"error": f"Service not found or error checking status: {str(e)}"}
 
 
 # Start the server (for development)
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8898)
