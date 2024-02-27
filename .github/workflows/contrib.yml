@@ -1,0 +1,45 @@
+name: "Contrib"
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  echo-input:
+    runs-on: ubuntu-latest
+    steps:
+      - run: git clone https://github.com/acowusu/segp
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' 
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: pip install git-fame
+      - name: Setup execa
+        run: npm install execa
+      - run: sudo apt-get update && sudo apt-get install jq -y
+      - name: Update package.json
+        run: |
+          jq '.name = "Contributions" | 
+             .type = "module" ' package.json > tmp.json && mv tmp.json package.json
+      - name: show files
+        run: ls -la
+      - name: show dir
+        run: pwd
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const execa = await import('/home/runner/work/segp/segp/node_modules/execa/index.js')
+            console.log(execa)
+            const  {stdout} = await execa.$`git-fame  --incl ".ts|.tsx|.py|.service|.html|.md|.patch"`
+
+            console.log(stdout)
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: stdout
+            })

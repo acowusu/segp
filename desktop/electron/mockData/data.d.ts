@@ -52,3 +52,13 @@ export interface Avatar {
   width: number;
   height: number;
 }
+
+export interface BackingTrack {
+  audioSrc: string; // path to audio file
+  audioDuration: number; // duration of audio file
+}
+interface Status {
+  url: string;
+  name: string;
+  status: string;
+}

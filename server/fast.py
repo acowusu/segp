@@ -84,7 +84,7 @@ svc.mount_asgi_app(fastapi_app)
 @fastapi_app.post(
     "/image"
 )
-async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotated[str, Form()],  width: Annotated[int, Form()],  height: Annotated[int, Form()],   num_inference_steps: Annotated[int, Form()]):
+async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotated[str, Form()]="",  width: Annotated[int, Form()] =1920,  height: Annotated[int, Form()]=1080,   num_inference_steps: Annotated[int, Form()]=100):
     images = anything_v3_runner.run(prompt=prompt, width=width, height=height,
                                     negative_prompt=negative_prompt, num_inference_steps=num_inference_steps)
     print(images[0][0])
@@ -93,7 +93,9 @@ async def predict_async(prompt: Annotated[str, Form()], negative_prompt: Annotat
     filtered_image.seek(0)
     return StreamingResponse(filtered_image, media_type="image/jpeg")
 
-
+@fastapi_app.get("/status")
+async def status():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     uvicorn.run(fastapi_app, host="0.0.0.0", port=8892)

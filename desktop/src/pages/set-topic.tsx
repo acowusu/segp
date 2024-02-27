@@ -16,6 +16,7 @@ import {
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Topic } from "../../electron/mockData/data";
 import { toast } from "sonner";
+import { Badge } from "../components/ui/badge";
 export const SetTopic: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Topic[]>([]);
@@ -55,6 +56,14 @@ export const SetTopic: React.FC = () => {
           <CardTitle>Select Topic</CardTitle>
           <CardDescription>
             These topics were identified in the report provided.
+            <br className="mb-4" />
+            <Badge variant={"secondary"}  className="mt-2 cursor-pointer"
+            onClick={()=>toast.promise(window.api.getTopics(true).then(setItems), {
+              loading: `Regenerating topics...`,
+              success: `Done`,
+              error: (e)=>`Error Regenerating: ${e}` 
+            })}>Refresh</Badge>
+
           </CardDescription>
         </CardHeader>
         <CardContent className="h-4/6">
