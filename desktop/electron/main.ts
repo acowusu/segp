@@ -111,9 +111,5 @@ app && app.whenReady().then(() => {
 
   createWindow()
 
-  setTimeout(() => {
-    // const db = getDatabase()
-    win?.webContents.send('main-process-message', `[database-sqlite] `)
-  }, 1000);
 })
 export { win }

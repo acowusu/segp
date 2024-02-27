@@ -19,8 +19,9 @@ export async function createProject(
   console.log(projectDir);
   await mkdir(projectDir);
   await copyFile(reportPath, `${projectPath}${sep}${name}${sep}report.pdf`);
-  createProjectStore(projectDir);
-  userStore.set("lastProject", projectDir);
+  // createProjectStore(projectDir);
+  // userStore.set("lastProject", projectDir);
+  await openProject(projectDir);
   const projectStore = getProjectStore();
   // closeDatabase();
   // getDatabase(`${projectDir}${sep}project.db`);
@@ -34,6 +35,18 @@ export async function openProject(projectPath: string): Promise<void> {
   // closeDatabase();
   createProjectStore(projectPath);
   userStore.set("lastProject", projectPath);
+  if(!userStore.has("recentProjects")) {
+    userStore.set("recentProjects", [projectPath]);
+  } else {
+    const recentProjects = userStore.get("recentProjects") as string[];
+    if(!recentProjects.includes(projectPath)) {
+      recentProjects.push(projectPath);
+      if (recentProjects.length > 5) {
+        recentProjects.shift();
+      }
+      userStore.set("recentProjects", recentProjects);
+    }
+  }
   // getDatabase(`${projectPath}${sep}project.db`);
 }
 
