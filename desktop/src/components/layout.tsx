@@ -3,10 +3,15 @@ import { ThemeToggle } from "./ui/theme-toggle";
 import { ScrollArea } from "./ui/scroll-area";
 import { Toaster } from "./ui/sonner";
 import { toast } from "sonner";
-import { UpdateIcon, DoubleArrowRightIcon, DoubleArrowLeftIcon } from "@radix-ui/react-icons";
+import {
+  UpdateIcon,
+  DoubleArrowRightIcon,
+  DoubleArrowLeftIcon,
+} from "@radix-ui/react-icons";
 import { useState, useMemo, useEffect } from "react";
 import { Badge } from "./ui/badge";
 import { Status } from "../../electron/mockData/data";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function Layout() {
   const location = useLocation();
@@ -39,7 +44,7 @@ export function Layout() {
 
   useEffect(() => {
     //Implementing the setInterval method
-    const interval = setInterval(updateStatuses, 5000);
+    const interval = setInterval(updateStatuses, 10000);
 
     //Clearing the interval
     return () => clearInterval(interval);
@@ -49,29 +54,46 @@ export function Layout() {
       {/* A "layout route" is a good place to put markup you want to
           share across all the pages on your site, like navigation. */}
       <div className="fixed top-3 left-5 text-xs flex items-center ">
-        <Badge
-        className="mr-4"
-          variant={"secondary"}
-          onClick={() =>
-            toast.promise(updateStatuses, {
-              loading: `Checking status...`,
-              success: `Done`,
-              error: `Failed to check status. Please try again.`,
-            })
-          }
-        >
-          <UpdateIcon />
-        </Badge>
-        {showStatus && status.map((s, index) => (
-          <Badge
-            onClick={async () => await toggleService(s)}
-            className="mr-4"
-            key={index}
-            variant={s.status === "Online" ? "cloud" : "destructive"}
-          >
-            {s.name}
-          </Badge>
-        ))}
+        <AnimatePresence>
+          {showStatus && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Badge
+                className="mr-4"
+                variant={"secondary"}
+                onClick={() =>
+                  toast.promise(updateStatuses, {
+                    loading: `Checking status...`,
+                    success: `Done`,
+                    error: `Failed to check status. Please try again.`,
+                  })
+                }
+              >
+                <UpdateIcon />
+              </Badge>
+
+              {status.map((s, index) => (
+                <Badge
+                  onClick={async () => await toggleService(s)}
+                  className="mr-4"
+                  key={index}
+                  variant={
+                    s.status === "Online"
+                      ? "cloud"
+                      : s.status === "Offline"
+                      ? "destructive"
+                      : "secondary"
+                  }
+                >
+                  {s.name}
+                </Badge>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
         <Badge
           onClick={() => setShowStatus(!showStatus)}
           className="mr-4"

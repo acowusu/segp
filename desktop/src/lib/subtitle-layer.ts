@@ -69,9 +69,6 @@ class SubtitleText extends etro.layer.Visual {
         thickness?: number
     }>
 
-    private _prevText: string
-    private _prevFont: string
-    private _prevMaxWidth: number
 
     /**
      * Creates a new text layer
@@ -88,9 +85,6 @@ class SubtitleText extends etro.layer.Visual {
         super({ background: undefined, ...options })
         // etro.applyOptions(options, this)
         this.text = options.text
-        this._prevText = ""
-        this._prevFont = ""
-        this._prevMaxWidth = 0
         this.font = options.font ?? '10px sans-serif'
         this.color = options.color ?? etro.parseColor('#fff')
         this.textX = options.textX ?? 0
@@ -113,9 +107,7 @@ class SubtitleText extends etro.layer.Visual {
         super.doRender()
         const text = etro.val(this, 'text', this.currentTime); const font = etro.val(this, 'font', this.currentTime)
         const maxWidth = this.maxWidth ? etro.val(this, 'maxWidth', this.currentTime) : undefined
-        // // properties that affect metrics
-        // if (this._prevText !== text || this._prevFont !== font || this._prevMaxWidth !== maxWidth)
-        //     this._updateMetrics(text, font, maxWidth);
+        
 
         this.cctx.font = font
         this.cctx.textAlign = etro.val(this, 'textAlign', this.currentTime)
@@ -170,9 +162,7 @@ class SubtitleText extends etro.layer.Visual {
             this.cctx.globalCompositeOperation = globalCompositionOperation
         }
 
-        this._prevText = text
-        this._prevFont = font
-        this._prevMaxWidth = maxWidth
+      
     }
 
     // _updateMetrics(text, font, maxWidth) {
