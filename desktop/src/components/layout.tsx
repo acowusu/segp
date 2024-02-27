@@ -44,7 +44,7 @@ export function Layout() {
 
   useEffect(() => {
     //Implementing the setInterval method
-    const interval = setInterval(updateStatuses, 10000);
+    const interval = setInterval(updateStatuses, 60000);
 
     //Clearing the interval
     return () => clearInterval(interval);

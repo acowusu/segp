@@ -55,7 +55,7 @@ export const OpenProject: React.FC<OpenProjectProps> = ({
               <Label htmlFor="list">Open Recent Projects</Label>
               {recentProjects.map((project) => (
                 <div key={project}>
-                  <Button type="button" className="w-full text-left" variant={"secondary"}  onClick={() => setProjectFile(project)}>{project}</Button>
+                  <div className="bg-secondary rounded-lg p-2 mt-2 overflow-hidden w-full text-left" onClick={() => setProjectFile(project)} > {project}</div>
                 </div>
               ))}
 
@@ -63,7 +63,7 @@ export const OpenProject: React.FC<OpenProjectProps> = ({
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-between relative bottom-[-72px]">
+        <CardFooter className="flex justify-between rcuselative bottom-[-72px]">
           <Button variant="outline">Cancel</Button>
           <Button disabled={disabledNext} onClick={handleNext}>
             Next
