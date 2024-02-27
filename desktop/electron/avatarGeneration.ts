@@ -1,16 +1,18 @@
-import type { Avatar } from './mockData/data';
+import type { Avatar, ScriptData } from './mockData/data';
 import { setProjectAvatar } from './projectData';
 import avatars from './mockData/avatars.json';
 
-export async function generateAvatar(avatar: Avatar, audioPath: string): Promise<string> {
+export async function generateAvatar(script: ScriptData, avatar: Avatar): Promise<ScriptData> {
 
+    console.log("Generating Avatar with script: ", script);
+    console.log("Generating Avatar with avatar: ", avatar);
     const endpoint = 'https://iguana.alexo.uk/v4/avatar/';
 
     const body = {
-        driven_audio: audioPath,
+        driven_audio: script.sadTalkerPath,
         source_image: avatar.sadtalkerPath,
     }
-   
+    console.log("Request body: ", body);
     const reponse = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -24,7 +26,8 @@ export async function generateAvatar(avatar: Avatar, audioPath: string): Promise
     }
 
     const avatarData = await reponse.json();
-    return avatarData.data_url;
+    script.avatarVideoUrl = avatarData.data_url;
+    return script;
 }
 
 export async function getAvatars(): Promise<Avatar[]> {

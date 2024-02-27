@@ -159,6 +159,63 @@ const generateAudio = async () => {
   }
 };
 
+const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
+  if (!window.api.getProjectHasAvatar()) {
+    console.log("No Avatar Option Selected. Skipping Avatar Layering... ");
+    return; 
+  }
+  let start = 0;
+  for (const section of sections) {
+    if (!section.avatarVideoUrl) throw new Error("No avatarURL found");
+    if (!section.scriptDuration) throw new Error("No duration found");
+    const avatar = await window.api.getProjectAvatar();
+    const layer = new etro.layer.Video({
+      startTime: start,
+      duration: section.scriptDuration,
+      source: section.avatarVideoUrl,
+      destX: 0, // default: 0
+      destY: 0, // default: 0
+      destWidth: avatar.width, // default: null (full width)
+      destHeight: avatar.height, // default: null (full height)
+      x: 0, // default: 0
+      y: 0, // default: 0
+      opacity: 1, // default: 1
+    });
+    movie.layers.push(layer);
+    console.log("adding layer", layer);
+
+    start += section.scriptDuration;
+  }
+}
+
+const generateAvatarSections = async () => {
+  if (!window.api.getProjectHasAvatar()) {
+    console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
+    return; 
+  }
+  try {
+    const initial = await window.api.getScript();
+    const result = [];
+    const avatar = await window.api.getProjectAvatar();
+    for (const section of initial) {
+      const modified = window.api.generateAvatar(section, avatar);
+      toast.promise(modified, {
+        loading: `Generating avatar for ${section.sectionName}...`,
+        success: (_) => {
+          return `Avatar has been generated for ${section.sectionName}. `;
+        },
+        error: "Error generating avatar for section: " + section.sectionName,
+      });
+      const resolvedModified = await modified;
+      result.push(resolvedModified);
+    }
+    window.api.setScript(result);
+    console.log("Avatar Sections Generated");
+  } catch (error) {
+    console.error("Error generating avatar:", error);
+  }
+}
+
 /** TODOs:
  * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
  * -> support other layers, audio
@@ -172,7 +229,7 @@ export const VideoGenerator: React.FC = () => {
   const [currentState, setCurrentState] = useState<string>("initial");
   const [script, setScript] = useState<ScriptData[]>([]);
   const updateScript = async () => {
-    window.api.getScript().then(async (script) => {
+    window.api.getScript().then( async (script) => {
       setScript(script);
     });
   };
@@ -211,11 +268,7 @@ export const VideoGenerator: React.FC = () => {
     // });
     // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
-    // await toast.promise(addSadTalkerLayers(script, movie), {
-    //   loading: `Adding sad talker...`,
-    //   success: `Sad talker added.`,
-    //   error: "Error adding sad talker",
-    // });
+
     addSubtitleLayers(script, movie);
 
     movieRef.current = movie;
@@ -226,6 +279,7 @@ export const VideoGenerator: React.FC = () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
     await generateAudio();
+    await generateAvatarSections();
     console.log("audio generated backing should exist");
 
     const interval = setInterval(() => {
