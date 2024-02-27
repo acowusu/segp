@@ -150,8 +150,14 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    navigate("/welcome/get-video");
+    navigate("/get-video");
     await window.api.setScript(items);
+    // START PIPELINE
+
+    // put ur stuff here 
+  };
+  const selectTopic = async () => {
+    navigate("/set-topic");
   };
   const updateScriptText = async (
     e: React.FormEvent,
@@ -366,12 +372,12 @@ export const ScriptEditor: React.FC = () => {
                 ))}
               </Reorder.Group>
             </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline">Back</Button>
-            <Button onClick={setScript}>Next</Button>
-          </CardFooter>
-        </FramelessCard>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button onClick={selectTopic} variant="outline">Back</Button>
+          <Button onClick={setScript}>Next</Button>
+        </CardFooter>
+      </FramelessCard> 
       )}
     </div>
   );

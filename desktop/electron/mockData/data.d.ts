@@ -15,6 +15,11 @@ export interface ScriptData {
   avatarVideoUrl?: string; // avatar video URL
 }
 
+export interface ScriptSelections {
+  topic: string; 
+  script: ScriptData[];
+}
+
 export interface Audience {
   name: string;
   description: string;

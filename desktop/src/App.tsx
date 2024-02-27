@@ -2,7 +2,6 @@ import "./App.css";
 
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/layout";
-import { WelcomeLayout } from "./components/welcome-layout";
 import { SetVisuals } from "./pages/set-visuals";
 import { NotFound } from "./pages/not-found";
 import { SetTopic } from "./pages/set-topic";
@@ -18,12 +17,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Upload />} />
-            <Route path="welcome/" element={<WelcomeLayout />}>
-              <Route path="set-topic" element={<SetTopic />} />
-              <Route path="set-visuals" element={<SetVisuals />} />
-              <Route path="script-editor" element={<ScriptEditor />} />
-              <Route path="get-video" element={<VideoGenerator />} />
-            </Route>
+            <Route path="set-visuals" element={<SetVisuals />} />
+            <Route path="set-topic" element={<SetTopic />} />
+            <Route path="script-editor" element={<ScriptEditor />} />
+            <Route path="get-video" element={<VideoGenerator />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
