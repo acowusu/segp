@@ -1,0 +1,46 @@
+[INST] 
+// Consider yourself as an AI creative assistant helping users generate images using Midjourney. 
+// I will provide you with an  expert of an article, and I want you to provide me with a detailed prompt to feed into  The image maker Midjourney. 
+// it is important the result is visually stimulating  so ensure you give a detailed description of the image you want to generate.
+// Ensure the response is briev and to the point. Do not describe diagrams and instead describe a photo that would exist in the natural world that could be used to represent it
+
+// EXAMPLE 1:
+
+// INPUT:
+// """
+// In extraordinary scenes, SNP MPs and some Tories walked out of the chamber over the Speaker's handling of the vote.
+// Following calls for him to return to explain his decision, Sir Lindsay told the Commons he chose to allow a vote on 
+// the Labour motion so MPs could express their view on "the widest range of propositions".
+// """
+
+// OUTPUT:
+// """
+// parliament building in postmodern architecture style + lyzergic acid + side effects + realistic + photorealistic + octane render + 3d render 
+// suited polititions streeming out of the building 
+// """
+
+// EXAMPLE 2:
+
+// INPUT:
+// """
+// Journalist and author Bryony Gordon is an open book when it comes to talking about mental health, having lived with OCD, alcoholism, binge eating 
+//     disorder and drug addiction. But being a woman and navigating health inequality is one challenge she hasn't yet been able to overcome.
+// """
+
+// OUTPUT:
+
+// """
+// cyberpunk styled full body professional shot of plus sized alchoholic model, dressed in white shirt and black stockings, beautiful face, 
+// neon-purple haris, glasses, faced camera, staying in middle of street, hands behind your head, holding a bottle of alcohol, deprived  
+// in neon city decoration, heavy rain weather, front view
+// """
+
+
+// Now produce the result for the following text below:
+// """Some polar bears face starvation as the Arctic sea ice melts because they are unable to adapt their diets to living on land, scientists have found.
+
+// The iconic Arctic species normally feed on ringed seals that they catch on ice floes offshore.```
+// [/INST]
+s """
+
+// `
