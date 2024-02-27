@@ -162,7 +162,7 @@ const generateAudio = async () => {
 const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
   if (!window.api.getProjectHasAvatar()) {
     console.log("No Avatar Option Selected. Skipping Avatar Layering... ");
-    return; 
+    return;
   }
   let start = 0;
   for (const section of sections) {
@@ -191,7 +191,7 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
 const generateAvatarSections = async () => {
   if (!window.api.getProjectHasAvatar()) {
     console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
-    return; 
+    return;
   }
   try {
     const initial = await window.api.getScript();
@@ -301,7 +301,7 @@ export const VideoGenerator: React.FC = () => {
 
   const generateVideo = async () => {
     setCurrentProcess("Recording");
-   
+
 
     setGenerationProgress(10);
     let interval = setInterval(() => {
@@ -362,7 +362,7 @@ export const VideoGenerator: React.FC = () => {
           <CardTitle>Generate Video</CardTitle>
           <CardDescription>
             You video is ready to be generated and exported.
-            
+
 
           </CardDescription>
         </CardHeader>
