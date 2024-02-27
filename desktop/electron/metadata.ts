@@ -24,6 +24,12 @@ export function getLastProject(): string {
   return userStore.get("lastProject") as string;
 }
 
+export function getRecentProjects(): string[] {
+  if (!userStore.has("recentProjects")) {
+    userStore.set("recentProjects", []);
+  }
+  return userStore.get("recentProjects") as string[];
+}
 export function getTextReportPath(): string {
   return `${getProjectPath()}${sep}report.txt`;
 }

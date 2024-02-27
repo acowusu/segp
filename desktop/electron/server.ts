@@ -1,6 +1,5 @@
 import { getProjectPath } from "./metadata";
 import type { ScriptData, Topic } from "./mockData/data";
-import { getProjectTopic } from "./projectData";
 import { downloadFile } from "./reportProcessing";
 import scriptSchema from "./schemas/script.json";
 import topicSchema from "./schemas/topic.json";
@@ -48,37 +47,14 @@ export const generateTextFromLLM = async (
 
     try {
         const response = await fetch(url, options);
-        const responseText = (await response.json() as LLMResponse).response;
+        const responseText = (await response.json() as LLMResponse<string>).response;
 
-        return responseText;
+        return responseText as string;
     } catch (err) {
         console.error("error:" + err);
         return "";
     }
 };
-
-// <<SYS>>You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
-// Format the response as a json list following this schema:
-// <SCHEMA>
-// {
-//   topic: string;
-//   summary: string;
-// }
-// </SCHEMA>
-// <EXAMPLE>
-// [
-//   {
-//       "topic": "Overview of Deep Convolutional Neural Networks",
-//       "summary": "An introduction to deep convolutional neural networks, their significance in image classification, and their revolutionary impact on computer vision."
-//   },
-//   {
-//       "topic": "The ImageNet Challenge: Revolutionizing Object Recognition",
-//       "summary": "Exploring the role of the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) in advancing neural network research and object recognition technologies."
-//   },</EXAMPLE>
-// Give the topics mentioned in the following article
-// <</SYS>>
-
-//  Here are the topics mentioned in the article you provided: 
 
 const TOPICS_SYS = `
 Below is some information.
@@ -86,8 +62,6 @@ Find me a list of topics from this information which you could create an informa
 For this video, you can use general knowledge, but you should aim to use only information which is supplied in the information. If there is information which conflicts with your knowledge, assume that the information provided is right:
 
 `
-
-
 
 
 const TOPICS_HEADER = `[INST]
@@ -162,7 +136,7 @@ export const generateScript = async (report: string, topic:Topic): Promise<Scrip
                 return {
                     id: performance.now().toString(16),
                     selectedScriptIndex: 0,
-                    sectionName: section.title + " Part " + i.toString(),
+                    sectionName: section.title + " Part " + (i+1).toString(),
                     scriptTexts: [sentence.text],
                     }
             })

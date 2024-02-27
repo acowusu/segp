@@ -52,7 +52,7 @@ export default defineConfig({
       // See 👉 https://github.com/electron-vite/vite-plugin-electron-renderer
       renderer: {},
     }),
-    bindingSqlite3(),
+    // bindingSqlite3(),
     bindingFFmpeg(),
   ],
   server: process.env.VSCODE_DEBUG && (() => {

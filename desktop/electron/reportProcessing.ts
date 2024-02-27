@@ -18,6 +18,7 @@ import * as projectData from "./projectData";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import watch from "node-watch"
 import fs from "fs";
+
 import path from "path";
 import dataurl from "dataurl";
 /**
@@ -117,7 +118,8 @@ export async function textToAudio(script: ScriptData): Promise<ScriptData> {
 
   const duration = parseFloat(headers.get("audio-duration")!);
   // Used with sadtalker
-  // const location = parseFloat(headers.get("media-location")!); 
+  const location = headers.get("media-location")!; 
+  script.sadTalkerPath = location;
   script.scriptAudio = destination;
   script.scriptDuration = duration;
 
@@ -203,10 +205,12 @@ export async function setAudience(audience: Audience): Promise<void> {
   projectData.setProjectAudience(audience);
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
-  console.log("setVoiceover", voiceover);
   projectData.setProjectVoiceover(voiceover);
 }
 export async function setVisual(visuals: Visual): Promise<void> {
   projectData.setProjectVisual(visuals);
+}
+export async function setLength(length: number): Promise<void> {
+  projectData.setProjectLength(length);
 }
 // Usage example:

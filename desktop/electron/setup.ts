@@ -1,6 +1,6 @@
 import { copyFile, writeFile } from "node:fs/promises";
 import { sep } from "path";
-import { closeDatabase, getDatabase } from "./database";
+// import { closeDatabase, getDatabase } from "./database";
 import { dialog } from "electron";
 import { BrowserWindow } from "electron";
 import { win } from "./main";
@@ -19,8 +19,9 @@ export async function createProject(
   console.log(projectDir);
   await mkdir(projectDir);
   await copyFile(reportPath, `${projectPath}${sep}${name}${sep}report.pdf`);
-  createProjectStore(projectDir);
-  userStore.set("lastProject", projectDir);
+  // createProjectStore(projectDir);
+  // userStore.set("lastProject", projectDir);
+  await openProject(projectDir);
   const projectStore = getProjectStore();
   // closeDatabase();
   // getDatabase(`${projectDir}${sep}project.db`);
@@ -31,10 +32,22 @@ export async function createProject(
 }
 
 export async function openProject(projectPath: string): Promise<void> {
-  closeDatabase();
+  // closeDatabase();
   createProjectStore(projectPath);
   userStore.set("lastProject", projectPath);
-  getDatabase(`${projectPath}${sep}project.db`);
+  if(!userStore.has("recentProjects")) {
+    userStore.set("recentProjects", [projectPath]);
+  } else {
+    const recentProjects = userStore.get("recentProjects") as string[];
+    if(!recentProjects.includes(projectPath)) {
+      recentProjects.push(projectPath);
+      if (recentProjects.length > 5) {
+        recentProjects.shift();
+      }
+      userStore.set("recentProjects", recentProjects);
+    }
+  }
+  // getDatabase(`${projectPath}${sep}project.db`);
 }
 
 export async function getDirectory(): Promise<string> {

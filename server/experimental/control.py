@@ -1,6 +1,8 @@
-import subprocess
-from fastapi import FastAPI, Request
 import re
+import subprocess
+
+from fastapi import FastAPI
+from fastapi import Request
 
 app = FastAPI(root_path="/v8")
 
@@ -9,7 +11,7 @@ allowed_services = [
     "fastapi-tts",
     "fastapi-llm",
     "fastapi-music",
-    "fastapi-audiofx"
+    "fastapi-audiofx",
 ]
 mapping = {
     "Image API": "fastapi-img",
@@ -18,7 +20,6 @@ mapping = {
     "Music API": "fastapi-music",
     "Sound Effects API": "fastapi-audiofx"
 }
-print("Control API started")
 
 
 @app.post("/control")
@@ -57,7 +58,10 @@ async def get_service_status(service_name: str):
         service_name = mapping.get(service_name, service_name)
     try:
         output = subprocess.run(
-            ["/usr/bin/sudo", "systemctl", "status", service_name], capture_output=True, text=True
+
+            ["/usr/bin/sudo", "systemctl", "status", service_name],
+            capture_output=True,
+            text=True,
         )
         isInactive = "inactive" in output.stdout
         isRunning = "running" in output.stdout
@@ -75,14 +79,28 @@ async def get_service_status(service_name: str):
         status_code = status_code_match.group(1) if status_code_match else None
 
         # Extract uptime
-        uptime_match = re.search(
-            r"Active: active \(running\) since (.+?);", output.stdout)
+
+        uptime_match = re.search(r"Active: active \(running\) since (.+?);",
+                                 output.stdout)
         uptime = uptime_match.group(1) if uptime_match else None
 
-        return {"status": output.stdout, "isInactive": isInactive, "isRunning": isRunning, "memoryUsage": memory_usage, "uptime": uptime, "lastCalled": time, "LastStatusCode": status_code, "last_line": last_line, "isCudaError": isCudaError}
+        return {
+            "status": output.stdout,
+            "isInactive": isInactive,
+            "isRunning": isRunning,
+            "memoryUsage": memory_usage,
+            "uptime": uptime,
+            "lastCalled": time,
+            "LastStatusCode": status_code,
+            "last_line": last_line,
+        }
 
     except subprocess.CalledProcessError as e:
-        return {"error": f"Service not found or error checking status: {str(e)}"}
+        return {
+            "error": f"Service not found or error checking status: {str(e)}"
+        }
+
+
 # Start the server (for development)
 if __name__ == "__main__":
     import uvicorn

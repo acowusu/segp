@@ -58,7 +58,10 @@ export const Upload: React.FC = () => {
         error: "Error",
       });
     }
-    navigate("/welcome/set-topic");
+
+
+    navigate("/set-visuals");
+    
     setDisabledNext(true);
   };
 
