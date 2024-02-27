@@ -1,10 +1,10 @@
 [
-    {   
-        "id": "1",
-        "name": "Lebron James",
-        "imagePath": "lebron.png" ,
-        "sadtalkerPath": "/www/sadtalker_assets/source_image/lebron.png",
-        "width": 559,
-        "height": 447
-    }
+  {
+    "id": "1",
+    "name": "Lebron James",
+    "imagePath": "lebron.png",
+    "sadtalkerPath": "/www/sadtalker_assets/source_image/lebron.png",
+    "width": 559,
+    "height": 447
+  }
 ]
