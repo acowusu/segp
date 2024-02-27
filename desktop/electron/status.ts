@@ -17,10 +17,10 @@ const endpoints = [
         url: "https://iguana.alexo.uk/v3/status",
         name: "LLM API",
     },
-    // {
-    //     url: "https://iguana.alexo.uk/v4/status",
-    //     name: "V4 API",
-    // },
+    {
+        url: "https://iguana.alexo.uk/v4/status",
+        name: "Avatar API",
+    },
     // {
     //     url: "https://iguana.alexo.uk/v5/status",
     //     name: "V5 API",
@@ -34,13 +34,33 @@ const endpoints = [
         name: "Sound Effects API",
     }
 ]
-
+export const delay = (ms: number): Promise<void> => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
 export const getServiceStatus = async (): Promise<Status[]> => {
     const statuses: Status[] = []
     for (const endpoint of endpoints) {
-        console.log("Checking", endpoint.url)
-        const response = await fetch(endpoint.url);
-        statuses.push({ url: endpoint.url, name: endpoint.name, status: response.status === 200 ? "Online" : "Offline" });
+        // console.log("Checking", endpoint.url)
+        const controller = new AbortController();
+        const { signal } = controller;
+
+        
+
+        try {
+            const response = await Promise.race( [fetch(endpoint.url, { signal }), delay(1000).then(() => { controller.abort(); throw new Error("AbortError") })] );
+            statuses.push({ url: endpoint.url, name: endpoint.name, status: response.status === 200 ? "Online" : "Offline" });
+            // Handle the response
+        } catch (error) {
+            if ((error as Error).name === 'AbortError') {
+                // console.log('Request aborted');
+                statuses.push({ url: endpoint.url, name: endpoint.name, status: "Unresponsive" });
+
+            } else {
+                // console.error('Error:', error);
+                statuses.push({ url: endpoint.url, name: endpoint.name, status: "Unresponsive" });
+
+            }
+        }
     }
     return statuses
 }
@@ -85,7 +105,7 @@ export const launchService = async (serviceName: string): Promise<void> => {
         body: JSON.stringify(body)
     });
     if (response.status !== 200) {
-        throw new Error("Failed to shutdown service");
+        throw new Error("Failed to Launch service");
     }
     const text = await response.text()
     console.log("Service launched", text)

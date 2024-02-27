@@ -1,6 +1,6 @@
 import { copyFile, writeFile } from "node:fs/promises";
 import { sep } from "path";
-import { closeDatabase, getDatabase } from "./database";
+// import { closeDatabase, getDatabase } from "./database";
 import { dialog } from "electron";
 import { BrowserWindow } from "electron";
 import { win } from "./main";
@@ -31,10 +31,10 @@ export async function createProject(
 }
 
 export async function openProject(projectPath: string): Promise<void> {
-  closeDatabase();
+  // closeDatabase();
   createProjectStore(projectPath);
   userStore.set("lastProject", projectPath);
-  getDatabase(`${projectPath}${sep}project.db`);
+  // getDatabase(`${projectPath}${sep}project.db`);
 }
 
 export async function getDirectory(): Promise<string> {

@@ -1,6 +1,5 @@
 import { getProjectPath } from "./metadata";
 import type { ScriptData, Topic } from "./mockData/data";
-import { getProjectTopic } from "./projectData";
 import { downloadFile } from "./reportProcessing";
 import scriptSchema from "./schemas/script.json";
 import topicSchema from "./schemas/topic.json";
@@ -48,9 +47,9 @@ export const generateTextFromLLM = async (
 
     try {
         const response = await fetch(url, options);
-        const responseText = (await response.json() as LLMResponse).response;
+        const responseText = (await response.json() as LLMResponse<string>).response;
 
-        return responseText;
+        return responseText as string;
     } catch (err) {
         console.error("error:" + err);
         return "";
@@ -162,7 +161,7 @@ export const generateScript = async (report: string, topic:Topic): Promise<Scrip
                 return {
                     id: performance.now().toString(16),
                     selectedScriptIndex: 0,
-                    sectionName: section.title + " Part " + i.toString(),
+                    sectionName: section.title + " Part " + (i+1).toString(),
                     scriptTexts: [sentence.text],
                     }
             })
