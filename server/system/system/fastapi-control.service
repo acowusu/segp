@@ -1,0 +1,12 @@
+[Unit]
+Description=FastAPI TTS Server
+After=network.target
+
+[Service]
+User=alexa
+WorkingDirectory=/home/alexa/segp-1/server/experimental  
+Environment=PATH=/home/alexa/.conda/envs/py39/bin:$PATH 
+ExecStart=/home/alexa/.conda/envs/py39/bin/python control.py
+
+[Install]
+WantedBy=multi-user.target
