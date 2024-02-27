@@ -1,12 +1,10 @@
-import etro from 'etro'
+import { Visual } from 'etro/src/layer/visual'
+// import type { Visual } from 'etro/src/layer/visual'
+import { VisualSourceOptions, VisualSourceMixin } from 'etro/src/layer/visual-source'
+import { AudioSourceOptions, AudioSourceMixin } from 'etro/src/layer/audio-source'
+type Constructor<T> = new (...args: unknown[]) => T
 
-class MyVisual extends etro.layer.Visual {
-    constructor(...args: unknown[]) {
-      super(args[0] as etro.layer.VisualOptions);
-    }
-  }
-  
-interface VideoOptions extends Omit<etro.layer.AudioSourceOptions & etro.layer.VisualSourceOptions, 'duration'|'source'> {
+interface VideoOptions extends Omit<AudioSourceOptions & VisualSourceOptions, 'duration'|'source'> {
   duration?: number
 
   /**
@@ -20,11 +18,11 @@ interface VideoOptions extends Omit<etro.layer.AudioSourceOptions & etro.layer.V
  * @extends AudioSource
  * @extends VisualSource
  */
-class CustomVideo extends etro.layer.VisualSourceMixin(MyVisual) {
+class CustomVideo extends AudioSourceMixin(VisualSourceMixin(Visual as Constructor<Visual>)) {
   /**
    * The raw html `<video>` element
    */
-  source!: HTMLVideoElement;
+  source!: HTMLVideoElement
 
   constructor (options: VideoOptions) {
     if (typeof (options.source) === 'string') {
@@ -39,9 +37,10 @@ class CustomVideo extends etro.layer.VisualSourceMixin(MyVisual) {
       // Set a default duration so that the super constructor doesn't throw an
       // error
       duration: options.duration ?? 0
-    } as (etro.layer.AudioSourceOptions & etro.layer.VisualSourceOptions))
+    } as (AudioSourceOptions & VisualSourceOptions))
   }
 }
 
 export { CustomVideo }
-export type { VideoOptions };
+export type { VideoOptions }
+
