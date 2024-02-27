@@ -11,6 +11,8 @@ export interface ScriptData {
   scriptDuration?: number; // duration of audio file
   scriptMedia?: string; // path to media file
   scriptPrompt?: string; // path to prompt file
+  sadTalkerPath?: string; // path to tmp file on server
+  avatarVideoUrl?: string; // avatar video URL
 }
 
 export interface ScriptSelections {
@@ -45,10 +47,23 @@ export interface AudioInfo {
   duration: number;
   subtitlePath: string;
 }
+declare module 'dataurl'
 
 export interface Avatar {
   id: string;
   name: string;
   imagePath: string;
   sadtalkerPath: string;
+  width: number;
+  height: number;
+}
+
+export interface BackingTrack {
+  audioSrc: string; // path to audio file
+  audioDuration: number; // duration of audio file
+}
+interface Status {
+  url: string;
+  name: string;
+  status: string;
 }

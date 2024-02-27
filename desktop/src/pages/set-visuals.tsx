@@ -223,7 +223,7 @@ export function SetVisuals() {
               )}
             />
             {avatar && (
-              <div className="grid grid-cols-3 gap-4 overflow-auto no-scrollbar p-2 border-t-2 border-black">
+              <div className="grid grid-cols-3 gap-4 ">
               {avatarItems.map((avatar, index) => (
                 <FormField
                   key={index}

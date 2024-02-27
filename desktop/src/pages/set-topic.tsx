@@ -15,32 +15,12 @@ import {
 } from "../components/ui/card";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Topic } from "../../electron/mockData/data";
-import { quantum } from 'ldrs'
 import { toast } from "sonner";
-
-
-
-const LoadingTopics = () => {
-  quantum.register()
-  return (
-    <div className="flex flex-col gap-8 items-center justify-center">
-      <h1 className="text-2xl font-bold p-4">Please wait while we generate your scripts</h1>
-      <l-quantum
-        size="100"
-        speed="3" 
-        color="red" 
-      ></l-quantum>
-    </div>
-  ) 
-}
-
-
-
+import { Badge } from "../components/ui/badge";
 export const SetTopic: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic>({} as Topic);
-  const [loadingTopics, setLoadingTopics] = useState(true)
 
   
   const setTopic = useCallback(async (topic :Topic) => {
@@ -65,19 +45,26 @@ export const SetTopic: React.FC = () => {
         setTopic(data);
       }).catch((e) => {
         console.log(e);
-      })).finally(() => setLoadingTopics(false))
+      }))
   }, [setTopic]);
   const setScript = async () => {
     navigate("/script-editor");
   };
   return (
     <div className="flex items-center justify-center mt-4">
-      {loadingTopics ? <LoadingTopics /> : 
       <FramelessCard >
         <CardHeader>
           <CardTitle>Select Topic</CardTitle>
           <CardDescription>
             These topics were identified in the report provided.
+            <br className="mb-4" />
+            <Badge variant={"secondary"}  className="mt-2 cursor-pointer"
+            onClick={()=>toast.promise(window.api.getTopics(true).then(setItems), {
+              loading: `Regenerating topics...`,
+              success: `Done`,
+              error: (e)=>`Error Regenerating: ${e}` 
+            })}>Refresh</Badge>
+
           </CardDescription>
         </CardHeader>
         <CardContent className="h-4/6">
@@ -116,7 +103,7 @@ export const SetTopic: React.FC = () => {
         <CardFooter className="flex justify-between ">
           <Button onClick={setScript}>Next</Button>
         </CardFooter>
-      </FramelessCard> }
+      </FramelessCard>
     </div>
   );
 };

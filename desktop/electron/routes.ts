@@ -12,7 +12,9 @@ import {
   setLength,
   getVoiceovers,
   textToAudio,
+  toDataURL,
   fetchImages,
+  generateBackingTrack,
 } from "./reportProcessing";
 import {
   generateAvatar,
@@ -31,6 +33,7 @@ import {
 import { getProjectName, getProjectPath, getIsDev, getLastProject} from "./metadata";
 import * as projectData from "./projectData"
 import {generateTextFromLLM, generateTopics, generateOpenJourneyPrompt, generateOpenJourneyImage} from "./server"
+import {getServiceStatus, launchService, shutdownService} from "./status"
 const api = {
   loadReport,
   getScript,
@@ -39,6 +42,9 @@ const api = {
   setTopic,
   getAudiences,
   setAudience,
+  getServiceStatus,
+  launchService,
+  shutdownService,
   setVisual,
   getVisuals,
   setVoiceover,
@@ -49,12 +55,14 @@ const api = {
   createProject,
   openProject,
   getProjectName,
+  generateBackingTrack,
   getProjectPath,
   textToAudio,
   getIsDev,
   generateAvatar,
   getLastProject,
   ...projectData,
+  toDataURL,
   generateTextFromLLM,
   generateOpenJourneyImage,
   generateOpenJourneyPrompt,

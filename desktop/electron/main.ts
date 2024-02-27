@@ -2,8 +2,9 @@ import { app, BrowserWindow, ipcMain, dialog , screen, protocol, net } from 'ele
 import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
+
 import { generateAvatar } from './avatarGeneration'
-import { extractTextFromPDF, getScript, getTopics, setTopic, textToAudio, fetchImages} from './reportProcessing'
+import { extractTextFromPDF} from './reportProcessing'
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -85,11 +86,8 @@ app && app.whenReady().then(() => {
     return net.fetch("file:///" + request.url.slice('local:///'.length))
   })
   ipcMain.handle('dialog:openFile', handleFileOpen)
-  ipcMain.handle('dialog:getTopics', getTopics)
-  ipcMain.handle('dialog:getScript', getScript)
-  ipcMain.handle('dialog:setTopic', (_, args) => setTopic(args))
   ipcMain.handle('api:generic', (_, { property, args }) => {
-    console.log(property)
+    console.log(property);
     const methodName = property as keyof IAPI
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const method = api[methodName] as (...items: any[]) => void;

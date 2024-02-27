@@ -1,4 +1,4 @@
-import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar, ScriptSelections } from "./mockData/data";
+import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar, ScriptSelections, BackingTrack } from "./mockData/data";
 import { getProjectStore } from "./store";
 
 export function getProjectTopic(): Topic {
@@ -118,4 +118,13 @@ export function getProjectLength(): number {
 
 export function setProjectLength(length: number): void {
   getProjectStore().set("length", length);
+}
+export function getProjectBackingTrack(): BackingTrack {
+  if (!getProjectStore().has("backingTrack")) {
+    throw new Error("Backing track not set");
+  }
+  return getProjectStore().get("backingTrack") as BackingTrack;
+}
+export function setProjectBackingTrack(backingTrack: BackingTrack): void {
+  getProjectStore().set("backingTrack", backingTrack);
 }

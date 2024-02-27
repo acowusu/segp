@@ -1,6 +1,4 @@
 import "./App.css";
-// import reactLogo from "./assets/react.svg";
-// import viteLogo from "/electron-vite.animate.svg";
 
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/layout";
@@ -10,8 +8,8 @@ import { SetTopic } from "./pages/set-topic";
 import { ScriptEditor } from "./pages/script-editor";
 import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
+import { VideoGenerator } from "./pages/videogen";
 function App() {
-  // const [count, setCount] = useState(0);
 
   return (
     <>
@@ -22,6 +20,7 @@ function App() {
             <Route path="set-visuals" element={<SetVisuals />} />
             <Route path="set-topic" element={<SetTopic />} />
             <Route path="script-editor" element={<ScriptEditor />} />
+            <Route path="get-video" element={<VideoGenerator />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
