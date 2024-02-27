@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { ScriptData } from "../../electron/mockData/data";
+import { ScriptData, Topic } from "../../electron/mockData/data";
 import { UpdateIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { Skeleton } from "../components/ui/skeleton";
 import { toast } from "sonner";
@@ -26,25 +26,7 @@ import {
 
 import { Progress } from "../components/ui/progress";
 
-const LoadingScripts = ({
-  generationProgress,
-}: {
-  generationProgress: number;
-}) => {
-  quantum.register();
 
-  return (
-    <div className="flex flex-col gap-8 items-center justify-center">
-      <h1 className="text-2xl font-bold p-4">
-        Please wait while we generate your scripts
-      </h1>
-      <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-        <l-quantum size="100" speed="3" color="red"></l-quantum>
-        <Progress value={generationProgress} className="w-5/6 mt-4" />
-      </Skeleton>
-    </div>
-  );
-};
 
 export const ScriptEditor: React.FC = () => {
   const navigate = useNavigate();
@@ -56,7 +38,33 @@ export const ScriptEditor: React.FC = () => {
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
   const [scriptLoadingProgress, setScriptLoadingProgress] = useState(0);
+  const [topic, setTopic] = useState<Topic>()
+
+  const LoadingScripts = ({
+    generationProgress,
+  }: {
+    generationProgress: number;
+  }) => {
+    quantum.register();
+  
+    return (
+      <div className="flex flex-col gap-8 items-center justify-center">
+        <h1 className="text-2xl font-bold p-4">
+          Please wait while we generate your scripts for {topic?.topic}
+        </h1>
+        <h1 className="text-xl font-semibold p-4">
+          About video:  {topic?.summary}
+        </h1>
+        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+          <l-quantum size="100" speed="3" color="red"></l-quantum>
+          <Progress value={generationProgress} className="w-5/6 mt-4" />
+        </Skeleton>
+      </div>
+    );
+  };
+
   useEffect(() => {
+    window.api.getProjectTopic().then(setTopic)
     const task = window.api
       .getScript()
       .then(setItems)
@@ -150,11 +158,8 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
+    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined}}));
     navigate("/get-video");
-    await window.api.setScript(items);
-    // START PIPELINE
-
-    // put ur stuff here 
   };
   const selectTopic = async () => {
     navigate("/set-topic");

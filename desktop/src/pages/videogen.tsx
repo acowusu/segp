@@ -8,6 +8,7 @@ import { SubtitleText } from "../lib/subtitle-layer";
 import { CustomVideo } from "../lib/custom-video-layer";
 import { ScriptData } from "../../electron/mockData/data";
 import { MagicWandIcon, PlayIcon } from "@radix-ui/react-icons";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../components/ui/card";
 const WIDTH = 1920;
@@ -222,6 +223,8 @@ const generateAvatarSections = async () => {
  * -> overlaiying of visual layers for subtitles on top of the visuals
  */
 export const VideoGenerator: React.FC = () => {
+  const navigate = useNavigate();
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
   const [generationProgress, setGenerationProgress] = useState<number>(0);
@@ -399,6 +402,10 @@ export const VideoGenerator: React.FC = () => {
         className={`w-full mb-4 ${currentState === "playing" ? "" : "hidden"}`}
         ref={canvasRef}
       ></canvas>
+
+        <Button onClick={() => navigate("/script-editor")}>
+          Return to script editor
+        </Button>
 
       {currentState === "playing" && (
         <>
