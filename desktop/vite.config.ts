@@ -136,12 +136,12 @@ function bindingFFmpeg(options: {
 
   const resolver = isPosixEnvironment? path.posix : path.win32
   return {
-    name: "vite-plugin-ffmpeg", 
+    name: "vite-plugin-ffmpeg",
     config(config) {
       const resolvedRoot = normalizePath(config.root ?path.resolve(config.root) : process.cwd())
       const output = resolver.resolve(resolvedRoot,options.output) // this is the dist-native dir that will be asarunpacked
       const osPath = getPlatform()
-      let ffmpegPath = resolver.resolve("build", "resources", osPath) 
+      let ffmpegPath = resolver.resolve("build", "resources", osPath)
       if (isPosixEnvironment) {
         ffmpegPath = resolver.join(ffmpegPath, "ffmpeg")
       } else { // windows then it is a zip
@@ -157,7 +157,7 @@ function bindingFFmpeg(options: {
       }
 
       if (isPosixEnvironment) {
-        fs.copyFileSync(ffmpegPath, resolver.join(output, options.binName)) 
+        fs.copyFileSync(ffmpegPath, resolver.join(output, options.binName))
         // copy for posix
       } else { // unzip to location for windows
         decompress(ffmpegPath, output) // windows dev build works

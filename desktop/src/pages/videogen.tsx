@@ -247,7 +247,7 @@ export const VideoGenerator: React.FC = () => {
 
   const generateVideo = async () => {
     setCurrentProcess("Recording");
-   
+
 
     setGenerationProgress(10);
     let interval = setInterval(() => {
@@ -308,7 +308,7 @@ export const VideoGenerator: React.FC = () => {
           <CardTitle>Generate Video</CardTitle>
           <CardDescription>
             You video is ready to be generated and exported.
-            
+
 
           </CardDescription>
         </CardHeader>
