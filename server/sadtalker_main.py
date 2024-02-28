@@ -8,6 +8,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi import Form
 from fastapi import HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing_extensions import Annotated
 
@@ -66,6 +67,9 @@ def is_valid_image_extension(path):
 
     return True
 
+@app.get("/status")
+async def status():
+    return {"status": "ok"}
 
 @app.post("/avatar/")
 async def animate_portrait(sadtalker: SadTalker):
@@ -101,15 +105,17 @@ async def animate_portrait(sadtalker: SadTalker):
 
         # get the last from results
         results = sorted(os.listdir(results_dir))
-        mp4_name = glob.glob(results_dir + "*.mp4")[0]
-        mp4 = open("{}".format(mp4_name), "rb").read()
-        data_url = "data:video/mp4;base64," + b64encode(mp4).decode()
+        mp4_name = results[-1]
+        path = results_dir + results[-1]
+        response = FileResponse(path=path, filename=mp4_name, media_type="video/mp4")
+
+        return response
 
         # Return data url
-        return {
-            "message": "Returned animation: {}".format(mp4_name),
-            "data_url": data_url,
-        }
+        # return {
+        #    "message": "Returned animation: {}".format(mp4_name),
+        #    "data_url": data_url,
+        #}
     except subprocess.CalledProcessError:
         raise HTTPException(status_code=500, detail="Subprocess call error")
     except Exception:
