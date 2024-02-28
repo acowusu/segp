@@ -6,6 +6,7 @@ export interface ScriptData {
   id: string; // GUID 
   selectedScriptIndex: number; // index of the selected script
   scriptTexts: string[];  // array of script texts
+  imagePrompts: string[]; // array of prompts for images
   sectionName: string; // Name of section
   scriptAudio?: string; // path to audio file
   scriptDuration?: number; // duration of audio file

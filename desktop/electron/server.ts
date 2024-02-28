@@ -4,6 +4,8 @@ import { downloadFile } from "./reportProcessing";
 import scriptSchema from "./schemas/script.json";
 import topicSchema from "./schemas/topic.json";
 import imageSchema from "./schemas/image.json";
+import newScriptSchema from "./schemas/newScript.json"
+import imagePromptsSchema from "./schemas/imagePromps.json"
 
 interface LLMResponse<T> {
     response: {
@@ -131,32 +133,87 @@ export const generateScript = async (report: string, topic:Topic): Promise<Scrip
         const response = await fetch(url, options);
         const responseParsed = (await response.json() as LLMResponse<LLMSection>).response;
         console.log(JSON.stringify(responseParsed))
-        return responseParsed.sections!.map((section:LLMSection) => {
-            return section.sentences.map((sentence, i) =>{
-                return {
-                    id: performance.now().toString(16),
-                    selectedScriptIndex: 0,
-                    sectionName: section.title + " Part " + (i+1).toString(),
-                    scriptTexts: [sentence.text],
-                    }
-            })
-            
-        }).flat()   ;
+        const awaitedParsed = responseParsed.sections!.map(async (section:LLMSection) => {
+        const sentences = section.sentences.map(async (sentence, i) =>{
+            return {
+                id: performance.now().toString(16), 
+                imagePrompts: await genImagePrompts(sentence.text),
+                selectedScriptIndex: 0,
+                sectionName: section.title + " Part " + (i+1).toString(),
+                scriptTexts: [sentence.text],
+                }
+        })
+        return await Promise.all(sentences);
+        })
+        
+        return (await Promise.all(awaitedParsed)).flat();
     } catch (err) {
         console.error("error:" + err);
         throw Error("Error generating Script")
     }
 }
 
+export const genNewScript = async (script: string): Promise<string> => {
+    console.log("gening new script")
+    const params = new URLSearchParams();
 
+    const SCRIPT_HEADER = `[INST]`
+    const SCRIPT_FOOTER = ` Format the response as JSON. [/INST]`
 
+    params.append("prompt",  SCRIPT_HEADER + "Give me one way to reword the following: " + script + SCRIPT_FOOTER);
+    params.append("schema", JSON.stringify(newScriptSchema));
+    params.append("temperature", "0.7");
+    // console.log(systemPrompt, userPromp, temperature);
+    const url = "https://iguana.alexo.uk/v3/generate";
 
-// TODO set settings here 
+    const options = {
+        method: "POST",
+        body: params,
+    };
+    
+    try {
+        const response = await fetch(url, options);
+        const responseParsed = (await response.json() as LLMResponse<string>);
+        console.log(JSON.stringify(responseParsed.response))
+        return responseParsed.response as string;
+    } catch (err) {
+        console.error("error:" + err);
+        throw Error("Error generating Script")
+    }
+}
 
+export const genImagePrompts = async (script: string): Promise<[string]> => {
+    console.log("gening new script")
+    const params = new URLSearchParams();
 
+    const SCRIPT_HEADER = `[INST]
+    Give me a list of objects which i can get images of which best fits in with this text:
+    `
+    const SCRIPT_FOOTER = ` Format the response as JSON. [/INST]`
 
+    params.append("prompt",  SCRIPT_HEADER + ": " + script + SCRIPT_FOOTER);
+    params.append("schema", JSON.stringify(imagePromptsSchema));
+    params.append("temperature", "0.7");
+    // console.log(systemPrompt, userPromp, temperature);
+    const url = "https://iguana.alexo.uk/v3/generate";
 
-
+    const options = {
+        method: "POST",
+        body: params,
+    };
+    
+    try {
+        console.log(params)
+        const response = await fetch(url, options);
+        console.log(response)
+        const responseParsed = (await response.json() as LLMResponse<[string]>);
+        console.log(responseParsed.response)
+        return responseParsed.response as [string];
+    } catch (err) {
+        console.error("error:" + err);
+        throw Error("Error generating Script")
+    }
+}
 
 
 const IMAGE_GEN_PROMPT = `[INST] 

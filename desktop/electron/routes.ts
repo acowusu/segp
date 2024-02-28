@@ -2,6 +2,7 @@ import { Promisified } from "./apiTypes";
 import {
   getScript,
   setScript,
+  generateNewScript,
   getTopics,
   setTopic,
   setAudience,
@@ -38,6 +39,7 @@ const api = {
   loadReport,
   getScript,
   setScript,
+  generateNewScript,
   getTopics,
   setTopic,
   getAudiences,

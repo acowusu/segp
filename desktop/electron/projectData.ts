@@ -51,7 +51,6 @@ export function getProjectScript(): ScriptData[] {
       }
     }
     return []
-    
 }
 
 

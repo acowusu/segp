@@ -2,7 +2,7 @@
 import { getProjectPath, getTextReportPath } from "./metadata";
 import audiences from "./mockData/audiences.json";
 import { pool } from "./pool";
-import { generateTopics, generateScript } from "./server"
+import { generateTopics, generateScript, genNewScript } from "./server"
 import type {
   Audience,
   BackingTrack,
@@ -166,10 +166,11 @@ export async function getScript(force?:boolean): Promise<ScriptData[]> {
   script = await generateScript(report, projectData.getProjectTopic())
   await setScript(script)
   return script
-
-
 }
 
+export async function generateNewScript(script: string): Promise<string> {
+  return await genNewScript(script)
+}
 export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);
 }

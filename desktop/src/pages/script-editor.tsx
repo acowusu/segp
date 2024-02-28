@@ -23,6 +23,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../components/ui/popover";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../components/ui/hover-card"
 
 import { Progress } from "../components/ui/progress";
 
@@ -39,6 +44,7 @@ export const ScriptEditor: React.FC = () => {
   const [loadingScripts, setLoadingScripts] = useState(true);
   const [scriptLoadingProgress, setScriptLoadingProgress] = useState(0);
   const [topic, setTopic] = useState<Topic>()
+  const [buttonLoading, setButtonLoading] = useState("");
 
   const LoadingScripts = ({
     generationProgress,
@@ -81,11 +87,6 @@ export const ScriptEditor: React.FC = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-  const handleShowDrafts = (e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    console.log;
-    setShowOtherDrafts(!showOtherDrafts);
-  };
 
   const handleDeleteCurrent = async (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -133,11 +134,9 @@ export const ScriptEditor: React.FC = () => {
     }
   };
   const updateScriptSelection = (
-    e: React.MouseEvent,
     item: ScriptData,
     index: number
   ) => {
-    e.stopPropagation();
     setItems(
       items.map((script) => {
         if (script.id === item.id) {
@@ -164,36 +163,58 @@ export const ScriptEditor: React.FC = () => {
   const selectTopic = async () => {
     navigate("/set-topic");
   };
+  const updateScriptDraftSelection = async (
+    item: ScriptData,
+    index: number
+  ) => {
+    //set loading, disable button
+    setButtonLoading(item.id)
+    window.api.generateNewScript(item.scriptTexts[item.scriptTexts.length - 1])
+    .then(async (newScript) => {
+      console.log(newScript);
+      const newItems = items.map((script) => {
+        if (script.id === item.id) {
+          script.scriptTexts.push(newScript)
+          script.selectedScriptIndex = index;
+        }
+        return script;
+      })
+      setItems(newItems)
+      await window.api.setScript(newItems);
+    })
+    .catch((err) => console.log(err))
+    .finally(() => setButtonLoading(""))
+  };
   const updateScriptText = async (
     e: React.FormEvent,
     index: number,
     id: string
   ) => {
     const target = e.target as HTMLInputElement;
-    setItems(
-      items.map((script) => {
-        if (script.id === id) {
-          script.scriptTexts[index] = target.value;
-        }
-        return script;
-      })
-    );
-    await window.api.setScript(items);
+    const newItems = items.map((script) => {
+      if (script.id === id) {
+        script.scriptTexts[index] = target.value;
+      }
+      return script;
+    })
+    setItems(newItems);
+    await window.api.setScript(newItems);
   };
   const updatePromptText = async (e: React.FormEvent, id: string) => {
     const target = e.target as HTMLInputElement;
+    const newItems = items.map((script) => {
+      if (script.id === id) {
+        script.scriptPrompt = target.value;
+      }
+      return script;
+    })
     setItems(
-      items.map((script) => {
-        if (script.id === id) {
-          script.scriptPrompt = target.value;
-        }
-        return script;
-      })
+      newItems
     );
     await window.api.setScript(items);
   };
   return (
-    <div className="flex items-center justify-center mt-4">
+    <div className="items-center justify-center mt-4">
       {loadingScripts ? (
         <LoadingScripts generationProgress={scriptLoadingProgress} />
       ) : (
@@ -215,83 +236,43 @@ export const ScriptEditor: React.FC = () => {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="h-4/6">
-            <div className="flex flex-col gap-2 p-4 pt-0">
+          <div className="flex flex-row my-4">
+          <CardContent className="h-4/6 basis-1/2 overflow-y-auto">
+            <div className="flex flex-col gap-2 p-4 pt-0 ">
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
                   <Reorder.Item key={item.id} value={item} className="mb-4">
-                    <div className="flex flex-row gap-2  ">
+                    <div className="flex flex-row gap-2 ">
                       <div
                         key={item.id}
                         className={cn(
-                          "flex grow flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
+                          "flex grow flex-col items-start gap-2 rounded-lg p-4 text-left text-sm transition-all border-2",
                           selectedScript.id === item.id &&
-                            " border-2 border-sky-500",
+                          " border-2 border-sky-500",
                           selectedScript.id !== item.id &&
-                            "hover:border-sky-500 hover: hover:border-dashed"
-                        )}
-                        onClick={() => handleSetSelectedScript(item)}
-                      >
+                          "hover:border-sky-500 hover: hover:border-dashed"
+                          )}
+                          onClick={() => handleSetSelectedScript(item)}
+                          >
                         <div
                           className={cn(
                             " text-xs flex justify-between w-full items-center",
                             selectedScript.id === item.id
-                              ? "text-foreground"
+                            ? "text-foreground"
                               : "text-muted-foreground"
-                          )}
-                        >
+                              )}
+                              >
                           <Badge
                             variant={
                               selectedScript.id === item.id
-                                ? "destructive"
+                              ? "destructive"
                                 : "secondary"
-                            }
-                            onClick={handleDeleteCurrent}
-                          >
+                              }
+                              onClick={handleDeleteCurrent}
+                              >
                             <Cross2Icon></Cross2Icon>
                           </Badge>
-                          {/* View Other Drafts */}
-                          <Badge
-                            variant={
-                              showOtherDrafts && selectedScript.id === item.id
-                                ? "cloud"
-                                : "secondary"
-                            }
-                            onClick={handleShowDrafts}
-                          >
-                            View Other Drafts
-                          </Badge>
                         </div>
-                        {selectedScript.id === item.id && showOtherDrafts && (
-                          <div className="grid md:grid-cols-3 gap-4 w-full">
-                            {item.scriptTexts.map((script, index) => (
-                              <div
-                                onClick={(e) =>
-                                  updateScriptSelection(e, item, index)
-                                }
-                                className="p-2 overflow-hidden border h-20 rounded-lg  hover:border-dashed hover:border-sky-500"
-                              >
-                                <div>
-                                  <Badge
-                                    variant={
-                                      index == item.selectedScriptIndex
-                                        ? "cloud"
-                                        : "secondary"
-                                    }
-                                  >
-                                    Draft {index + 1}
-                                  </Badge>
-                                </div>
-                                {script}
-                              </div>
-                            ))}
-
-                            {/* <div className="p-2 overflow-hidden border h-20 rounded-lg  hover:border-dashed hover:border-sky-500">
-                            <PlusIcon className="w-8 h-8 text-secondary hover:text-sky-500 m-auto" />
-                           <p className="text-center">Add new draft</p>
-                          </div> */}
-                          </div>
-                        )}
                         <div className="flex w-full flex-col gap-1">
                           <div className="flex items-center">
                             <div className="flex items-center gap-2">
@@ -301,24 +282,52 @@ export const ScriptEditor: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="line-clamp-2 text-xs text-muted-foreground">
+                        <div className="line-clamp-2 text-xs text-muted-foreground flex flex-row">
+                          <button 
+                          onClick={() => updateScriptSelection(item, item.selectedScriptIndex - 1)}
+                          disabled = {item.selectedScriptIndex === 0}
+                          className="border rounded-l-lg p-2 font-bold flex items-center justify-center">
+                            {"<"}
+                          </button>
                           {selectedScript.id === item.id ? (
-                            <ContentEditable
-                              html={item.scriptTexts[item.selectedScriptIndex]}
-                              disabled={false}
-                              onChange={(e) => {
-                                updateScriptText(
-                                  e,
-                                  item.selectedScriptIndex,
-                                  item.id
-                                );
-                              }}
-                              className="w-full focus:min-h-20 focus:border rounded-lg focus:p-2 overflow-y-auto	 focus:outline-none"
-                            />
+                            <div className="mx-4 p-2">
+                              <ContentEditable
+                                html={item.scriptTexts[item.selectedScriptIndex]}
+                                disabled={false}
+                                onChange={(e) => {
+                                  updateScriptText(
+                                    e,
+                                    item.selectedScriptIndex,
+                                    item.id
+                                    );
+                                  }}
+                                  className="w-full focus:min-h-20 focus:border rounded-lg focus:p-2 overflow-y-auto	 focus:outline-none"
+                                  />
+                              </div>
                           ) : (
-                            item.scriptTexts[item.selectedScriptIndex]
+                            <div className="mx-4 p-2">
+                              {item.scriptTexts[item.selectedScriptIndex]}
+                            </div>
                           )}
-                          {}
+                          
+                            {item.selectedScriptIndex !== item.scriptTexts.length - 1 ? 
+                            <button 
+                            onClick={() => updateScriptSelection(item, item.selectedScriptIndex + 1)}
+                            className="border rounded-r-lg p-2 font-bold flex items-center justify-center">{">"}</button> : 
+                            <HoverCard openDelay={200}>
+                            <HoverCardTrigger>
+                              <button 
+                              disabled = {buttonLoading !== ""}
+                              className="border rounded-r-lg p-2 font-bold flex items-center justify-center text-lg"
+                              onClick={async () => updateScriptDraftSelection(item, item.selectedScriptIndex + 1)}
+                              >
+                                {buttonLoading === item.id ? "loading" : "+"}
+                              </button>
+                            </HoverCardTrigger>
+                            <HoverCardContent>
+                              Generate another version of this section of the script
+                            </HoverCardContent>
+                          </HoverCard>}
                         </div>
                       </div>
                       <div></div>
@@ -332,7 +341,7 @@ export const ScriptEditor: React.FC = () => {
                                     src={`local:///${item.scriptMedia}`}
                                     alt="script media"
                                     className="w-48 aspect-video object-cover rounded-lg"
-                                  />
+                                    />
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
                                   <div className="grid gap-4">
@@ -346,17 +355,17 @@ export const ScriptEditor: React.FC = () => {
                                     </div>
                                     {item.scriptPrompt && (
                                       <ContentEditable
-                                        html={item.scriptPrompt}
-                                        disabled={false}
-                                        onChange={(e) => {
-                                          updatePromptText(e, item.id);
-                                        }}
-                                        className="w-full min-h-20 border rounded-lg p-2 overflow-y-auto	 focus:outline-none"
+                                      html={item.scriptPrompt}
+                                      disabled={false}
+                                      onChange={(e) => {
+                                        updatePromptText(e, item.id);
+                                      }}
+                                      className="w-full min-h-20 border rounded-lg p-2 overflow-y-auto	 focus:outline-none"
                                       />
-                                    )}
+                                      )}
                                     <Button
                                       onClick={() => genAiImage(item, true)}
-                                    >
+                                      >
                                       <UpdateIcon />
                                     </Button>
                                   </div>
@@ -377,7 +386,14 @@ export const ScriptEditor: React.FC = () => {
                 ))}
               </Reorder.Group>
             </div>
-        </CardContent>
+          </CardContent>
+          <div className="basis-1/2 h-screen">
+            <div className="border p-6 flex flex-col items-center justify-center rounded-xl h-4/5">
+                FIXED CONTENT ON PAGE
+            </div>
+          </div>
+            
+        </div>
         <CardFooter className="flex justify-between">
           <Button onClick={selectTopic} variant="outline">Back</Button>
           <Button onClick={setScript}>Next</Button>
