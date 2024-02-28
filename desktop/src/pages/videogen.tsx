@@ -53,7 +53,7 @@ export const VideoGenerator: React.FC = () => {
     canvas.height = 1080;
     console.log("setting up player", movie);
     const script = await window.api.getScript();
-    await addAudioLayers(script, movie);
+    // await addAudioLayers(script, movie);
     // const backing = await window.api.getProjectBackingTrack();
     // const backingLayer = new etro.layer.Audio({
       //   startTime: 0,
@@ -81,8 +81,8 @@ export const VideoGenerator: React.FC = () => {
   const generateEtro = async () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
-    await generateAudio();
-    await generateAvatarSections();
+    // await generateAudio();
+    // await generateAvatarSections();
     console.log("audio generated backing should exist");
 
     const interval = setInterval(() => {

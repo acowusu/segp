@@ -1,27 +1,58 @@
 /**
  * @prettier
  */
-
+// -> commit: acfdf4885ad8f2445b62e1c3dea0407d6ede2b10 is just before experimental etro stuff
 import { Separator } from "@radix-ui/react-menu";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SidebarNav } from "../components/ui/sidebar-nav";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router";
-import { boolean } from "zod";
 import { ScriptData } from "../../electron/mockData/data";
 import { Button } from "../components/ui/button";
+import etro from "etro";
+import { addSingleImageLayer } from "../lib/etro-utils";
 
 type NavHeader = {
   // id: string;
   title: string;
   href: string;
 };
+
+type SectionData = {
+  section: ScriptData;
+  moviePromise: Promise<etro.Movie>;
+};
+
+function dispatchMovie(
+  data: ScriptData,
+  canvasRef: React.MutableRefObject<HTMLCanvasElement | null>
+): Promise<etro.Movie> {
+  return new Promise((resolve, reject) => {
+    if (canvasRef.current == undefined) {
+      reject(new Error("Presentation Layout: canvas is not defined"));
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    const movie = new etro.Movie({
+      canvas: canvas,
+      repeat: false,
+      background: etro.parseColor("#ccc"),
+    });
+
+    addSingleImageLayer(data, movie, 0); //Add image from the start
+    resolve(movie);
+  });
+}
+
 export const PresentationLayout: React.FC = () => {
   const navigate = useNavigate();
 
   const [isScriptReady, setIsScriptReady] = useState<boolean>(false);
   const [sections, setSections] = useState<NavHeader[]>([]);
-  const [script, setScript] = useState<ScriptData[]>();
-  const [scriptMap, setScriptMap] = useState<Map<string, ScriptData>>();
+  // const [script, setScript] = useState<ScriptData[]>();
+  const [scriptMap, setScriptMap] = useState<Map<string, SectionData>>();
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
   useEffect(() => {
     window.api
       .getScript()
@@ -33,11 +64,17 @@ export const PresentationLayout: React.FC = () => {
 
         data.forEach((entry: ScriptData) => {
           const { id, sectionName } = entry;
-          map.set(id, entry);
+
+          map.set(id, {
+            section: entry,
+            moviePromise: dispatchMovie(entry, canvasRef),
+          });
+
           temp.push({
             title: sectionName,
             href: `/presentation/${id}`, // same as the one in App.tsx
           });
+
           setSections(temp);
           setScriptMap(map);
         });
@@ -66,6 +103,7 @@ export const PresentationLayout: React.FC = () => {
               <aside className="-mx-4 lg:w-1/5">
                 <SidebarNav items={sections} />
               </aside>
+              <canvas className={`w-full mb-4`} ref={canvasRef}></canvas>
               <div className="flex-1 space-y-10 lg:max-w-2xl">
                 <Outlet context={{ scriptMap }} />
                 <div className="flex justify-between">
@@ -96,20 +134,37 @@ export const PresentationSection: React.FC = () => {
   const param = useParams();
   const id = param.sectionId!;
 
+  const [isMovieReady, setIsMovieReady] = useState<boolean>(false);
+  const movieRef = useRef<etro.Movie | null>();
   // get from parent element
-  const { scriptMap }: { scriptMap: Map<string, ScriptData> } =
+  const { scriptMap }: { scriptMap: Map<string, SectionData> } =
     useOutletContext();
 
   console.log("id of the section", id);
-  const section: ScriptData = scriptMap.get(id)!;
+  const { section, moviePromise } = scriptMap.get(id)!;
   console.log("given Section", section);
-
+  useEffect(() => {
+    moviePromise
+      .then((movie) => {
+        movieRef.current = movie;
+      })
+      .finally(() => setIsMovieReady(true));
+  }, [moviePromise]);
   return (
     <div>
       <h3 className="text-xl font-bold tracking-tight">
         {section.sectionName}
       </h3>
       <p> {section.scriptTexts[section.selectedScriptIndex]}</p>
+      <Button
+        disabled={!isMovieReady}
+        onClick={() => {
+          movieRef.current!.play();
+        }}
+      >
+        {" "}
+        Play
+      </Button>
     </div>
   );
 };
