@@ -55,10 +55,10 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
           duration: section.scriptDuration,
           source: "local:///" + section.scriptMedia,
           destX: (_element: etro.EtroObject, time: number) => {
-            return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
+            return lerp(-WIDTH / 10, 0, time, section.scriptDuration!);
           }, // default: 0
           destY: (_element: etro.EtroObject, time: number) => {
-            return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
+            return lerp(-HEIGHT / 10, 0, time, section.scriptDuration!);
           }, // default: 0
           destWidth: (_element: etro.EtroObject, time: number) => {
             return lerp(WIDTH * 1.2, WIDTH, time, section.scriptDuration!);
@@ -80,16 +80,12 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
           duration: section.scriptDuration,
           source: "local:///" + section.scriptMedia,
           destX: (_element: etro.EtroObject, time: number) => {
-            return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
+            return lerp(0, -WIDTH / 5, time, section.scriptDuration!);
           }, // default: 0
-          destY: (_element: etro.EtroObject, time: number) => {
-            return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
-          }, // default: 0
-          destWidth: WIDTH, // default: null (full width)
-          destHeight: HEIGHT,
-          x: (_element: etro.EtroObject, time: number) => {
-            return lerp(-100, 100, time, section.scriptDuration!);
-          }, // default: 0
+          destY: 0, // default: 0
+          destWidth: WIDTH * 1.2, // default: null (full width)
+          destHeight: HEIGHT  *1.2,
+          x: 0, // default: 0
           y: 0, // default: 0
           sourceWidth: WIDTH,
           sourceHeight: HEIGHT,
