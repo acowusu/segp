@@ -28,8 +28,9 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "../components/ui/hover-card"
-
+import loadingMessages from "../../electron/mockData/loadingScripts/scriptLoading.json"
 import { Progress } from "../components/ui/progress";
+import { MediaChoices } from "../components/custom/mediaChoices";
 
 
 
@@ -39,12 +40,16 @@ export const ScriptEditor: React.FC = () => {
   const [selectedScript, setSelectedScript] = useState<ScriptData>(
     {} as ScriptData
   );
+  const [aiImageURL, setAiImageURL] = useState("")
   const [showOtherDrafts, setShowOtherDrafts] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
   const [scriptLoadingProgress, setScriptLoadingProgress] = useState(0);
   const [topic, setTopic] = useState<Topic>()
   const [buttonLoading, setButtonLoading] = useState("");
+  const [mediaSelected, setMediaSelected] = useState("")
+
+  const loadingImages = ["./analysingpdf.png", "./inspiration.png", "./dict.png" ,"./writing.png"]
 
   const LoadingScripts = ({
     generationProgress,
@@ -61,16 +66,25 @@ export const ScriptEditor: React.FC = () => {
         <h1 className="text-xl font-semibold p-4">
           About video:  {topic?.summary}
         </h1>
-        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+        {generationProgress <= 100 ? <><div className="w-full mb-4 flex align-center items-center	justify-center flex-col gap-4">
+          <img src={loadingImages[(Math.floor(generationProgress / 25)) % 4]} width={500} height={500}/>
+          <div className="font-bold text-xl">{loadingMessages[(Math.floor(generationProgress / 5)) % 20]}</div>
+        </div>
+        <Progress value={generationProgress} className="w-5/6 mt-4" /></> 
+        : 
+        <Skeleton className="w-4/5 h-3/5 mb-4 flex align-center items-center	justify-center flex-col	">
           <l-quantum size="100" speed="3" color="red"></l-quantum>
-          <Progress value={generationProgress} className="w-5/6 mt-4" />
-        </Skeleton>
+          <div className="text-xl font-bold">
+            Finalising...
+          </div>
+        </Skeleton>}
       </div>
     );
   };
 
   useEffect(() => {
     window.api.getProjectTopic().then(setTopic)
+    const TICK = 2000
     const task = window.api
       .getScript()
       .then(setItems)
@@ -84,7 +98,7 @@ export const ScriptEditor: React.FC = () => {
     });
     const interval = setInterval(() => {
       setScriptLoadingProgress((prev) => prev + 1);
-    }, 1000);
+    }, TICK);
     return () => clearInterval(interval);
   }, []);
 
@@ -119,20 +133,32 @@ export const ScriptEditor: React.FC = () => {
       const resolvedPrompt = await imgPrompt;
       const imgPath = await img;
       console.log(imgPath);
+      const updatedItems = items.map((item) => {
+        if (item.id === script.id) {
+          item.scriptMedia = imgPath;
+          item.scriptPrompt = resolvedPrompt;
+        }
+        return item;
+      }) 
       setItems(
-        items.map((item) => {
-          if (item.id === script.id) {
-            item.scriptMedia = imgPath;
-            item.scriptPrompt = resolvedPrompt;
-          }
-          return item;
-        })
+        updatedItems
       );
-      await window.api.setScript(items);
+      setAiImageURL(updatedItems.find((item) => item.id === script.id)?.scriptMedia ?? "")
+      await window.api.setScript(updatedItems);
     } else {
       console.log("Media already exists");
     }
   };
+  const setMedia = async (script: ScriptData, url: string) => {
+    const newItems = items.map((item) => {
+      if (script.id === item.id) {
+        item.scriptMedia = url;
+      }
+      return item;
+    })
+    setItems(newItems)
+    await window.api.setScript(newItems)
+  }
   const updateScriptSelection = (
     item: ScriptData,
     index: number
@@ -153,6 +179,9 @@ export const ScriptEditor: React.FC = () => {
 
     if (script !== undefined) {
       setSelectedScript(script);
+      if (script.imagePrompts) {
+        setMediaSelected(script.imagePrompts[0].prompt)
+      }
     }
     setDisabled(false);
   };
@@ -321,7 +350,7 @@ export const ScriptEditor: React.FC = () => {
                               className="border rounded-r-lg p-2 font-bold flex items-center justify-center text-lg"
                               onClick={async () => updateScriptDraftSelection(item, item.selectedScriptIndex + 1)}
                               >
-                                {buttonLoading === item.id ? "loading" : "+"}
+                                {buttonLoading === item.id ? "..." : "+"}
                               </button>
                             </HoverCardTrigger>
                             <HoverCardContent>
@@ -330,17 +359,41 @@ export const ScriptEditor: React.FC = () => {
                           </HoverCard>}
                         </div>
                       </div>
-                      <div></div>
-                      <div className="flex-col grow-0 max-w-48  min-w-48  w-48 ">
+                      <div>
+                        {item.scriptMedia ? <img src={`local:///${item.scriptMedia}`} width={200} height={200} /> : 
+                        <div className="border rounded-lg p-4">No image</div>}
+                      </div>
+                    </div>
+                  </Reorder.Item>
+                ))}
+              </Reorder.Group>
+            </div>
+          </CardContent>
+          <div className="basis-1/2 h-screen">
+          {selectedScript.id !== undefined && 
+            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl h-4/5">
+                <h1 className="text-4xl font-bold">
+                  Customise your media 
+                </h1>
+                <h3>
+                  Selected: {selectedScript.sectionName}
+                </h3>
+                <div className="grid grid-cols-4 w-full h-full">
+                  <div className="col-span-1 h-full flex flex-col gap-4">
+                    <Button onClick={() => setMediaSelected("GenAI")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
+                    <MediaChoices prompts={selectedScript.imagePrompts??[]}/>
+                  </div>
+                  <div className="col-span-3 h-full flex items-center justify-center">
+                  {mediaSelected === "GenAI" ? <div className="flex-col grow-0">
                         {
                           <>
-                            {item.scriptMedia !== undefined ? (
+                            {aiImageURL !== "" ? (
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <img
-                                    src={`local:///${item.scriptMedia}`}
+                                    src={`local:///${selectedScript.scriptMedia}`}
                                     alt="script media"
-                                    className="w-48 aspect-video object-cover rounded-lg"
+                                    className="w-full aspect-video object-cover rounded-lg"
                                     />
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
@@ -353,18 +406,18 @@ export const ScriptEditor: React.FC = () => {
                                         Customize the prompt for this image
                                       </p>
                                     </div>
-                                    {item.scriptPrompt && (
+                                    {selectedScript.scriptPrompt && (
                                       <ContentEditable
-                                      html={item.scriptPrompt}
+                                      html={selectedScript.scriptPrompt}
                                       disabled={false}
                                       onChange={(e) => {
-                                        updatePromptText(e, item.id);
+                                        updatePromptText(e, selectedScript.id);
                                       }}
                                       className="w-full min-h-20 border rounded-lg p-2 overflow-y-auto	 focus:outline-none"
                                       />
                                       )}
                                     <Button
-                                      onClick={() => genAiImage(item, true)}
+                                      onClick={() => genAiImage(selectedScript, true)}
                                       >
                                       <UpdateIcon />
                                     </Button>
@@ -373,24 +426,26 @@ export const ScriptEditor: React.FC = () => {
                               </Popover>
                             ) : (
                               <Skeleton className="aspect-video	   flex align-center items-center	justify-center flex-col relative inset-y-0 right-0 w-48	">
-                                <Button onClick={() => genAiImage(item, true)}>
+                                <Button onClick={() => {genAiImage(selectedScript, true)}}>
                                   <UpdateIcon />
                                 </Button>
                               </Skeleton>
                             )}
                           </>
                         }
-                      </div>
-                    </div>
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
+                      </div> : 
+                      <div className="grid grid-cols-3">
+                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt === mediaSelected)?.imageURLS.map((url) => {
+                          return (<div className="" onClick={async () => setMedia(selectedScript, url)}>
+                            <img src={`local:///${url}`} width={200} height={200}/>
+                          </div>)
+                      })}
+                      </div>}
+                  </div>
+                  
+                </div>
             </div>
-          </CardContent>
-          <div className="basis-1/2 h-screen">
-            <div className="border p-6 flex flex-col items-center justify-center rounded-xl h-4/5">
-                FIXED CONTENT ON PAGE
-            </div>
+            }
           </div>
             
         </div>

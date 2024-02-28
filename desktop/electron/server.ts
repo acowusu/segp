@@ -1,6 +1,6 @@
 import { getProjectPath } from "./metadata";
-import type { ScriptData, Topic } from "./mockData/data";
-import { downloadFile } from "./reportProcessing";
+import type { ScriptData, Topic, ImageData } from "./mockData/data";
+import { downloadFile, fetchImages } from "./reportProcessing";
 import scriptSchema from "./schemas/script.json";
 import topicSchema from "./schemas/topic.json";
 import imageSchema from "./schemas/image.json";
@@ -135,12 +135,14 @@ export const generateScript = async (report: string, topic:Topic): Promise<Scrip
         console.log(JSON.stringify(responseParsed))
         const awaitedParsed = responseParsed.sections!.map(async (section:LLMSection) => {
         const sentences = section.sentences.map(async (sentence, i) =>{
+            const imgPrompts = await genImagePrompts(sentence.text);
             return {
                 id: performance.now().toString(16), 
-                imagePrompts: await genImagePrompts(sentence.text),
+                imagePrompts: imgPrompts,
                 selectedScriptIndex: 0,
                 sectionName: section.title + " Part " + (i+1).toString(),
                 scriptTexts: [sentence.text],
+                scriptMedia: imgPrompts[0].imageURLS[0]
                 }
         })
         return await Promise.all(sentences);
@@ -182,7 +184,7 @@ export const genNewScript = async (script: string): Promise<string> => {
     }
 }
 
-export const genImagePrompts = async (script: string): Promise<[string]> => {
+export const genImagePrompts = async (script: string): Promise<ImageData[]> => {
     console.log("gening new script")
     const params = new URLSearchParams();
 
@@ -206,9 +208,20 @@ export const genImagePrompts = async (script: string): Promise<[string]> => {
         console.log(params)
         const response = await fetch(url, options);
         console.log(response)
-        const responseParsed = (await response.json() as LLMResponse<[string]>);
+        const responseParsed = (await response.json() as LLMResponse<string[]>);
         console.log(responseParsed.response)
-        return responseParsed.response as [string];
+        const promptList = (responseParsed.response as string[]).splice(0, 3);
+        const images = promptList.map(async (prompt) => 
+        {
+            const imageURL = (await fetchImages([prompt]))[0].splice(0, 10); 
+            return {
+            prompt: prompt,
+            imageURLS: imageURL
+        } as ImageData});
+
+        return await Promise.all(images);
+
+
     } catch (err) {
         console.error("error:" + err);
         throw Error("Error generating Script")
