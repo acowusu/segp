@@ -9,41 +9,14 @@ import { ScriptData } from "../../electron/mockData/data";
 import { MagicWandIcon, PlayIcon } from "@radix-ui/react-icons";
 import { toast } from "sonner";
 import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../components/ui/card";
+import { addSingleImageLayer } from "../lib/etro-utils";
 const WIDTH = 1920;
 const HEIGHT = 1080;
-function lerp(a: number, b: number, t: number, p: number) {
-  return a + (b - a) * (t / p);
-}
+
 function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
   let start = 0;
   sections.forEach((section: ScriptData) => {
-    if (!section.scriptMedia) throw new Error("No media found");
-    if (!section.scriptDuration) throw new Error("No duration found");
-    const layer = new etro.layer.Image({
-      startTime: start,
-      duration: section.scriptDuration,
-      source: "local:///" + section.scriptMedia,
-      destX: (_element: etro.EtroObject, time: number) => {
-        return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
-      }, // default: 0
-      destY: (_element: etro.EtroObject, time: number) => {
-        return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
-      }, // default: 0
-      destWidth: (_element: etro.EtroObject, time: number) => {
-        return lerp(WIDTH, WIDTH * 1.2, time, section.scriptDuration!);
-      }, // default: null (full width)
-      destHeight: (_element: etro.EtroObject, time: number) => {
-        return lerp(HEIGHT, HEIGHT * 1.2, time, section.scriptDuration!);
-      },
-      x: 0, // default: 0
-      y: 0, // default: 0
-      sourceWidth: WIDTH,
-      sourceHeight: HEIGHT,
-      opacity: 1, // default: 1
-    });
-    console.log("adding layer", layer);
-    start += section.scriptDuration;
-    movie.layers.push(layer);
+    start = addSingleImageLayer(section, movie, start)
   });
 }
 
@@ -261,7 +234,7 @@ export const VideoGenerator: React.FC = () => {
     canvas.height = 1080;
     console.log("setting up player", movie);
     const script = await window.api.getScript();
-    await addAudioLayers(script, movie);
+    // await addAudioLayers(script, movie);
     // const backing = await window.api.getProjectBackingTrack();
     // const backingLayer = new etro.layer.Audio({
     //   startTime: 0,
@@ -274,7 +247,7 @@ export const VideoGenerator: React.FC = () => {
     // });
     // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
-    await addSadTalkerLayers(script, movie);
+    // await addSadTalkerLayers(script, movie);
     addSubtitleLayers(script, movie);
 
     movieRef.current = movie;
@@ -284,8 +257,8 @@ export const VideoGenerator: React.FC = () => {
   const generateEtro = async () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
-    await generateAudio();
-    await generateAvatarSections();
+    // await generateAudio();
+    // await generateAvatarSections();
     console.log("audio generated backing should exist");
 
     const interval = setInterval(() => {
