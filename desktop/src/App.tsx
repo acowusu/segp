@@ -9,6 +9,7 @@ import { ScriptEditor } from "./pages/script-editor";
 import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
 import { VideoGenerator } from "./pages/videogen";
+import { PresentationLayout, PresentationSection } from "./pages/presentation";
 function App() {
 
   return (
@@ -20,6 +21,9 @@ function App() {
             <Route path="set-visuals" element={<SetVisuals />} />
             <Route path="set-topic" element={<SetTopic />} />
             <Route path="script-editor" element={<ScriptEditor />} />
+            <Route path="presentation" element={<PresentationLayout />}>
+              <Route path=":sectionId" element={<PresentationSection />} />
+            </Route>
             <Route path="get-video" element={<VideoGenerator />} />
             <Route path="*" element={<NotFound />} />
           </Route>

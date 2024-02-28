@@ -195,7 +195,7 @@ export const ScriptEditor: React.FC = () => {
   };
   const setScript = async () => {
     await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
-    navigate("/get-video");
+    navigate("/presentation");
   };
   const selectTopic = async () => {
     navigate("/set-topic");
