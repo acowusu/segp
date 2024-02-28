@@ -21,19 +21,25 @@ export const PresentationLayout: React.FC = () => {
   const [isScriptReady, setIsScriptReady] = useState<boolean>(false);
   const [sections, setSections] = useState<NavHeader[]>([]);
   const [script, setScript] = useState<ScriptData[]>();
+  const [scriptMap, setScriptMap] = useState<Map<string, ScriptData>>();
   useEffect(() => {
     window.api
       .getScript()
-      .then((data) => {
-        setScript(data);
+      .then((data: ScriptData[]) => {
+        const map = new Map();
+
         console.log("setting script to", data);
         const temp: NavHeader[] = [];
-        data.forEach(({ id, sectionName }) => {
+
+        data.forEach((entry: ScriptData) => {
+          const { id, sectionName } = entry;
+          map.set(id, entry);
           temp.push({
             title: sectionName,
             href: `/presentation/${id}`, // same as the one in App.tsx
           });
           setSections(temp);
+          setScriptMap(map);
         });
       })
       .finally(() => {
@@ -61,7 +67,7 @@ export const PresentationLayout: React.FC = () => {
                 <SidebarNav items={sections} />
               </aside>
               <div className="flex-1 space-y-10 lg:max-w-2xl">
-                <Outlet context={{ script }} />
+                <Outlet context={{ scriptMap }} />
                 <div className="flex justify-between">
                   <Button
                     variant="outline"
@@ -87,19 +93,15 @@ export const PresentationLayout: React.FC = () => {
 
 // export const PresentationSection: React.FC<{id: number; title: string;}> = ({id, title}) => {
 export const PresentationSection: React.FC = () => {
-  // const { id } = useOutletContext();
-  const id = useParams();
+  const param = useParams();
+  const id = param.sectionId!;
 
-  // gotten form parent element
-  const { script } = useOutletContext();
-
-  console.log("full script", script);
+  // get from parent element
+  const { scriptMap }: { scriptMap: Map<string, ScriptData> } =
+    useOutletContext();
 
   console.log("id of the section", id);
-  const section: ScriptData = script.find(
-    (data: ScriptData) => data.id === id.sectionId
-  );
-
+  const section: ScriptData = scriptMap.get(id)!;
   console.log("given Section", section);
 
   return (
