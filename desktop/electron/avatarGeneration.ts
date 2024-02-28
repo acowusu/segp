@@ -1,6 +1,10 @@
 import type { Avatar, ScriptData } from './mockData/data';
 import { setProjectAvatar } from './projectData';
 import avatars from './mockData/avatars.json';
+import { downloadFile } from './reportProcessing';
+import { getProjectPath } from './metadata';
+import fs from "fs";
+import dataurl from "dataurl";
 
 export async function generateAvatar(script: ScriptData, avatar: Avatar): Promise<ScriptData> {
 
@@ -13,20 +17,24 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
         source_image: avatar.sadtalkerPath,
     }
     console.log("Request body: ", body);
-    const reponse = await fetch(endpoint, {
+
+    const { destination } = await downloadFile(endpoint, getProjectPath(), {
         method: 'POST',
+        body: JSON.stringify(body),
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body),
-    });
+    }); 
+    // const reponse = await fetch(endpoint, {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(body),
+    // });
 
-    if (!reponse.ok) {
-        throw new Error(`Failed to generate avatar. Status: ${reponse.status} - ${reponse.statusText}`);
-    }
-
-    const avatarData = await reponse.json();
-    script.avatarVideoUrl = avatarData.data_url;
+    script.avatarVideoUrl = destination;
+    console.log(script)
     return script;
 }
 
@@ -37,4 +45,15 @@ export async function getAvatars(): Promise<Avatar[]> {
 export async function setAvatar(avatar: Avatar): Promise<void> {
     console.log("setAvatar", avatar);
     setProjectAvatar(avatar);
+}
+
+export const toVideoUrl = (filePath:string):Promise<string> => {
+    const videoPromise = new Promise((resolve, reject) => {
+        fs.readFile(filePath, (err, data) => {
+            if (err) { reject(err); }
+            resolve(dataurl.convert({ data, mimetype: 'video/mp4' }));
+            console.log("toVideoUrl", dataurl.convert({ data, mimetype: 'video/mp4' }));
+        });
+    });
+    return videoPromise as Promise<string>;
 }

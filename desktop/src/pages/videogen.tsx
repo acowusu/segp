@@ -178,7 +178,7 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
     const layer = new etro.layer.Video({
       startTime: start,
       duration: section.scriptDuration,
-      source: section.avatarVideoUrl,
+      source: await window.api.toVideoUrl(section.avatarVideoUrl),
       destX: 0, // default: 0
       destY: 0, // default: 0
       destWidth: avatar.width, // default: null (full width)
@@ -261,7 +261,7 @@ export const VideoGenerator: React.FC = () => {
     canvas.height = 1080;
     console.log("setting up player", movie);
     const script = await window.api.getScript();
-    await addAudioLayers(script, movie);
+    // await addAudioLayers(script, movie);
     // const backing = await window.api.getProjectBackingTrack();
     // const backingLayer = new etro.layer.Audio({
     //   startTime: 0,
@@ -273,9 +273,9 @@ export const VideoGenerator: React.FC = () => {
     //   playbackRate: 1, //default: 1
     // });
     // movie.layers.push(backingLayer);
-    addImageLayers(script, movie);
+    // addImageLayers(script, movie);
     await addSadTalkerLayers(script, movie);
-    addSubtitleLayers(script, movie);
+    // addSubtitleLayers(script, movie);
 
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);
@@ -284,7 +284,16 @@ export const VideoGenerator: React.FC = () => {
   const generateEtro = async () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
-    await generateAudio();
+    // await generateAudio();
+    const mock = [{
+      id: "1", 
+      selectedScriptIndex: 0,
+      scriptTexts: ["Hello, World"],
+      sectionName: "Hello, World",
+      scriptDuration: 5,
+      sadTalkerPath: "/www/sadtalker_assets/driven_audio/1.wav"
+    }] as ScriptData[];; 
+    await window.api.setScript(mock);
     await generateAvatarSections();
     console.log("audio generated backing should exist");
 
