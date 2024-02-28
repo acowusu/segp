@@ -206,9 +206,23 @@ export async function setAudience(audience: Audience): Promise<void> {
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
   console.log("setVoiceover", voiceover);
+  
+ projectData.setProjectScript(
+  projectData.getProjectScript().map((script) => {
+    script.scriptAudio = undefined;
+    script.sadTalkerPath = undefined;
+    return script
+  })
+ )
   projectData.setProjectVoiceover(voiceover);
 }
 export async function setVisual(visuals: Visual): Promise<void> {
+  projectData.setProjectScript(
+    projectData.getProjectScript().map((script) => {
+      script.avatarVideoUrl = undefined;
+      return script
+    })
+   )
   projectData.setProjectVisual(visuals);
 }
 // Usage example:
