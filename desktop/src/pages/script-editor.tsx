@@ -150,7 +150,7 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    navigate("/get-video");
+    navigate("/presentation");
     await window.api.setScript(items);
     // START PIPELINE
 
