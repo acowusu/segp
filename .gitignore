@@ -1,4 +1,5 @@
 desktop/coverage/coverage-summary.json
 desktop/coverage/coverage-final.json
 server/__pycache__/
+desktop/.envgit 
 desktop/.env
