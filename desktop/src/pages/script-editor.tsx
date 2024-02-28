@@ -134,10 +134,13 @@ export const ScriptEditor: React.FC = () => {
       items.map((script) => {
         if (script.id === item.id) {
           script.selectedScriptIndex = index;
+          script.avatarVideoUrl = undefined;
+          script.scriptAudio = undefined;
         }
         return script;
       })
     );
+    window.api.setScript(items);
   };
   const handleSetSelectedScript = async (script: ScriptData) => {
     if (disabled) return;
