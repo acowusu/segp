@@ -225,4 +225,7 @@ export async function setVisual(visuals: Visual): Promise<void> {
    )
   projectData.setProjectVisual(visuals);
 }
+export async function setLength(length: number): Promise<void> {
+  projectData.setProjectLength(length);
+}
 // Usage example:

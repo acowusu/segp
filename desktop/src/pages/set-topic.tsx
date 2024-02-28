@@ -21,6 +21,7 @@ export const SetTopic: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic>({} as Topic);
+
   
   const setTopic = useCallback(async (topic :Topic) => {
     if (topic !== undefined) {
@@ -47,7 +48,7 @@ export const SetTopic: React.FC = () => {
       }))
   }, [setTopic]);
   const setScript = async () => {
-    navigate("/welcome/script-editor");
+    navigate("/script-editor");
   };
   return (
     <div className="flex items-center justify-center mt-4">
@@ -100,7 +101,6 @@ export const SetTopic: React.FC = () => {
           </ScrollArea>
         </CardContent>
         <CardFooter className="flex justify-between ">
-          <Button variant="outline">Back</Button>
           <Button onClick={setScript}>Next</Button>
         </CardFooter>
       </FramelessCard>
