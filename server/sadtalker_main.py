@@ -111,11 +111,6 @@ async def animate_portrait(sadtalker: SadTalker):
 
         return response
 
-        # Return data url
-        # return {
-        #    "message": "Returned animation: {}".format(mp4_name),
-        #    "data_url": data_url,
-        #}
     except subprocess.CalledProcessError:
         raise HTTPException(status_code=500, detail="Subprocess call error")
     except Exception:

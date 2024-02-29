@@ -27,7 +27,6 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
     }); 
 
     script.avatarVideoUrl = destination;
-    console.log(script)
     return script;
 }
 
