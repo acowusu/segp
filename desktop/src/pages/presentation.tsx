@@ -10,6 +10,9 @@ import { ScriptData } from "../../electron/mockData/data";
 import { Button } from "../components/ui/button";
 import etro from "etro";
 import { addSingleImageLayer } from "../lib/etro-utils";
+import { Skeleton } from "../components/ui/skeleton";
+import { PlayIcon } from "lucide-react";
+import { MagicWandIcon } from "@radix-ui/react-icons";
 
 type NavHeader = {
   // id: string;
@@ -19,28 +22,14 @@ type NavHeader = {
 
 type SectionData = {
   section: ScriptData;
-  moviePromise: Promise<etro.Movie>;
+  assetPromise: Promise<void>;
 };
 
-function dispatchMovie(
-  data: ScriptData,
-  canvasRef: React.MutableRefObject<HTMLCanvasElement | null>
-): Promise<etro.Movie> {
+// new idea movie is created within the Child however its assets start loading here.
+
+function dispatchMovie(data: ScriptData): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (canvasRef.current == undefined) {
-      reject(new Error("Presentation Layout: canvas is not defined"));
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    const movie = new etro.Movie({
-      canvas: canvas,
-      repeat: false,
-      background: etro.parseColor("#ccc"),
-    });
-
-    addSingleImageLayer(data, movie, 0); //Add image from the start
-    resolve(movie);
+    resolve();
   });
 }
 
@@ -67,7 +56,7 @@ export const PresentationLayout: React.FC = () => {
 
           map.set(id, {
             section: entry,
-            moviePromise: dispatchMovie(entry, canvasRef),
+            moviePromise: dispatchMovie(entry),
           });
 
           temp.push({
@@ -96,34 +85,35 @@ export const PresentationLayout: React.FC = () => {
             video
           </p>
         </div>
-        {isScriptReady ? (
-          <>
-            <Separator className="my-6" />
-            <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-              <aside className="-mx-4 lg:w-1/5">
-                <SidebarNav items={sections} />
-              </aside>
-              <canvas className={`w-full mb-4`} ref={canvasRef}></canvas>
-              <div className="flex-1 space-y-10 lg:max-w-2xl">
-                <Outlet context={{ scriptMap }} />
-                <div className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate("/script-Editor")}
-                  >
-                    Back
-                  </Button>
-                  <Button onClick={() => navigate("/get-video")}> Next </Button>
+        <div>
+          {isScriptReady ? (
+            <>
+              <Separator className="my-6" />
+              <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                <aside className="-mx-4 lg:w-1/5">
+                  <SidebarNav items={sections} />
+                </aside>
+                <div className="flex-1 space-y-10 lg:max-w-2xl">
+                  <Outlet context={{ scriptMap }} />
                 </div>
               </div>
+            </>
+          ) : (
+            <div>
+              {" "}
+              <p className="text-muted-foreground">Loading Script ... </p>
             </div>
-          </>
-        ) : (
-          <div>
-            {" "}
-            <p className="text-muted-foreground">Loading Script ... </p>
+          )}
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/script-Editor")}
+            >
+              Back
+            </Button>
+            <Button onClick={() => navigate("/get-video")}> Next </Button>
           </div>
-        )}
+        </div>
       </div>
     </>
   );
@@ -134,37 +124,123 @@ export const PresentationSection: React.FC = () => {
   const param = useParams();
   const id = param.sectionId!;
 
-  const [isMovieReady, setIsMovieReady] = useState<boolean>(false);
-  const movieRef = useRef<etro.Movie | null>();
+  type CurrentState = "initial" | "playing" | "playback";
+  const [currentState, setCurrentState] = useState<CurrentState>("initial");
+
+  const movieRef = useRef<etro.Movie | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [movies, setMovies] = useState<Map<string, etro.Movie>>(new Map());
   // get from parent element
   const { scriptMap }: { scriptMap: Map<string, SectionData> } =
     useOutletContext();
 
   console.log("id of the section", id);
-  const { section, moviePromise } = scriptMap.get(id)!;
+  const { section, assetPromise } = scriptMap.get(id)!;
   console.log("given Section", section);
+
+  // useEffect(() => {
+  //   assetPromise
+  //     .then((movie) => {
+  //       movieRef.current = movie;
+  //     })
+  //     .finally(() => setIsMovieReady(true));
+  // }, [assetPromise]);
   useEffect(() => {
-    moviePromise
-      .then((movie) => {
-        movieRef.current = movie;
-      })
-      .finally(() => setIsMovieReady(true));
-  }, [moviePromise]);
+    setCurrentState("initial");
+    if (canvasRef.current == undefined) {
+      console.log("canvas is null");
+      return;
+    }
+    console.log("here", id);
+
+    setupPlayer().then(() => setCurrentState("playback"));
+  }, [id]);
+
+  const setupPlayer = async () => {
+    if (movieRef.current) {
+      console.log("movie exist", movieRef.current);
+      console.log("pausing if playing");
+      !movieRef.current.paused && movieRef.current.pause();
+    }
+    let movie: etro.Movie;
+    const existingMovie = movies.get(id); // check if new section has a movie created
+
+    if (!existingMovie) {
+      const canvas = canvasRef.current!;
+      movie = new etro.Movie({
+        canvas: canvas,
+        repeat: false,
+        background: etro.parseColor("#ccc"),
+      });
+
+      canvas.width = 1920;
+      canvas.height = 1080;
+
+      addSingleImageLayer(section, movie, 0); //Add image from the start
+      setMovies((map) => new Map(map.set(id, movie)));
+    } else {
+      movie = existingMovie;
+    }
+
+    movieRef.current = movie;
+  };
+
+  // const generateSectionEtro = async () => {
+  //   await setupPlayer();
+  //   setCurrentState("playback");
+  // };
+
   return (
-    <div>
-      <h3 className="text-xl font-bold tracking-tight">
-        {section.sectionName}
-      </h3>
-      <p> {section.scriptTexts[section.selectedScriptIndex]}</p>
-      <Button
-        disabled={!isMovieReady}
-        onClick={() => {
-          movieRef.current!.play();
-        }}
-      >
-        {" "}
-        Play
-      </Button>
-    </div>
+    <>
+      <div>
+        <h3 className="text-xl font-bold tracking-tight">
+          {section.sectionName}
+        </h3>
+        <p> {section.scriptTexts[section.selectedScriptIndex]}</p>
+      </div>
+      <div>
+        {currentState === "initial" && (
+          <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+            <p> Loading Section...</p>
+          </Skeleton>
+        )}
+
+        {currentState === "playback" && (
+          <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+            <Button
+              className="ml-4"
+              onClick={() => {
+                movieRef.current?.play();
+                setCurrentState("playing");
+                console.log("playing");
+                console.log(movieRef.current);
+              }}
+            >
+              Play
+              <PlayIcon />
+            </Button>
+          </Skeleton>
+        )}
+        <canvas
+          className={`w-full mb-4 ${
+            currentState === "playing" ? "" : "hidden"
+          }`}
+          ref={canvasRef}
+        ></canvas>
+        {currentState === "playing" && (
+          <>
+            <Button
+              className=""
+              onClick={() => {
+                movieRef.current?.pause();
+                setCurrentState("playback");
+              }}
+            >
+              Pause
+            </Button>
+          </>
+        )}
+      </div>
+    </>
   );
 };
