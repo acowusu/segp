@@ -30,7 +30,7 @@ def read_root():
 def is_valid_path(path):
     """
 
-    :param path:
+    :param path: 
 
     """
     return path.startswith("/")
@@ -39,7 +39,7 @@ def is_valid_path(path):
 def is_valid_audio_extension(path):
     """
 
-    :param path:
+    :param path: 
 
     """
     _, extension = os.path.splitext(path)
@@ -54,7 +54,7 @@ def is_valid_audio_extension(path):
 def is_valid_image_extension(path):
     """
 
-    :param path:
+    :param path: 
 
     """
     _, extension = os.path.splitext(path)
