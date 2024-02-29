@@ -36,17 +36,15 @@ svc.mount_asgi_app(app)
 #    return {"status": "ok"}
 
 @app.post("/video")
-async def generate_video(image_file: UploadFile = File(...)):
-    print("entered api")
+async def generate_video(image_file: UploadFile = Form(...)):
     data = await image_file.read()
     image = PIL.Image.open(BytesIO(data))
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
-    # image = load_image(image_file)
+    #image = load_image(image_file)
     generator = torch.manual_seed(42)
-    frames = svd_runner.run(image, decode_chunk_size=8, generator=generator)[0][0]
+    frames = svd_runner.run(image, decode_chunk_size=8, generator=generator, motion_bucket_id=120, noise_aug_strength=0.1)[0][0]
     path = export_to_video(frames, fps=7) # default written to temporary file
-    print(path)
    
     return FileResponse(path=path, media_type="video/mp4")
 
