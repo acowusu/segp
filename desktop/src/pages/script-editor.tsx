@@ -40,7 +40,6 @@ export const ScriptEditor: React.FC = () => {
   const [selectedScript, setSelectedScript] = useState<ScriptData>(
     {} as ScriptData
   );
-  const [aiImageURL, setAiImageURL] = useState("") // TODO FIX SO IS ARRAY
   const [showOtherDrafts, setShowOtherDrafts] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
@@ -275,7 +274,7 @@ export const ScriptEditor: React.FC = () => {
                       <div
                         key={item.id}
                         className={cn(
-                          "flex grow flex-col items-start gap-2 rounded-lg p-4 text-left text-sm transition-all border-2",
+                          "flex w-full flex-col items-start gap-2 rounded-lg p-4 text-left text-sm transition-all border-2",
                           selectedScript.id === item.id &&
                           " border-2 border-sky-500",
                           selectedScript.id !== item.id &&
@@ -359,7 +358,7 @@ export const ScriptEditor: React.FC = () => {
                           </HoverCard>}
                         </div>
                       </div>
-                      <div className="w-24 flex grow-0 border">
+                      <div className="w-[25rem] flex grow-0">
                         {item.scriptMedia ? <img src={`${item.scriptMedia}`} className="w-full aspect-video object-cover rounded-lg"/> : 
                         <div className="border p-4 w-full aspect-video object-cover rounded-lg">No image</div>}
                       </div>
@@ -383,7 +382,7 @@ export const ScriptEditor: React.FC = () => {
                     <Button onClick={() => setMediaSelected("GenAI")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
                     <MediaChoices prompts={selectedScript.imagePrompts??[]} callback={setMediaSelected}/>
                   </div>
-                  <div className="w-full h-full flex justify-start items-start my-4 gap-4">
+                  <div className="w-full h-full flex justify-start items-start mt-4 gap-4">
                   {mediaSelected === "GenAI" ? <div className="flex-col grow-0">
                         {
                           <div className="grid grid-cols-3 gap-4">
@@ -393,7 +392,9 @@ export const ScriptEditor: React.FC = () => {
                                   <img
                                     src={image}
                                     alt="script media"
-                                    className="w-full aspect-video object-cover rounded-lg"
+                                    className={`aspect-video border rounded-lg overflow-hidden 
+                          ${selectedScript.scriptMedia === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
+                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index])}}
                                     />
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
@@ -425,7 +426,7 @@ export const ScriptEditor: React.FC = () => {
                                 </PopoverContent>
                               </Popover>
                               ))}
-                              <Skeleton className="aspect-video	flex align-center items-center justify-center flex-col relative inset-y-0 right-0 w-48	">
+                              <Skeleton className="aspect-video w-full flex items-center justify-center	">
                                 <Button className="text-2xl font-bold" onClick={() => {genAiImage(selectedScript, true)}}>
                                   +
                                 </Button>
