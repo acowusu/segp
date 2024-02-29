@@ -31,7 +31,7 @@ import {
   openProject,
   loadReport,
 } from "./setup";
-import { getProjectName, getProjectPath, getIsDev, getLastProject} from "./metadata";
+import { getProjectName, getProjectPath, getIsDev, getLastProject, getRecentProjects} from "./metadata";
 import * as projectData from "./projectData"
 import {generateTextFromLLM, generateTopics, generateOpenJourneyPrompt, generateOpenJourneyImage} from "./server"
 import {getServiceStatus, launchService, shutdownService} from "./status"
@@ -63,6 +63,7 @@ const api = {
   getIsDev,
   generateAvatar,
   getLastProject,
+  getRecentProjects,
   ...projectData,
   toDataURL,
   generateTextFromLLM,

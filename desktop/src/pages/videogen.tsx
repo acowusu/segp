@@ -5,7 +5,6 @@ import etro from "etro";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { SubtitleText } from "../lib/subtitle-layer";
-import { CustomVideo } from "../lib/custom-video-layer";
 import { ScriptData } from "../../electron/mockData/data";
 import { MagicWandIcon, PlayIcon } from "@radix-ui/react-icons";
 import { useNavigate } from "react-router-dom";
@@ -103,21 +102,28 @@ async function addSadTalkerLayers(sections: ScriptData[], movie: etro.Movie) {
   for (const section of sections) {
     if (!section.scriptMedia) throw new Error("No media found");
     if (!section.scriptDuration) throw new Error("No duration found");
-    const layer = new CustomVideo({
+    const layer = new etro.layer.Video({
       startTime: 0,
       duration: section.scriptDuration,
       source: await window.api.toDataURL(
-        `C:\\Users\\alexa\\Downloads\\Bellingcat\\talker.jpg`
+        `C:\\Users\\alexa\\Downloads\\mail2\\cat.mp4`
       ),
-      // destWidth: WIDTH/4,
-      // destHeight: HEIGHT/4,
+      // sourceWidth: 1920,
+      // sourceHeight: 1080,
+      destX: 0, // default: 0
+      destY: 0, // default: 0
+      x: 0, // default: 0
+      y: 0, // default: 0
+      destWidth: WIDTH,
+      destHeight: HEIGHT,
     });
+    const effect = new etro.effect.ChromaKey({
+      target: new etro.Color(0, 255, 0, 0), // default: new etro.Color(1, 0, 0, 1)
+      threshold: 165, // default: 0.5
+      interpolate: false, // default: false
+    })
     layer.effects.push(
-      new etro.effect.ChromaKey({
-        target: new etro.Color(0, 255, 0, 0), // default: new etro.Color(1, 0, 0, 1)
-        threshold: 100, // default: 0.5
-        // interpolate: true, // default: false
-      })
+      effect
     );
     movie.layers.push(layer);
   }
@@ -252,7 +258,7 @@ const generateAvatarSections = async () => {
       const modified = window.api.generateAvatar(section, avatar);
       toast.promise(modified, {
         loading: `Generating avatar for ${section.sectionName}...`,
-        success: (_) => {
+        success: () => {
           return `Avatar has been generated for ${section.sectionName}. `;
         },
         error: "Error generating avatar for section: " + section.sectionName,
@@ -321,7 +327,7 @@ export const VideoGenerator: React.FC = () => {
     // });
     // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
-
+    await addSadTalkerLayers(script, movie);
     addSubtitleLayers(script, movie);
 
     movieRef.current = movie;
@@ -365,7 +371,7 @@ export const VideoGenerator: React.FC = () => {
       });
     }, 50);
     const blob: Blob = (await movieRef.current?.record({
-      frameRate: 60,
+      frameRate: 24,
       type: 'video/webm;codecs=h264',
       // audio: default true,
       // video: default true,

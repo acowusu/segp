@@ -18,7 +18,7 @@ mapping = {
     "Text to speech API": "fastapi-tts",
     "LLM API": "fastapi-llm",
     "Music API": "fastapi-music",
-    "Sound Effects API": "fastapi-audiofx",
+    "Sound Effects API": "fastapi-audiofx"
 }
 
 
@@ -58,13 +58,14 @@ async def get_service_status(service_name: str):
         service_name = mapping.get(service_name, service_name)
     try:
         output = subprocess.run(
+
             ["/usr/bin/sudo", "systemctl", "status", service_name],
             capture_output=True,
             text=True,
         )
         isInactive = "inactive" in output.stdout
         isRunning = "running" in output.stdout
-
+        isCudaError = "CUDA out of memory" in output.stdout
         # Extract memory usage
         memory_match = re.search(r"Memory: ([\d.]+[A-Z])", output.stdout)
         memory_usage = memory_match.group(1) if memory_match else None
@@ -78,6 +79,7 @@ async def get_service_status(service_name: str):
         status_code = status_code_match.group(1) if status_code_match else None
 
         # Extract uptime
+
         uptime_match = re.search(r"Active: active \(running\) since (.+?);",
                                  output.stdout)
         uptime = uptime_match.group(1) if uptime_match else None
@@ -102,5 +104,4 @@ async def get_service_status(service_name: str):
 # Start the server (for development)
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8898)
