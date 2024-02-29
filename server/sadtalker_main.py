@@ -67,9 +67,11 @@ def is_valid_image_extension(path):
 
     return True
 
+
 @app.get("/status")
 async def status():
     return {"status": "ok"}
+
 
 @app.post("/avatar/")
 async def animate_portrait(sadtalker: SadTalker):
@@ -107,7 +109,8 @@ async def animate_portrait(sadtalker: SadTalker):
         results = sorted(os.listdir(results_dir))
         mp4_name = results[-1]
         path = results_dir + results[-1]
-        response = FileResponse(path=path, filename=mp4_name, media_type="video/mp4")
+        response = FileResponse(
+            path=path, filename=mp4_name, media_type="video/mp4")
 
         return response
 
