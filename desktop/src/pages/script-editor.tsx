@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { ScriptData, Topic } from "../../electron/mockData/data";
-import { UpdateIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { UpdateIcon, Cross2Icon, PlusIcon, ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import { Skeleton } from "../components/ui/skeleton";
 import { toast } from "sonner";
 import {
@@ -250,7 +250,7 @@ export const ScriptEditor: React.FC = () => {
     await window.api.setScript(items);
   };
   return (
-    <div className="items-center justify-center mt-4">
+    <div className="items-center justify-center">
       {loadingScripts ? (
         <LoadingScripts generationProgress={scriptLoadingProgress} />
       ) : (
@@ -272,13 +272,13 @@ export const ScriptEditor: React.FC = () => {
               </Badge>
             </div>
           </CardHeader>
-          <div className="flex flex-row my-4">
-          <CardContent className="h-4/6 basis-1/2 overflow-y-auto">
-            <div className="flex flex-col gap-2 p-4 pt-0 ">
+          <div className="flex my-4">
+          <CardContent className="h-4/6 basis-1/2">
+            <div className="flex flex-col gap-2 pt-0  ">
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
                   <Reorder.Item key={item.id} value={item} className="mb-4">
-                    <div className="flex flex-row gap-2 ">
+                    <div className="flex flex-row gap-4 ">
                       <div
                         key={item.id}
                         className={cn(
@@ -290,40 +290,39 @@ export const ScriptEditor: React.FC = () => {
                           )}
                           onClick={() => handleSetSelectedScript(item)}
                           >
-                        <div
-                          className={cn(
-                            " text-xs flex justify-between w-full items-center",
-                            selectedScript.id === item.id
-                            ? "text-foreground"
-                              : "text-muted-foreground"
-                              )}
-                              >
-                          <Badge
-                            variant={
-                              selectedScript.id === item.id
-                              ? "destructive"
-                                : "secondary"
-                              }
-                              onClick={handleDeleteCurrent}
-                              >
-                            <Cross2Icon />
-                          </Badge>
-                        </div>
-                        <div className="flex w-full flex-col gap-1">
-                          <div className="flex items-center">
-                            <div className="flex items-center gap-2">
-                              <div className="font-semibold">
-                                {item.sectionName}
-                              </div>
-                            </div>
+                        <div className="flex flex-row justify-between w-full">
+                          
+                          <div className="font-semibold">
+                            {item.sectionName}
                           </div>
+
+                          <div
+                            className={cn(
+                              " text-xs",
+                              selectedScript.id === item.id
+                              ? "text-foreground"
+                                : "text-muted-foreground"
+                                )}
+                                >
+                            <Badge
+                              variant={
+                                selectedScript.id === item.id
+                                ? "destructive"
+                                  : "secondary"
+                                }
+                                onClick={handleDeleteCurrent}
+                                >
+                              <Cross2Icon />
+                            </Badge>
+                          </div>
+                            
                         </div>
                         <div className="line-clamp-2 text-xs text-muted-foreground flex flex-row">
                           <button 
                           onClick={() => updateScriptSelection(item, item.selectedScriptIndex - 1)}
                           disabled = {item.selectedScriptIndex === 0}
                           className="border rounded-l-lg p-2 font-bold flex items-center justify-center">
-                            {"<"}
+                            <ArrowLeftIcon />
                           </button>
                           {selectedScript.id === item.id ? (
                             <div className="mx-4 p-2">
@@ -349,21 +348,25 @@ export const ScriptEditor: React.FC = () => {
                             {item.selectedScriptIndex !== item.scriptTexts.length - 1 ? 
                             <button 
                             onClick={() => updateScriptSelection(item, item.selectedScriptIndex + 1)}
-                            className="border rounded-r-lg p-2 font-bold flex items-center justify-center">{">"}</button> : 
-                            <HoverCard openDelay={200}>
-                            <HoverCardTrigger>
+                            className="border rounded-r-lg p-2 font-bold flex items-center justify-center"><ArrowRightIcon /></button> : 
+                            
                               <button 
                               disabled = {buttonLoading !== ""}
-                              className="border rounded-r-lg p-2 font-bold flex items-center justify-center text-lg"
+                              className="border rounded-r-lg flex items-center justify-center"
                               onClick={async () => updateScriptDraftSelection(item, item.selectedScriptIndex + 1)}
                               >
-                                {buttonLoading === item.id ? "..." : "+"}
+                                <HoverCard openDelay={200}>
+                                <HoverCardTrigger>
+                                    <div className="h-full w-full font-bold p-2 text-lg">
+                                      {buttonLoading === item.id ? "..." : <PlusIcon />}
+                                    </div>
+                                    </HoverCardTrigger>
+                                <HoverCardContent>
+                                  Generate another version of this section of the script
+                                </HoverCardContent>
+                              </HoverCard>
                               </button>
-                            </HoverCardTrigger>
-                            <HoverCardContent>
-                              Generate another version of this section of the script
-                            </HoverCardContent>
-                          </HoverCard>}
+                            }
                         </div>
                       </div>
                       <div className="w-[25rem] flex grow-0">
@@ -376,9 +379,9 @@ export const ScriptEditor: React.FC = () => {
               </Reorder.Group>
             </div>
           </CardContent>
-          <div className="basis-1/2 h-screen fixed w-1/2 right-1">
+          <div className="basis-1/2 h-screen fixed w-1/2 right-0">
           {selectedScript.id !== undefined && 
-            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl top-[10rem] mx-8">
+            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl mr-8">
                 <h1 className="text-2xl font-bold">
                   Customise your media 
                 </h1>
@@ -391,9 +394,9 @@ export const ScriptEditor: React.FC = () => {
                     <MediaChoices prompts={selectedScript.imagePrompts??[]} callback={setMediaSelected}/>
                   </div>
                   <div className="w-full h-full flex justify-start items-start mt-4 gap-4">
-                  {mediaSelected === "GenAI" ? <div className="flex-col grow-0">
+                  {mediaSelected === "GenAI" ? <div className="flex-col grow-0 w-full">
                         {
-                          <div className="grid grid-cols-3 gap-4">
+                          <div className="grid grid-cols-3 gap-4 w-full">
                               {selectedScript.aiImages && selectedScript.aiImages.map((image, index) => (
                                 <Popover key={index}>
                                 <PopoverTrigger asChild>
@@ -434,7 +437,7 @@ export const ScriptEditor: React.FC = () => {
                                 </PopoverContent>
                               </Popover>
                               ))}
-                              <Skeleton className="aspect-video w-full flex items-center justify-center	">
+                              <Skeleton className="aspect-video w-full border flex items-center justify-center	">
                                 <Button className="text-2xl font-bold" onClick={() => {genAiImage(selectedScript, true)}}>
                                   +
                                 </Button>

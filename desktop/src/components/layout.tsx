@@ -109,7 +109,7 @@ export function Layout() {
       )}
       <ThemeToggle className="z-10  fixed bottom-5 right-5 " />
       <Toaster />
-      <div className="p-16">
+      <div className="px-8 py-4">
         <Outlet />
       </div>
     </ScrollArea>
