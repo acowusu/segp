@@ -137,13 +137,13 @@ export const ScriptEditor: React.FC = () => {
         if (item.id === script.id) {
           item.scriptMedia = imgPath;
           item.scriptPrompt = resolvedPrompt;
+          item.aiImages = item.aiImages ? [...item.aiImages, imgPath] : [imgPath]
         }
         return item;
       }) 
       setItems(
         updatedItems
       );
-      setAiImageURL(updatedItems.find((item) => item.id === script.id)?.scriptMedia ?? "")
       await window.api.setScript(updatedItems);
     } else {
       console.log("Media already exists");
@@ -369,9 +369,9 @@ export const ScriptEditor: React.FC = () => {
               </Reorder.Group>
             </div>
           </CardContent>
-          <div className="basis-1/2 h-screen">
+          <div className="basis-1/2 h-screen fixed w-1/2 right-1">
           {selectedScript.id !== undefined && 
-            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl fixed top-[10rem] mr-8">
+            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl top-[10rem] mx-8">
                 <h1 className="text-2xl font-bold">
                   Customise your media 
                 </h1>
@@ -386,12 +386,12 @@ export const ScriptEditor: React.FC = () => {
                   <div className="w-full h-full flex justify-start items-start my-4 gap-4">
                   {mediaSelected === "GenAI" ? <div className="flex-col grow-0">
                         {
-                          <>
-                            {aiImageURL !== "" ? (
-                              <Popover>
+                          <div className="grid grid-cols-3 gap-4">
+                              {selectedScript.aiImages && selectedScript.aiImages.map((image, index) => (
+                                <Popover key={index}>
                                 <PopoverTrigger asChild>
                                   <img
-                                    src={selectedScript.scriptMedia}
+                                    src={image}
                                     alt="script media"
                                     className="w-full aspect-video object-cover rounded-lg"
                                     />
@@ -424,14 +424,14 @@ export const ScriptEditor: React.FC = () => {
                                   </div>
                                 </PopoverContent>
                               </Popover>
-                            ) : (
-                              <Skeleton className="aspect-video	   flex align-center items-center	justify-center flex-col relative inset-y-0 right-0 w-48	">
-                                <Button onClick={() => {genAiImage(selectedScript, true)}}>
-                                  <UpdateIcon />
+                              ))}
+                              <Skeleton className="aspect-video	flex align-center items-center justify-center flex-col relative inset-y-0 right-0 w-48	">
+                                <Button className="text-2xl font-bold" onClick={() => {genAiImage(selectedScript, true)}}>
+                                  +
                                 </Button>
                               </Skeleton>
-                            )}
-                          </>
+                            
+                          </div>
                         }
                       </div> : 
                       <div className="grid grid-cols-3 gap-4">
@@ -453,7 +453,7 @@ export const ScriptEditor: React.FC = () => {
           </div>
             
         </div>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex w-1/2 justify-between">
           <Button onClick={selectTopic} variant="outline">Back</Button>
           <Button onClick={setScript}>Next</Button>
         </CardFooter>
