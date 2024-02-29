@@ -38,14 +38,3 @@ export async function setAvatar(avatar: Avatar): Promise<void> {
     console.log("setAvatar", avatar);
     setProjectAvatar(avatar);
 }
-
-export const toVideoUrl = (filePath:string):Promise<string> => {
-    const videoPromise = new Promise((resolve, reject) => {
-        fs.readFile(filePath, (err, data) => {
-            if (err) { reject(err); }
-            resolve(dataurl.convert({ data, mimetype: 'video/mp4' }));
-            console.log("toVideoUrl", dataurl.convert({ data, mimetype: 'video/mp4' }));
-        });
-    });
-    return videoPromise as Promise<string>;
-}
