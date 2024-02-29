@@ -20,7 +20,7 @@ import {
 import { ImageData } from "../../../electron/mockData/data"
 
 
-export function MediaChoices({prompts}: {prompts: ImageData[]}) {
+export function MediaChoices({prompts, callback}: {prompts: ImageData[], callback: (name: string)=>void}) {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState(prompts[0].prompt)
 
@@ -55,13 +55,14 @@ export function MediaChoices({prompts}: {prompts: ImageData[]}) {
                 value={prompt.prompt}
                 onSelect={(currentValue) => {
                   setValue(currentValue === value ? "" : currentValue)
+                  callback(currentValue)
                   setOpen(false)
                 }}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === prompt.prompt ? "opacity-100" : "opacity-0"
+                    value === prompt.prompt.toLowerCase() ? "opacity-100" : "opacity-0"
                   )}
                 />
                 {prompt.prompt}

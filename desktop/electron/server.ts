@@ -318,5 +318,5 @@ export const generateOpenJourneyImage = async (prompt: string): Promise<string> 
     );
 
 
-    return destination
+    return "local:///" + destination
 }

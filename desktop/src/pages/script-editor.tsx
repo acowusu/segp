@@ -40,7 +40,7 @@ export const ScriptEditor: React.FC = () => {
   const [selectedScript, setSelectedScript] = useState<ScriptData>(
     {} as ScriptData
   );
-  const [aiImageURL, setAiImageURL] = useState("")
+  const [aiImageURL, setAiImageURL] = useState("") // TODO FIX SO IS ARRAY
   const [showOtherDrafts, setShowOtherDrafts] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
@@ -249,7 +249,7 @@ export const ScriptEditor: React.FC = () => {
       ) : (
         <FramelessCard>
           <CardHeader>
-            <CardTitle>Script Editor</CardTitle>
+            <CardTitle className="text-4xl">Script Editor</CardTitle>
             <div>
               <Badge
                 variant={"secondary"}
@@ -359,9 +359,9 @@ export const ScriptEditor: React.FC = () => {
                           </HoverCard>}
                         </div>
                       </div>
-                      <div>
-                        {item.scriptMedia ? <img src={`local:///${item.scriptMedia}`} width={200} height={200} /> : 
-                        <div className="border rounded-lg p-4">No image</div>}
+                      <div className="w-24 flex grow-0 border">
+                        {item.scriptMedia ? <img src={`${item.scriptMedia}`} className="w-full aspect-video object-cover rounded-lg"/> : 
+                        <div className="border p-4 w-full aspect-video object-cover rounded-lg">No image</div>}
                       </div>
                     </div>
                   </Reorder.Item>
@@ -371,19 +371,19 @@ export const ScriptEditor: React.FC = () => {
           </CardContent>
           <div className="basis-1/2 h-screen">
           {selectedScript.id !== undefined && 
-            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl h-4/5">
-                <h1 className="text-4xl font-bold">
+            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl fixed top-[10rem] mr-8">
+                <h1 className="text-2xl font-bold">
                   Customise your media 
                 </h1>
                 <h3>
                   Selected: {selectedScript.sectionName}
                 </h3>
-                <div className="grid grid-cols-4 w-full h-full">
-                  <div className="col-span-1 h-full flex flex-col gap-4">
+                <div className="w-full h-full">
+                  <div className="flex flex-row gap-4">
                     <Button onClick={() => setMediaSelected("GenAI")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
-                    <MediaChoices prompts={selectedScript.imagePrompts??[]}/>
+                    <MediaChoices prompts={selectedScript.imagePrompts??[]} callback={setMediaSelected}/>
                   </div>
-                  <div className="col-span-3 h-full flex items-center justify-center">
+                  <div className="w-full h-full flex justify-start items-start my-4 gap-4">
                   {mediaSelected === "GenAI" ? <div className="flex-col grow-0">
                         {
                           <>
@@ -391,7 +391,7 @@ export const ScriptEditor: React.FC = () => {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <img
-                                    src={`local:///${selectedScript.scriptMedia}`}
+                                    src={selectedScript.scriptMedia}
                                     alt="script media"
                                     className="w-full aspect-video object-cover rounded-lg"
                                     />
@@ -434,10 +434,14 @@ export const ScriptEditor: React.FC = () => {
                           </>
                         }
                       </div> : 
-                      <div className="grid grid-cols-3">
-                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt === mediaSelected)?.imageURLS.map((url) => {
-                          return (<div className="" onClick={async () => setMedia(selectedScript, url)}>
-                            <img src={`local:///${url}`} width={200} height={200}/>
+                      <div className="grid grid-cols-3 gap-4">
+                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.imageURLS.map((url, index) => {
+                          return (<div key={index} className={`aspect-video border rounded-lg overflow-hidden 
+                          ${selectedScript.scriptMedia === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}
+                    
+                          
+                          `} onClick={async () => setMedia(selectedScript, url)}>
+                            <img src={`${url}`}/>
                           </div>)
                       })}
                       </div>}

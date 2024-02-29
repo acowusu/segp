@@ -28,7 +28,7 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
         layer = new etro.layer.Image({
           startTime: start,
           duration: section.scriptDuration,
-          source: "local:///" + section.scriptMedia,
+          source: section.scriptMedia,
           destX: (_element: etro.EtroObject, time: number) => {
             return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
           }, // default: 0
@@ -53,7 +53,7 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
         layer = new etro.layer.Image({
           startTime: start,
           duration: section.scriptDuration,
-          source: "local:///" + section.scriptMedia,
+          source: section.scriptMedia,
           destX: (_element: etro.EtroObject, time: number) => {
             return lerp(-WIDTH / 10, 0, time, section.scriptDuration!);
           }, // default: 0
@@ -78,7 +78,7 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
         layer = new etro.layer.Image({
           startTime: start,
           duration: section.scriptDuration,
-          source: "local:///" + section.scriptMedia,
+          source: section.scriptMedia,
           destX: (_element: etro.EtroObject, time: number) => {
             return lerp(0, -WIDTH / 5, time, section.scriptDuration!);
           }, // default: 0
