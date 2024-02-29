@@ -25,7 +25,6 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
             'Content-Type': 'application/json'
         },
     }); 
-    // const reponse = await fetch(endpoint, {
     //     method: 'POST',
     //     headers: {
     //         'Content-Type': 'application/json'
