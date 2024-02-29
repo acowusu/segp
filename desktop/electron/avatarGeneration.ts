@@ -25,7 +25,6 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
             'Content-Type': 'application/json'
         },
     }); 
-    //     method: 'POST',
     //     headers: {
     //         'Content-Type': 'application/json'
     //     },
