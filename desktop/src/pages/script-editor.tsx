@@ -103,8 +103,16 @@ export const ScriptEditor: React.FC = () => {
 
   const handleDeleteCurrent = async (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    setItems(items.filter((item) => item.id !== selectedScript.id));
-    await window.api.setScript(items);
+    var newIndex = items.findIndex((item) => item.id == selectedScript.id) 
+    const newItems = items.filter((item) => item.id !== selectedScript.id)
+    if (newIndex >= newItems.length) {
+      newIndex -= 1
+    }
+    if (newIndex >= 0) {
+      setSelectedScript(newItems[newIndex])
+    }
+    setItems(newItems);
+    await window.api.setScript(newItems);
   };
   const genAiImage = async (
     script: ScriptData,
@@ -298,7 +306,7 @@ export const ScriptEditor: React.FC = () => {
                               }
                               onClick={handleDeleteCurrent}
                               >
-                            <Cross2Icon></Cross2Icon>
+                            <Cross2Icon />
                           </Badge>
                         </div>
                         <div className="flex w-full flex-col gap-1">
