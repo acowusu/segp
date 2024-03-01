@@ -1,3 +1,17 @@
+# Stable Video Diffusion
+
+## Setup
+1. Create and activate the conda environment:
+    ```bash
+    conda activate imgtovid
+    ```
+
+## Usage
+1. Run the main.py script:
+    ```bash
+    python3 vid.py
+    ```
+
 # SadTalker
 
 ## Installation
