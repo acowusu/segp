@@ -10,6 +10,7 @@ import { MagicWandIcon, PlayIcon } from "@radix-ui/react-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../components/ui/card";
+import { getProjectHasSoundEffect } from "../../electron/projectData";
 const WIDTH = 1920;
 const HEIGHT = 1080;
 function lerp(a: number, b: number, t: number, p: number) {
@@ -203,7 +204,7 @@ const generateAudio = async () => {
         result.push(section);
         continue;
       }
-      const modified = window.api.textToAudio(section);
+      var modified = window.api.textToAudio(section);
       toast.promise(modified, {
         loading: `Generating audio for ${section.sectionName}...`,
         success: (newSection) => {
@@ -211,15 +212,20 @@ const generateAudio = async () => {
         },
         error: "Error generating audio for section: " + section.sectionName,
       });
-      const effectModified = window.api.generateSoundEffect(section);
-      toast.promise(modified, {
-        loading: `Generating sound effects for ${section.sectionName}...`,
-        success: (newSection) => {
-          return `Sound effect has been generated for ${section.sectionName}. ${newSection.soundEffect} has been saved.`;
-        },
-        error: "Error generating sound effect for section: " + section.sectionName,
-      });
-      const resolvedModified = await effectModified;
+      var resolvedModified = await modified
+      
+      if (getProjectHasSoundEffect()) {
+        var modifed = window.api.generateSoundEffect(resolvedModified);
+        toast.promise(modified, {
+          loading: `Generating sound effects for ${section.sectionName}...`,
+          success: (newSection) => {
+            return `Sound effect has been generated for ${section.sectionName}. ${newSection.soundEffect} has been saved.`;
+          },
+          error: "Error generating sound effect for section: " + section.sectionName,
+        });
+        resolvedModified = await modifed;
+      }
+      
       result.push(resolvedModified);
     }
     // const length = result.reduce((acc, val) => {
