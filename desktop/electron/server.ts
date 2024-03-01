@@ -324,8 +324,8 @@ export const generateOpenJourneyImage = async (prompt: string): Promise<string> 
 
 const EFFECT_GEN_PROMPT = `[INST] 
 Consider yourself as an AI creative assistant helping users generate sound effects using AI audio generator. 
-I will provide you with an expert of an article, and I want you to provide me with a simple prompt to feed into sound effect generator. 
-Ensure the response is brief and to the point.
+I will provide you with an expert of an article, and I want you to provide me with a simple prompt relavent to the article which I can feed into sound effect generator which should last 2-4 seconds. 
+Ensure the response is brief and to the point. the sounds should be brief sounds
 
 EXAMPLE 1:
 
@@ -338,7 +338,7 @@ the Labour motion so MPs could express their view on "the widest range of propos
 
 OUTPUT:
 """
-loud cameras clicking, murmuring of people in the background
+loud cameras clicking
 """
 
 EXAMPLE 2:
@@ -346,7 +346,6 @@ EXAMPLE 2:
 INPUT:
 """
 If you are not careful, the window will smash and you will be left cleaning up the pieces
-
 """
 
 OUTPUT:
@@ -354,6 +353,12 @@ OUTPUT:
 Loud window smashing
 """
 
+The conflict has been a chronicle of turmoil, carnage, and misery, influencing not only Ukraine but also Russia. The trajectory of the situation has been evident for years, reaching a turning point in 2022 with the complete invasion of Ukraine by President Putin, marked as a pivotal juncture
+
+OUTPUT:
+"""
+Loud gunfire
+"""
 
 Now produce the result for the following text below:
 """<<<TO BE REPLACED>>>"""

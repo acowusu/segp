@@ -176,22 +176,21 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
     movie.layers.push(layer);
     console.log("adding layer", layer);
 
-    start += section.scriptDuration;
-
-    if (!section.soundEffect) throw new Error("No effect found");
-    const effectLayer = new etro.layer.Audio({
-      startTime: start,
-      duration: Math.min(4, section.scriptDuration),
-      source: await window.api.toDataURL(section.soundEffect),
-      sourceStartTime: 0, // default: 0
-      muted: false, // default: false
-      volume: 1, // default: 1
+    if (section.soundEffect) {
+      const effectLayer = new etro.layer.Audio({
+        startTime: start,
+        duration: Math.min(4, section.scriptDuration),
+        source: await window.api.toDataURL(section.soundEffect),
+        sourceStartTime: 0, // default: 0
+        muted: false, // default: false
+        volume: 0.4, // default: 1
       playbackRate: 1, //default: 1
     });
     movie.layers.push(effectLayer);
     console.log("adding sound effect layer", effectLayer);
-
+  };
     start += section.scriptDuration;
+
 
   }
 }
@@ -214,7 +213,7 @@ const generateAudio = async () => {
       });
       var resolvedModified = await modified
       
-      if (getProjectHasSoundEffect()) {
+      if (await window.api.getProjectHasSoundEffect()) {
         var modifed = window.api.generateSoundEffect(resolvedModified);
         toast.promise(modified, {
           loading: `Generating sound effects for ${section.sectionName}...`,
@@ -357,7 +356,7 @@ export const VideoGenerator: React.FC = () => {
     // });
     // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
-    await addSadTalkerLayers(script, movie);
+    // await addSadTalkerLayers(script, movie);
     addSubtitleLayers(script, movie);
 
     movieRef.current = movie;
