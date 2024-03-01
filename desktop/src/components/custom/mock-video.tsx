@@ -87,12 +87,12 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       x: WIDTH/2-WIDTH/4, // default: 0
       y: HEIGHT-200, // default: 0
       width: WIDTH/2, // default: null (full width)
-      height: 120, // default: null (full height)
+      height: parseInt(subtitleSize) + 20, // default: null (full height)
       opacity: 1, // default: 1
       color: etro.parseColor('white'), // default: new etro.Color(0, 0, 0, 1)
       font: subtitleSize + ' sans-serif', // default: '10px sans-serif'
       textX: WIDTH/4, // default: 0
-      textY: 100, // default: 0
+      textY: parseInt(subtitleSize), // default: 0
       textAlign: 'center', // default: 'left'
       textBaseline: 'alphabetic', // default: 'alphabetic'
       textDirection: 'ltr', // default: 'ltr'
