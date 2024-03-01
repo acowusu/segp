@@ -324,9 +324,8 @@ export const generateOpenJourneyImage = async (prompt: string): Promise<string> 
 
 const EFFECT_GEN_PROMPT = `[INST] 
 Consider yourself as an AI creative assistant helping users generate sound effects using AI audio generator. 
-I will provide you with an  expert of an article, and I want you to provide me with a detailed prompt to feed into sound effect generator. 
-it is important the result is clear so ensure you give a detailed description of the sound you want to generate.
-Ensure the response is briev and to the point. Do not describe diagrams and instead describe a photo that would exist in the natural world that could be used to represent it
+I will provide you with an expert of an article, and I want you to provide me with a simple prompt to feed into sound effect generator. 
+Ensure the response is brief and to the point.
 
 EXAMPLE 1:
 
@@ -401,17 +400,12 @@ export const generateSoundEffect = async (section: ScriptData): Promise<ScriptDa
 
     const url = "https://iguana.alexo.uk/v7/generate_audio";
     
-    const options = {
-        method: "POST",
-        body: JSON.stringify(params),
-    };
-    
     try {
         
 
-        const { destination, headers } = await downloadFile('https://iguana.alexo.uk/v0/generate_audio', getProjectPath(), {
+        const { destination } = await downloadFile(url, getProjectPath(), {
             method: 'POST',
-            body: JSON.stringify(options),
+            body: JSON.stringify(params),
             headers: {
                 'Content-Type': 'application/json'
             },

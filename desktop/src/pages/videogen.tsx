@@ -176,6 +176,22 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
     console.log("adding layer", layer);
 
     start += section.scriptDuration;
+
+    if (!section.soundEffect) throw new Error("No effect found");
+    const effectLayer = new etro.layer.Audio({
+      startTime: start,
+      duration: Math.min(4, section.scriptDuration),
+      source: await window.api.toDataURL(section.soundEffect),
+      sourceStartTime: 0, // default: 0
+      muted: false, // default: false
+      volume: 1, // default: 1
+      playbackRate: 1, //default: 1
+    });
+    movie.layers.push(effectLayer);
+    console.log("adding sound effect layer", effectLayer);
+
+    start += section.scriptDuration;
+
   }
 }
 const generateAudio = async () => {
@@ -195,7 +211,15 @@ const generateAudio = async () => {
         },
         error: "Error generating audio for section: " + section.sectionName,
       });
-      const resolvedModified = await modified;
+      const effectModified = window.api.generateSoundEffect(section);
+      toast.promise(modified, {
+        loading: `Generating sound effects for ${section.sectionName}...`,
+        success: (newSection) => {
+          return `Sound effect has been generated for ${section.sectionName}. ${newSection.soundEffect} has been saved.`;
+        },
+        error: "Error generating sound effect for section: " + section.sectionName,
+      });
+      const resolvedModified = await effectModified;
       result.push(resolvedModified);
     }
     // const length = result.reduce((acc, val) => {
