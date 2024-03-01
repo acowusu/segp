@@ -31,6 +31,8 @@ import { useNavigate } from "react-router-dom";
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
   subtitles: z.boolean().default(false).optional(),
+  backgroundAudio: z.boolean().default(false).optional(),
+  soundEffects: z.boolean().default(false).optional(),
   audience: z
     .string({ required_error: "Please Select an Audience" })
     .default("").optional(),
@@ -49,6 +51,8 @@ const defaultValues: () => Promise<Partial<FormValues>> = async () => {
   return {
     avatar: await window.api.getProjectHasAvatar().catch(()=>false)!,
     subtitles:  await window.api.getProjectHasSubtitles().catch(()=>false)!,
+    backgroundAudio:  await window.api.getProjectHasBackgroundAudio().catch(()=>false)!,
+    soundEffects:  await window.api.getProjectHasSoundEffect().catch(()=>false)!,
     audience: ( await window.api.getProjectAudience().catch(()=>({name:""}))).name!,
     voiceover: (await window.api.getProjectVoiceover().catch(()=>({id:""}))).id!,
     videoLength: await window.api.getProjectLength(),
@@ -154,6 +158,8 @@ export function SetVisuals() {
     console.log(data);
     window.api.setProjectHasAvatar(data.avatar || false);
     window.api.setProjectHasSubtitles(data.subtitles || false);
+    window.api.setProjectHasBackgroundAudio(data.backgroundAudio || false);
+    window.api.setProjectHasSoundEffects(data.soundEffects || false);
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
     setAvatar(avatarItems.find(item => item.id === data.avatarSelection)!)
@@ -305,6 +311,46 @@ export function SetVisuals() {
                       <FormLabel className="text-base">Subtitles</FormLabel>
                       <FormDescription>
                         Show subtitles on the video
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="backgroundAudio"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Backing Track</FormLabel>
+                      <FormDescription>
+                        Turn on custom generated background audio
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="soundEffects"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Sound Effects</FormLabel>
+                      <FormDescription>
+                        Add sound Effects to spice up your video
                       </FormDescription>
                     </div>
                     <FormControl>
