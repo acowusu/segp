@@ -8,6 +8,7 @@ from diffusers.utils import load_image, export_to_video
 import torch
 from io import BytesIO 
 import PIL
+import math
 
 MODEL_ID= "stabilityai/stable-video-diffusion-img2vid-xt"
 
@@ -36,15 +37,24 @@ svc.mount_asgi_app(app)
 #    return {"status": "ok"}
 
 @app.post("/video")
-async def generate_video(image_file: UploadFile = Form(...)):
+async def generate_video(image_file: UploadFile = Form(...), fps: Annotated[int, Form()]=7, video_length: Annotated[int, Form()]=10):
     data = await image_file.read()
     image = PIL.Image.open(BytesIO(data))
+    image = image.resize((1024, 576))
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
     #image = load_image(image_file)
     generator = torch.manual_seed(42)
-    frames = svd_runner.run(image, decode_chunk_size=8, generator=generator, motion_bucket_id=120, noise_aug_strength=0.1)[0][0]
-    path = export_to_video(frames, fps=7) # default written to temporary file
+
+    frames = [image]
+    no_frames_generated = 25
+    iterations = math.ceil(video_length * fps / no_frames_generated)
+    for _ in range(iterations):
+        ext_image = frames[-1] 
+        new_frames = svd_runner.run(ext_image, decode_chunk_size=8, generator=generator, motion_bucket_id=120, noise_aug_strength=0.1)[0][0]
+        frames.extend(new_frames[1:])
+
+    path = export_to_video(frames, fps=fps) # default written to temporary file
    
     return FileResponse(path=path, media_type="video/mp4")
 
