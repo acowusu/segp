@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../components/ui/card";
 import { getProjectHasSoundEffect } from "../../electron/projectData";
+import bgAudio from "../../electron/mockData/music.json"
 const WIDTH = 1920;
 const HEIGHT = 1080;
 function lerp(a: number, b: number, t: number, p: number) {
@@ -183,7 +184,7 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
         source: await window.api.toDataURL(section.soundEffect),
         sourceStartTime: 0, // default: 0
         muted: false, // default: false
-        volume: 0.4, // default: 1
+        volume: 0.6, // default: 1
       playbackRate: 1, //default: 1
     });
     movie.layers.push(effectLayer);
@@ -193,6 +194,21 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
 
 
   }
+  
+  if (await window.api.getProjectHasBackgroundAudio()) {
+    const effectLayer = new etro.layer.Audio({
+      startTime: 0,
+      duration: start,
+      source: bgAudio[0].path,
+      sourceStartTime: 0, // default: 0
+      muted: false, // default: false
+      volume: 0.3, // default: 1
+    playbackRate: 1, //default: 1
+  });
+  movie.layers.push(effectLayer);
+  console.log("adding bg music layer", effectLayer);
+  }
+
 }
 const generateAudio = async () => {
   try {
