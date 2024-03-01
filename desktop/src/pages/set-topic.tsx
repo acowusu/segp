@@ -74,7 +74,7 @@ export const SetTopic: React.FC = () => {
                 <button
                   key={item.topic}
                   className={cn(
-                    "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all",
+                    "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all max-w-[40rem]",
                     selectedTopic.topic === item.topic && "border-2 border-sky-500",
                     selectedTopic.topic !== item.topic &&
                           "hover:border-sky-500 hover: hover:border-dashed border-2"

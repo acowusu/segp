@@ -173,8 +173,8 @@ export function SetVisuals() {
         Project Settings
       </h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex flex-col xl:flex-row gap-8">
+          <div className="max-w-[40rem] w-full">
             <h3 className="mb-4 text-lg font-medium">Configuration</h3>
             <FormField
             control={form.control}
@@ -318,16 +318,19 @@ export function SetVisuals() {
               />
             </div>
           </div>
+          <div className="flex flex-col gap-4">
+
           <h3 className="text-lg font-medium">Preview</h3>
 
-        <OverlayPreview
-          backgroundUrl={"example2-min.jpg"}
-          avatarUrl={selectedAvatar.imagePath ?? "big-person.png"}
-          showAvatar={avatar}
-          showSubtitle={subtitles}
-        />
+            <OverlayPreview
+              backgroundUrl={"example2-min.jpg"}
+              avatarUrl={selectedAvatar.imagePath ?? "big-person.png"}
+              showAvatar={avatar}
+              showSubtitle={subtitles}
+              />
 
-          <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
+              <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
+          </div>
         </form>
       </Form>
     </>

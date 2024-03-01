@@ -12,7 +12,20 @@ export const multiply =  ({ a, b }: { a: number, b: number }) => {
     return a * b
 }
 
+
+
 // import { worker_convertWebmToMp4 } from "./worker";
+
+import { convert } from "pdf-img-convert";
+
+async function getImageFromPdf(filepath: string, outputPath: string) {
+  const outputImages = await convert("./report.pdf");
+  const imagePaths = outputImages.map((image, i) => {
+    const path = outputPath + "output" + i + ".png";
+    return path;
+  });
+}
+
 
 export interface ImageData {
   data: Uint8ClampedArray;
@@ -50,11 +63,14 @@ export const extractTextFromPDF = async ({
     const pdf = await getDocumentProxy(new Uint8Array(buffer));
 
     const { totalPages, text } = await extractText(pdf, { mergePages: true });
-    const images = [];
+    const images: ImageData[] = [];
     // console.log("# Extracting images 1");
-    for (let i = 1; i < totalPages; i++) {
-        images.push(...(await extractImagesFromPDF({ filePath, pageNumber:i, projectPath })));
-    }
+    // for (let i = 1; i < totalPages; i++) {
+    //     images.push(...(await extractImagesFromPDF({ filePath, pageNumber:i, projectPath })));
+    // }
+
+    getImageFromPdf(filePath, projectPath)
+
     return {text: text as string, images};
 };
 

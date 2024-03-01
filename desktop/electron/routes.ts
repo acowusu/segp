@@ -33,7 +33,7 @@ import {
 } from "./setup";
 import { getProjectName, getProjectPath, getIsDev, getLastProject, getRecentProjects} from "./metadata";
 import * as projectData from "./projectData"
-import {generateTextFromLLM, generateTopics, generateOpenJourneyPrompt, generateOpenJourneyImage} from "./server"
+import {generateTextFromLLM, generateTopics, generateOpenJourneyPrompt, generateOpenJourneyImage, generateSoundEffect} from "./server"
 import {getServiceStatus, launchService, shutdownService} from "./status"
 const api = {
   loadReport,
@@ -68,6 +68,7 @@ const api = {
   toDataURL,
   generateTextFromLLM,
   generateOpenJourneyImage,
+  generateSoundEffect,
   generateOpenJourneyPrompt,
   generateTopics,
   // Add your API methods here

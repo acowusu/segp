@@ -86,6 +86,7 @@
     "node-watch": "^0.7.4",
     "patch-package": "^8.0.0",
     "path2d-polyfill": "^2.0.1",
+    "pdf-img-convert": "^1.2.1",
     "pexels": "^1.4.0",
     "pngjs": "^7.0.0",
     "react": "^18.2.0",

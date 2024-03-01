@@ -15,6 +15,8 @@ export interface ScriptData {
   sadTalkerPath?: string; // path to tmp file on server
   avatarVideoUrl?: string; // avatar video URL
   aiImages?: string[]; // list of ai generated images
+  soundEffectPrompt?: string; // sound effect prompt
+  soundEffect?: string; // path to generated sound effect
 }
 
 export interface ImageData {

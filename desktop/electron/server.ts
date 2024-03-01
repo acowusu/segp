@@ -320,3 +320,115 @@ export const generateOpenJourneyImage = async (prompt: string): Promise<string> 
 
     return "local:///" + destination
 }
+
+
+const EFFECT_GEN_PROMPT = `[INST] 
+Consider yourself as an AI creative assistant helping users generate sound effects using AI audio generator. 
+I will provide you with an  expert of an article, and I want you to provide me with a detailed prompt to feed into sound effect generator. 
+it is important the result is clear so ensure you give a detailed description of the sound you want to generate.
+Ensure the response is briev and to the point. Do not describe diagrams and instead describe a photo that would exist in the natural world that could be used to represent it
+
+EXAMPLE 1:
+
+INPUT:
+"""
+In extraordinary scenes, SNP MPs and some Tories walked out of the chamber over the Speaker's handling of the vote.
+Following calls for him to return to explain his decision, Sir Lindsay told the Commons he chose to allow a vote on 
+the Labour motion so MPs could express their view on "the widest range of propositions".
+"""
+
+OUTPUT:
+"""
+loud cameras clicking, murmuring of people in the background
+"""
+
+EXAMPLE 2:
+
+INPUT:
+"""
+If you are not careful, the window will smash and you will be left cleaning up the pieces
+
+"""
+
+OUTPUT:
+"""
+Loud window smashing
+"""
+
+
+Now produce the result for the following text below:
+"""<<<TO BE REPLACED>>>"""
+[/INST]
+"""`
+
+const generateSoundEffectPrompt = async (section: ScriptData): Promise<string> => {
+
+    const prompt = EFFECT_GEN_PROMPT.replace("<<<TO BE REPLACED>>>", section.scriptTexts[section.selectedScriptIndex]);
+    const params = new URLSearchParams();
+   
+    params.append("prompt",  prompt);
+    params.append("schema", JSON.stringify(imageSchema));
+    params.append("temperature", "0.7");
+    const url = "https://iguana.alexo.uk/v3/generate";
+    
+    const options = {
+        method: "POST",
+        body: params,
+    };
+    
+    try {
+        const response = await fetch(url, options);
+        const responseParsed = (await response.json() as LLMResponse<string>);
+        console.log("sound effect prompt:")
+        console.log(JSON.stringify(responseParsed.response))
+        return responseParsed.response as string;
+      
+    } catch (err) {
+        console.error("error:" + err);
+        throw Error("Error generating Effect Prompt")
+    }
+}
+
+
+export const generateSoundEffect = async (section: ScriptData): Promise<ScriptData> => {
+
+    const effectPrompt = await generateSoundEffectPrompt(section)
+
+    const params = {
+        "script": effectPrompt,
+        "duration": 4
+    }
+
+    const url = "https://iguana.alexo.uk/v7/generate_audio";
+    
+    const options = {
+        method: "POST",
+        body: JSON.stringify(params),
+    };
+    
+    try {
+        
+
+        const { destination, headers } = await downloadFile('https://iguana.alexo.uk/v0/generate_audio', getProjectPath(), {
+            method: 'POST',
+            body: JSON.stringify(options),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        section.soundEffectPrompt = effectPrompt
+        section.soundEffect = destination
+        return section;
+      
+    } catch (err) {
+        console.error("error:" + err);
+        throw Error("Error generating Audio Effect")
+    }
+}
+
+
+
+
+
+
+
