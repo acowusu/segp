@@ -8,6 +8,7 @@ interface MockVideoProps {
   avatarUrl: string;
   showAvatar?: boolean;
   showSubtitle?: boolean;
+  subtitleSize?: string;
 }
 
 export const MockVideo: React.FC<MockVideoProps> = ({
@@ -15,6 +16,7 @@ export const MockVideo: React.FC<MockVideoProps> = ({
   avatarUrl,
   showAvatar = false,
   showSubtitle = false,
+  subtitleSize = "80px",
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const movieRef = useRef<etro.Movie | null>();
@@ -88,7 +90,7 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       height: 120, // default: null (full height)
       opacity: 1, // default: 1
       color: etro.parseColor('white'), // default: new etro.Color(0, 0, 0, 1)
-      font: '100px sans-serif', // default: '10px sans-serif'
+      font: subtitleSize + ' sans-serif', // default: '10px sans-serif'
       textX: WIDTH/4, // default: 0
       textY: 100, // default: 0
       textAlign: 'center', // default: 'left'
@@ -110,7 +112,7 @@ export const MockVideo: React.FC<MockVideoProps> = ({
 
     movie.play();
     movieRef.current = movie;
-  }, [avatarUrl, backgroundUrl, showAvatar, showSubtitle]);
+  }, [avatarUrl, backgroundUrl, showAvatar, showSubtitle, subtitleSize]);
   return (
     <>
       <canvas className="w-full" ref={canvasRef} />
