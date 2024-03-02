@@ -14,6 +14,8 @@ import {
   getVoiceovers,
   toDataURL,
   fetchImages,
+  generateBackingTrack,
+  updateScriptSection,
 } from "./reportProcessing";
 import { generateBackingTrack, textToAudio } from "./audioService";
 import {
@@ -78,6 +80,8 @@ const api = {
   getAvatars,
   setAvatar,
   fetchImages,
+  //
+  setScriptSection: updateScriptSection,
 };
 export default api;
 

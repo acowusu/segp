@@ -125,6 +125,12 @@ export async function getScript(force?:boolean): Promise<ScriptData[]> {
   script = await generateScript(report, projectData.getProjectTopic())
   await setScript(script)
   return script
+
+
+}
+
+export async function updateScriptSection(section: ScriptData): Promise<void> {
+  projectData.updateProjectScriptSection(section);
 }
 
 export async function generateNewScript(script: string): Promise<string> {
