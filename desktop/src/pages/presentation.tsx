@@ -6,13 +6,12 @@ import { Separator } from "@radix-ui/react-menu";
 import React, { useEffect, useRef, useState } from "react";
 import { SidebarNav } from "../components/ui/sidebar-nav";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router";
-import { ScriptData } from "../../electron/mockData/data";
+import { LayerOpts, ScriptData } from "../../electron/mockData/data";
 import { Button } from "../components/ui/button";
 import etro from "etro";
-import { addSingleImageLayer } from "../lib/etro-utils";
+import { addSingleImageLayer, addSectionAvatar } from "../lib/etro-utils";
 import { Skeleton } from "../components/ui/skeleton";
-import { PlayIcon } from "lucide-react";
-import { MagicWandIcon } from "@radix-ui/react-icons";
+import { MailOpen, PlayIcon } from "lucide-react";
 
 type NavHeader = {
   // id: string;
@@ -40,7 +39,6 @@ export const PresentationLayout: React.FC = () => {
   const [sections, setSections] = useState<NavHeader[]>([]);
   // const [script, setScript] = useState<ScriptData[]>();
   const [scriptMap, setScriptMap] = useState<Map<string, SectionData>>();
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     window.api
@@ -157,11 +155,6 @@ export const PresentationSection: React.FC = () => {
   }, [id]);
 
   // this will need some parameters to change the video by
-  const restyleSection = () => {
-    setCurrentState("initial");
-    const movie = movieRef.current;
-    assert(movie, "Restyle: Movie must exist at this point"); // a movie reference must exist at this point
-  };
 
   const setupPlayer = async () => {
     if (movieRef.current) {
@@ -184,6 +177,7 @@ export const PresentationSection: React.FC = () => {
       canvas.height = 1080;
 
       addSingleImageLayer(section, movie, 0); //Add image from the start
+      await addSectionAvatar(section, movie, 0);
       setMovies((map) => new Map(map.set(id, movie)));
     } else {
       movie = existingMovie;
@@ -192,6 +186,24 @@ export const PresentationSection: React.FC = () => {
     movieRef.current = movie;
   };
 
+  const restyleSection = async ({ preset }: { preset: LayerOpts }) => {
+    !movieRef.current?.paused && movieRef.current?.pause();
+    setCurrentState("initial");
+    // const movie = movieRef.current;
+
+    // assert(movie, "Restyle: Movie must exist at this point"); // a movie reference must exist at this point
+    const newMovie = new etro.Movie({
+      canvas: canvasRef.current!,
+      repeat: false,
+      background: etro.parseColor("#ccc"),
+    });
+
+    addSingleImageLayer(section, newMovie, 0);
+    await addSectionAvatar(section, newMovie, 0, preset);
+    setMovies((map) => new Map(map.set(id, newMovie)));
+    movieRef.current = newMovie;
+    setCurrentState("playback");
+  };
   // const generateSectionEtro = async () => {
   //   await setupPlayer();
   //   setCurrentState("playback");
@@ -211,7 +223,6 @@ export const PresentationSection: React.FC = () => {
             <p> Loading Section...</p>
           </Skeleton>
         )}
-
         {currentState === "playback" && (
           <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
             <Button
@@ -228,12 +239,17 @@ export const PresentationSection: React.FC = () => {
             </Button>
           </Skeleton>
         )}
+        {/* <div className="relative w-full mb-4"> */}
         <canvas
-          className={`w-full mb-4 ${
+          className={` w-full mb-4 ${
             currentState === "playing" ? "" : "hidden"
           }`}
           ref={canvasRef}
-        ></canvas>
+        ></canvas>{" "}
+        {/* <Button className="relative top-[50%] left-[50%] translate-x-[50%] -translate-y-full -ms-[50%]">
+            Dummy{" "}
+          </Button>
+        </div> */}
         {currentState === "playing" && (
           <>
             <Button
@@ -249,8 +265,22 @@ export const PresentationSection: React.FC = () => {
         )}
         <div>
           <h3> Styles: </h3>
-          <Button> Style 1 </Button>
-          <Button> Style 2 </Button>
+          <Button
+            onClick={() => {
+              restyleSection({ preset: { x: 1408, y: 632 } });
+            }}
+          >
+            {" "}
+            Style 1{" "}
+          </Button>
+          <Button
+            onClick={() => {
+              restyleSection({ preset: { x: 0, y: 0 } });
+            }}
+          >
+            {" "}
+            Style 2{" "}
+          </Button>
           <Button> Style 3 </Button>
         </div>
       </div>
