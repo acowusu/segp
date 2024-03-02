@@ -148,13 +148,13 @@ export async function generateAudio(section: ScriptData) {
 
     const modified = window.api.textToAudio(section);
 
-    toast.promise(modified, {
-      loading: `Generating audio for ${section.sectionName}...`,
-      success: (newSection) => {
-        return `Audio has been generated for ${section.sectionName}. ${newSection.scriptAudio} has been saved.`;
-      },
-      error: `Error generating audio for section: ${section.sectionName}`,
-    });
+    // toast.promise(modified, {
+    //   loading: `Generating audio for ${section.sectionName}...`,
+    //   success: (newSection) => {
+    //     return `Audio has been generated for ${section.sectionName}. ${newSection.scriptAudio} has been saved.`;
+    //   },
+    //   error: `Error generating audio for section: ${section.sectionName}`,
+    // });
     const resolvedModified = await modified;
     window.api.updateProjectScriptSection(resolvedModified);
   } catch (error) {
@@ -171,15 +171,20 @@ async function generateAvatar(section: ScriptData) {
     return; // undefined if the avatar is not selected for the project
   }
   try {
+    // Similar to line 141 -> must be addressed
+    if (section.avatarVideoUrl) {
+      console.log(`Avatar for ${section.sectionName} alreay exists`);
+      return;
+    }
     const avatar = await window.api.getProjectAvatar();
     const modified = window.api.generateAvatar(section, avatar);
-    toast.promise(modified, {
-      loading: `Generating avatar for ${section.sectionName}...`,
-      success: () => {
-        return `Avatar has been generated for ${section.sectionName}. `;
-      },
-      error: "Error generating avatar for section: " + section.sectionName,
-    });
+    // toast.promise(modified, {
+    //   loading: `Generating avatar for ${section.sectionName}...`,
+    //   success: () => {
+    //     return `Avatar has been generated for ${section.sectionName}. `;
+    //   },
+    //   error: "Error generating avatar for section: " + section.sectionName,
+    // });
     const resolvedModified = await modified;
     window.api.updateProjectScriptSection(resolvedModified);
   } catch (error) {
