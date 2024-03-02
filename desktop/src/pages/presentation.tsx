@@ -13,6 +13,7 @@ import { dispatchSectionGeneration } from "../lib/etro-utils";
 import { Skeleton } from "../components/ui/skeleton";
 import { PlayIcon } from "lucide-react";
 import { SubtitleText } from "../lib/subtitle-layer";
+import { toast } from "sonner";
 
 type NavHeader = {
   // id: string;
@@ -27,7 +28,7 @@ type NavHeader = {
 
 // maybe preserce start and end timestamsp??
 type SectionData = {
-  start: number;
+  start: number; //might not be needed
   end: number;
   script: ScriptData;
   media: Promise<etro.layer.Visual>; // Essentially Image | Video
@@ -67,12 +68,12 @@ export const PresentationLayout: React.FC = () => {
 
           const [media, avatar, audio] = dispatchSectionGeneration(
             entry,
-            start
+            0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
           );
 
           const end = entry.scriptDuration;
           map.set(id, {
-            start: start,
+            start: start, // real start time this is cached for later to videogen can quickly convert the layers
             end: end,
             script: entry,
             media: media,
@@ -156,6 +157,16 @@ export const PresentationLayout: React.FC = () => {
   );
 };
 
+function toastNotif<T>(promise: Promise<T>, section: ScriptData, type: string) {
+  toast.promise(promise, {
+    loading: `Generating ${type} for ${section.sectionName}...`,
+    success: () => {
+      return `${type} generation is completed for ${section.sectionName}`;
+    },
+    error: `Error in ${type} layer creation in ${section.sectionName}`,
+  });
+}
+
 // export const PresentationSection: React.FC<{id: number; title: string;}> = ({id, title}) => {
 export const PresentationSection: React.FC = () => {
   const param = useParams();
@@ -210,10 +221,18 @@ export const PresentationSection: React.FC = () => {
       canvas.height = 1080;
 
       // add the assets to the movie:
-      const { media, avatar, audip } = sectionData;
+      const { media, avatar, audio } = sectionData;
 
+      // Primary Media
+      toastNotif(media, section, "Media");
       movie.addLayer(await media);
+
+      // Avatar layers
+      toastNotif(avatar, section, "Avatar");
       movie.addLayer(await avatar);
+
+      // Audio
+      // toastNotif(audio, section, "Audio");
 
       setMovies((map) => new Map(map.set(id, movie)));
     } else {
