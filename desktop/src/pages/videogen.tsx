@@ -249,6 +249,7 @@ export const VideoGenerator: React.FC = () => {
     // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
     // await addSadTalkerLayers(script, movie);
+    await addAvatarLayers(script, movie);
     addSubtitleLayers(script, movie);
 
     movieRef.current = movie;
@@ -259,7 +260,7 @@ export const VideoGenerator: React.FC = () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
     // await generateAudio();
-    // await generateAvatarSections();
+    await generateAvatarSections();
     console.log("audio generated backing should exist");
 
     const interval = setInterval(() => {
