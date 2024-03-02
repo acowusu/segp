@@ -139,11 +139,11 @@ export async function generateBackingTrack(prompt: string, duration: number): Pr
 
 }
 
-export const toDataURL = (filePath:string):Promise<string> => {
+export const toDataURL = (filePath:string, mimetype:string):Promise<string> => {
   const songPromise = new Promise((resolve, reject) => {
     fs.readFile(filePath, (err, data) => {
       if (err) { reject(err); }
-      resolve(dataurl.convert({ data, mimetype: 'audio/wav' }));
+      resolve(dataurl.convert({ data, mimetype: mimetype }));
     });
   });
   return songPromise as Promise<string>;

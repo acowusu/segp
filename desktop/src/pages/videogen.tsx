@@ -28,7 +28,8 @@ async function addSadTalkerLayers(sections: ScriptData[], movie: etro.Movie) {
       startTime: 0,
       duration: section.scriptDuration,
       source: await window.api.toDataURL(
-        `C:\\Users\\alexa\\Downloads\\mail2\\cat.mp4`
+        `C:\\Users\\alexa\\Downloads\\mail2\\cat.mp4`,
+        "video/mp4"
       ),
       // sourceWidth: 1920,
       // sourceHeight: 1080,
@@ -88,7 +89,7 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
     const layer = new etro.layer.Audio({
       startTime: start,
       duration: section.scriptDuration,
-      source: await window.api.toDataURL(section.scriptAudio),
+      source: await window.api.toDataURL(section.scriptAudio, 'audio/wav'),
       sourceStartTime: 0, // default: 0
       muted: false, // default: false
       volume: 1, // default: 1
@@ -151,7 +152,7 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
     const layer = new etro.layer.Video({
       startTime: start,
       duration: section.scriptDuration,
-      source: section.avatarVideoUrl,
+      source: await window.api.toDataURL(section.avatarVideoUrl, 'video/mp4'),
       destX: 0, // default: 0
       destY: 0, // default: 0
       destWidth: avatar.width, // default: null (full width)
