@@ -16,6 +16,11 @@ export interface ScriptData {
   soundEffectPath?: string; // path to sound effect file
 }
 
+export interface ScriptSelections {
+  topic: string; 
+  script: ScriptData[];
+}
+
 export interface Audience {
   name: string;
   description: string;
