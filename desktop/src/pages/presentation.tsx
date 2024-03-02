@@ -9,9 +9,10 @@ import { Outlet, useNavigate, useOutletContext, useParams } from "react-router";
 import { LayerOpts, ScriptData } from "../../electron/mockData/data";
 import { Button } from "../components/ui/button";
 import etro from "etro";
-import { addSingleImageLayer, addSectionAvatar } from "../lib/etro-utils";
+import { dispatchSectionGeneration } from "../lib/etro-utils";
 import { Skeleton } from "../components/ui/skeleton";
-import { MailOpen, PlayIcon } from "lucide-react";
+import { PlayIcon } from "lucide-react";
+import { SubtitleText } from "../lib/subtitle-layer";
 
 type NavHeader = {
   // id: string;
@@ -19,18 +20,23 @@ type NavHeader = {
   href: string;
 };
 
+// type SectionData = {
+//   section: ScriptData;
+//   assetPromise: Promise<void>;
+// };
+
+// maybe preserce start and end timestamsp??
 type SectionData = {
-  section: ScriptData;
-  assetPromise: Promise<void>;
+  start: number;
+  end: number;
+  script: ScriptData;
+  media: Promise<etro.layer.Visual>; // Essentially Image | Video
+  avatar: Promise<etro.layer.Video>;
+  audio: Promise<etro.layer.Audio>;
+  // subtitles: Promise<SubtitleText>; //  <: etro.layer.Visual
+  // backing: Promise<etro.layer.Audio>;
+  // soundfx: Promise<etro.layer.Audio>;
 };
-
-// new idea movie is created within the Child however its assets start loading here.
-
-function dispatchMovie(data: ScriptData): Promise<void> {
-  return new Promise((resolve, reject) => {
-    resolve();
-  });
-}
 
 export const PresentationLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -38,7 +44,7 @@ export const PresentationLayout: React.FC = () => {
   const [isScriptReady, setIsScriptReady] = useState<boolean>(false);
   const [sections, setSections] = useState<NavHeader[]>([]);
   // const [script, setScript] = useState<ScriptData[]>();
-  const [scriptMap, setScriptMap] = useState<Map<string, SectionData>>();
+  const [dataMap, setDataMap] = useState<Map<string, SectionData>>();
 
   useEffect(() => {
     window.api
@@ -49,13 +55,35 @@ export const PresentationLayout: React.FC = () => {
         console.log("setting script to", data);
         const temp: NavHeader[] = [];
 
+        let start = 0;
         data.forEach((entry: ScriptData) => {
           const { id, sectionName } = entry;
 
+          if (!entry.scriptDuration) {
+            throw new Error(
+              "The duration of the script Section is not defined"
+            );
+          }
+
+          const [media, avatar, audio] = dispatchSectionGeneration(
+            entry,
+            start
+          );
+
+          const end = entry.scriptDuration;
           map.set(id, {
-            section: entry,
-            moviePromise: dispatchMovie(entry),
+            start: start,
+            end: end,
+            script: entry,
+            media: media,
+            avatar: avatar,
+            audio: audio,
+            // subtitles:
+            // backing:
+            // soundfx:
           });
+
+          start += end; // should exist get sections will fail (do check!)
 
           temp.push({
             title: sectionName,
@@ -63,7 +91,7 @@ export const PresentationLayout: React.FC = () => {
           });
 
           setSections(temp);
-          setScriptMap(map);
+          setDataMap(map);
         });
       })
       .finally(() => {
@@ -92,7 +120,7 @@ export const PresentationLayout: React.FC = () => {
                   <SidebarNav items={sections} />
                 </aside>
                 <div className="flex-1 space-y-10 lg:max-w-2xl">
-                  <Outlet context={{ scriptMap }} />
+                  <Outlet context={{ scriptMap: dataMap }} />
                 </div>
               </div>
             </>
@@ -109,7 +137,18 @@ export const PresentationLayout: React.FC = () => {
             >
               Back
             </Button>
-            <Button onClick={() => navigate("/get-video")}> Next </Button>
+            <Button
+              onClick={() =>
+                navigate("/get-video", {
+                  state: {
+                    placeholder: "hello", // pass data into videogen?
+                  },
+                })
+              }
+            >
+              {" "}
+              Next{" "}
+            </Button>
           </div>
         </div>
       </div>
@@ -129,20 +168,14 @@ export const PresentationSection: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [movies, setMovies] = useState<Map<string, etro.Movie>>(new Map());
   // get from parent element
-  const { scriptMap }: { scriptMap: Map<string, SectionData> } =
+  const { scriptMap: dataMap }: { scriptMap: Map<string, SectionData> } =
     useOutletContext();
 
   console.log("id of the section", id);
-  const { section, assetPromise } = scriptMap.get(id)!;
+  const sectionData: SectionData = dataMap.get(id)!;
+  const section = sectionData.script;
   console.log("given Section", section);
 
-  // useEffect(() => {
-  //   assetPromise
-  //     .then((movie) => {
-  //       movieRef.current = movie;
-  //     })
-  //     .finally(() => setIsMovieReady(true));
-  // }, [assetPromise]);
   useEffect(() => {
     setCurrentState("initial");
     if (canvasRef.current == undefined) {
@@ -176,8 +209,12 @@ export const PresentationSection: React.FC = () => {
       canvas.width = 1920;
       canvas.height = 1080;
 
-      addSingleImageLayer(section, movie, 0); //Add image from the start
-      await addSectionAvatar(section, movie, 0);
+      // add the assets to the movie:
+      const { media, avatar, audip } = sectionData;
+
+      movie.addLayer(await media);
+      movie.addLayer(await avatar);
+
       setMovies((map) => new Map(map.set(id, movie)));
     } else {
       movie = existingMovie;
@@ -187,27 +224,12 @@ export const PresentationSection: React.FC = () => {
   };
 
   const restyleSection = async ({ preset }: { preset: LayerOpts }) => {
+    // pause if a movie is playing
     !movieRef.current?.paused && movieRef.current?.pause();
     setCurrentState("initial");
-    // const movie = movieRef.current;
 
-    // assert(movie, "Restyle: Movie must exist at this point"); // a movie reference must exist at this point
-    const newMovie = new etro.Movie({
-      canvas: canvasRef.current!,
-      repeat: false,
-      background: etro.parseColor("#ccc"),
-    });
-
-    addSingleImageLayer(section, newMovie, 0);
-    await addSectionAvatar(section, newMovie, 0, preset);
-    setMovies((map) => new Map(map.set(id, newMovie)));
-    movieRef.current = newMovie;
     setCurrentState("playback");
   };
-  // const generateSectionEtro = async () => {
-  //   await setupPlayer();
-  //   setCurrentState("playback");
-  // };
 
   return (
     <>
