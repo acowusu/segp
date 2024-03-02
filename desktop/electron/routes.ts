@@ -15,6 +15,7 @@ import {
   toDataURL,
   fetchImages,
   generateBackingTrack,
+  updateScriptSection,
 } from "./reportProcessing";
 import {
   generateAvatar,
@@ -76,6 +77,8 @@ const api = {
   getAvatars,
   setAvatar,
   fetchImages,
+  //
+  setScriptSection: updateScriptSection,
 };
 export default api;
 

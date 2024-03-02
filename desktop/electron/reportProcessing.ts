@@ -170,6 +170,10 @@ export async function getScript(force?:boolean): Promise<ScriptData[]> {
 
 }
 
+export async function updateScriptSection(section: ScriptData): Promise<void> {
+  projectData.updateProjectScriptSection(section);
+}
+
 export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);
 }

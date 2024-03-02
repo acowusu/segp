@@ -95,6 +95,27 @@ export function setProjectVisual(visual: Visual): void {
   getProjectStore().set("visual", visual);
 }
 
+
+// Strictly for updating an already existing script section, probably not the most efficient way
+export function updateProjectScriptSection(new_section: ScriptData): void {
+  const currentScript = getProjectScript();
+  let found = false;
+  for (let i = 0; i < currentScript.length; i++) {
+    if (currentScript[i].id === new_section.id) {
+      currentScript[i] = new_section
+      found = true;
+      break;
+    }
+  }
+  if (found) {
+    console.log("setProjectScriptSection: found the section, replacing it")
+    setProjectScript(currentScript);
+  }
+
+  console.log("setProjectScriptSection: did not find the section, no replacement")
+
+}
+
 export function setProjectScript(new_script: ScriptData[]): void {
   const scriptSelection = getProjectStore().get("script_selections", []) as ScriptSelections[];
   let foundTopic = false;
