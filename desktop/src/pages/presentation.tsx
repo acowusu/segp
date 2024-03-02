@@ -156,6 +156,13 @@ export const PresentationSection: React.FC = () => {
     setupPlayer().then(() => setCurrentState("playback"));
   }, [id]);
 
+  // this will need some parameters to change the video by
+  const restyleSection = () => {
+    setCurrentState("initial");
+    const movie = movieRef.current;
+    assert(movie, "Restyle: Movie must exist at this point"); // a movie reference must exist at this point
+  };
+
   const setupPlayer = async () => {
     if (movieRef.current) {
       console.log("movie exist", movieRef.current);
@@ -240,6 +247,12 @@ export const PresentationSection: React.FC = () => {
             </Button>
           </>
         )}
+        <div>
+          <h3> Styles: </h3>
+          <Button> Style 1 </Button>
+          <Button> Style 2 </Button>
+          <Button> Style 3 </Button>
+        </div>
       </div>
     </>
   );
