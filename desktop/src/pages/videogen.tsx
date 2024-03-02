@@ -113,6 +113,19 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
   for (const section of sections) {
     if (!section.scriptAudio) throw new Error("No media found");
     if (!section.scriptDuration) throw new Error("No duration found");
+    if(section.soundEffectPath){
+      console.log("adding sound effect layer", section.soundEffectPath);
+      const soundEffectLayer = new etro.layer.Audio({
+        startTime: start,
+        duration: section.scriptDuration,
+        source: await window.api.toDataURL(section.soundEffectPath),
+        sourceStartTime: 0, // default: 0
+        muted: false, // default: false
+        volume: 0.5, // default: 1
+        playbackRate: 1, //default: 1
+      });
+      movie.layers.push(soundEffectLayer);
+    }
     const layer = new etro.layer.Audio({
       startTime: start,
       duration: section.scriptDuration,
@@ -185,13 +198,13 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
     const layer = new etro.layer.Video({
       startTime: start,
       duration: section.scriptDuration,
-      source: section.avatarVideoUrl,
+      source:await window.api.toDataURL(section.avatarVideoUrl),
       destX: 0, // default: 0
       destY: 0, // default: 0
-      destWidth: avatar.width, // default: null (full width)
-      destHeight: avatar.height, // default: null (full height)
-      x: WIDTH -  avatar.width, // default: 0
-      y: HEIGHT- avatar.height, // default: 0
+      destWidth: avatar.width/3, // default: null (full width)
+      destHeight: avatar.height/3, // default: null (full height)
+      x: WIDTH -  avatar.width/3, // default: 0
+      y: HEIGHT- avatar.height/3, // default: 0
       opacity: 1, // default: 1
       volume: 0, // default: 1
     });
@@ -220,11 +233,11 @@ const generateAvatarSections = async () => {
     const result = [];
     const avatar = await window.api.getProjectAvatar();
     for (const section of initial) {
-      // if(section.){
-      //   toast.success(`Avatar has already been generated for ${section.sectionName}.`);
-      //   result.push(section);
-      //   continue;
-      // }
+      if(section.avatarVideoUrl){
+        toast.success(`Avatar has already been generated for ${section.sectionName}.`);
+        result.push(section);
+        continue;
+      }
       const modified = window.api.generateAvatar(section, avatar);
       toast.promise(modified, {
         loading: `Generating avatar for ${section.sectionName}...`,
@@ -295,13 +308,13 @@ export const VideoGenerator: React.FC = () => {
       // });
       // movie.layers.push(backingLayer);
       addImageLayers(script, movie);
-      await toast.promise(addAvatarLayers(script, movie), {
+      await toast.promise(addAvatarLayers(script, movie).then(()=>addSubtitleLayers(script, movie)
+      ), {
         loading: `Adding Avatar Layers...`,
         success: `Avatar Layers have been added.  `,
         error: (error)=> `Error adding Avatar Layers ${error}` ,
-      });
+      })
     // await addSadTalkerLayers(script, movie);
-    addSubtitleLayers(script, movie);
 
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);

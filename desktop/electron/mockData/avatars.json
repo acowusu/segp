@@ -10,7 +10,7 @@
     {   
         "id": "2",
         "name": "Lucy Clements",
-        "imagePath": "lucy.png" ,
+        "imagePath": "lucy (Small).png" ,
         "sadtalkerPath": "/www/sadtalker_assets/source_image/lucy.png",
         "width": 1080,
         "height": 1080
@@ -18,7 +18,7 @@
     {   
         "id": "3",
         "name": "Luke Duffy",
-        "imagePath": "reporter-male.png" ,
+        "imagePath": "reporter-male (Small).png" ,
         "sadtalkerPath": "/www/sadtalker_assets/source_image/reporter-male.png",
         "width": 1080,
         "height": 1080
@@ -26,7 +26,7 @@
     {   
         "id": "4",
         "name": "Isaias Berhane",
-        "imagePath": "reporter-male-alt.png" ,
+        "imagePath": "reporter-male-alt (Small).png" ,
         "sadtalkerPath": "/www/sadtalker_assets/source_image/reporter-male-alt.png",
         "width": 1080,
         "height": 1080
@@ -34,7 +34,7 @@
         {   
         "id": "5",
         "name": "Temshe Michael",
-        "imagePath": "reporter-female.png" ,
+        "imagePath": "reporter-female (Small).png" ,
         "sadtalkerPath": "/www/sadtalker_assets/source_image/reporter-female.png",
         "width": 1080,
         "height": 1080
