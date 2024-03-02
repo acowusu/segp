@@ -1,3 +1,5 @@
+import etro from "etro";
+
 export interface Topic {
   topic: string;
   summary: string;
@@ -71,8 +73,17 @@ export interface BackingTrack {
   audioSrc: string; // path to audio file
   audioDuration: number; // duration of audio file
 }
+
+/* Etro Related */
+export interface LayerOpts { // can be migrated to etro-utils thought this made more sense here
+  x?: etro.Dynamic<number>
+  y?: etro.Dynamic<number>
+  // add others as needed to later manipulate the layer
+}
+
 interface Status {
   url: string;
   name: string;
   status: string;
 }
+
