@@ -12,13 +12,15 @@ allowed_services = [
     "fastapi-llm",
     "fastapi-music",
     "fastapi-audiofx",
+    "fastapi-vid"
 ]
 mapping = {
     "Image API": "fastapi-img",
     "Text to speech API": "fastapi-tts",
     "LLM API": "fastapi-llm",
     "Music API": "fastapi-music",
-    "Sound Effects API": "fastapi-audiofx"
+    "Sound Effects API": "fastapi-audiofx",
+    "Video API": "fastapi-vid"
 }
 
 
