@@ -1,15 +1,16 @@
-from io import BytesIO
 import math
+import os
+from io import BytesIO
+
+import bentoml
 import PIL
 import torch
-from diffusers.utils import load_image, export_to_video
-from typing_extensions import Annotated
 import uvicorn
+from bentoml.io import JSON, Image
+from diffusers.utils import export_to_video, load_image
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse
-from fastapi import FastAPI, Form, UploadFile, File
-from bentoml.io import Image, JSON
-import bentoml
-import os
+from typing_extensions import Annotated
 
 os.environ["HF_HOME"] = "/hf"
 
