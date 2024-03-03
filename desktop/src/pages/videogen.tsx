@@ -47,37 +47,6 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
   });
 }
 
-async function addSadTalkerLayers(sections: ScriptData[], movie: etro.Movie) {
-  for (const section of sections) {
-    if (!section.scriptMedia) throw new Error("No media found");
-    if (!section.scriptDuration) throw new Error("No duration found");
-    const layer = new etro.layer.Video({
-      startTime: 0,
-      duration: section.scriptDuration,
-      source: await window.api.toDataURL(
-        `C:\\Users\\alexa\\Downloads\\mail2\\cat.mp4`,
-        "video/mp4"
-      ),
-      // sourceWidth: 1920,
-      // sourceHeight: 1080,
-      destX: 0, // default: 0
-      destY: 0, // default: 0
-      x: 0, // default: 0
-      y: 0, // default: 0
-      destWidth: WIDTH,
-      destHeight: HEIGHT,
-    });
-    const effect = new etro.effect.ChromaKey({
-      target: new etro.Color(0, 0, 0, 1), // default: new etro.Color(1, 0, 0, 1)
-      threshold: 165, // default: 0.5
-      interpolate: false, // default: false
-    })
-    layer.effects.push(
-      effect
-    );
-    movie.layers.push(layer);
-  }
-}
 
 function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
   let start = 0;
@@ -119,7 +88,7 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
       const soundEffectLayer = new etro.layer.Audio({
         startTime: start,
         duration: section.scriptDuration,
-        source: await window.api.toDataURL(section.soundEffectPath),
+        source: await window.api.toDataURL(section.soundEffectPath, 'audio/wav'),
         sourceStartTime: 0, // default: 0
         muted: false, // default: false
         volume: 0.5, // default: 1
