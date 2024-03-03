@@ -33,8 +33,8 @@ app = FastAPI(root_path="/v9")
 svc.mount_asgi_app(app)
 
 #@app.get("/status")
-#async def status():
-#    return {"status": "ok"}
+async def status():
+    return {"status": "ok"}
 
 @app.post("/video")
 async def generate_video(image_file: UploadFile = Form(...), fps: Annotated[int, Form()]=7, video_length: Annotated[int, Form()]=10):
@@ -43,7 +43,6 @@ async def generate_video(image_file: UploadFile = Form(...), fps: Annotated[int,
     image = image.resize((1024, 576))
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
-    #image = load_image(image_file)
     generator = torch.manual_seed(42)
 
     frames = [image]
