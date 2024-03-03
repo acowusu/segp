@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import etro from "etro";
+import { SubtitleText } from "../../lib/subtitle-layer";
 
 const WIDTH = 1920; 
 const HEIGHT = 1080;
@@ -78,7 +79,7 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       background: etro.parseColor("#010101"),
     });
 
-    const subtitleLayer = new etro.layer.Text({
+    const subtitleLayer = new SubtitleText({
       startTime: 0,
       duration: 9,
       text:  (_element: etro.EtroObject, time: number) => {
