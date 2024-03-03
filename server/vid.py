@@ -1,3 +1,5 @@
+import os
+os.environ['HF_HOME'] = '/hf'
 import bentoml
 from bentoml.io import Image, JSON
 from fastapi import FastAPI, Form, UploadFile, File
