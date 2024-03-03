@@ -1,9 +1,11 @@
-import { setVoiceover, setAudience, setVisual, setTopic, getVoiceovers, getVisuals, getAudiences, getScript } from "./reportProcessing";
+import { setVoiceover, setAudience, setVisual, setTopic, getVoiceovers, getVisuals, getAudiences, downloadFile } from "./reportProcessing";
 import voiceovers from './mockData/voiceovers.json'
 import topics from './mockData/topics.json'
 import audiences from './mockData/audiences.json'
 import visuals from './mockData/visuals.json'
 import { test, expect, vi } from "vitest";
+import { tmpdir } from "os";
+import { promises as fsPromises } from 'fs';
 const mockStore =   new Map()
 mockStore.set("voiceover", voiceovers[0])
 mockStore.set("audience", audiences[0])
@@ -58,3 +60,31 @@ test("setTopic should set the topic", async () => {
     expect(mockStore.get("topic")).toEqual(topic);
 });
 
+test("downloadFile should download the file and return the destination and headers", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        body: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+        arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+        headers: new Map([["content-type", "application/pdf"]]),
+
+    });
+
+    const url = "https://example.com/file.pdf";
+    const fileDirectory = await tmpdir();
+    const fetchOptions = {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer token"
+        }
+    };
+    const fileName = "file.pdf";
+
+    const result = await downloadFile(url, fileDirectory, fetchOptions, fileName);
+
+    expect(result.destination).toContain(fileDirectory);
+    expect(result.destination).toContain(fileName);
+    expect(result.headers.get("content-type")).toEqual("application/pdf");
+    // remove the file
+    await fsPromises.unlink(result.destination).catch(console.error);
+});
