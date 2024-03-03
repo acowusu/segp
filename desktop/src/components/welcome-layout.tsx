@@ -58,7 +58,7 @@ export function WelcomeLayout() {
         console.error("Failed to fetch project name:", error);
       }
     };
-    
+
     fetchProjectName();
     console.log("Project name:", projectName);
   }, [projectName]);
