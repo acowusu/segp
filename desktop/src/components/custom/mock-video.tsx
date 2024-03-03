@@ -60,7 +60,7 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       y: 0, // default: 0
       width: WIDTH, // default: null (full width)
       height: HEIGHT, // default: null (full height)
-      opacity: 0.8, // default: 1
+      opacity: 1, // default: 1
     });
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
@@ -105,8 +105,8 @@ export const MockVideo: React.FC<MockVideoProps> = ({
     movie.addLayer(layer1);
     movie.addLayer(layer2);
     movie.addLayer(backgroundLayer);
-    showSubtitle && movie.addLayer(subtitleLayer);
     showAvatar && movie.addLayer(avatarLayer);
+    showSubtitle && movie.addLayer(subtitleLayer);
 
     movie.play();
     movieRef.current = movie;

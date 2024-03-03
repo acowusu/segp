@@ -3,7 +3,6 @@ import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
 
-import { generateAvatar } from './avatarGeneration'
 import { extractTextFromPDF} from './reportProcessing'
 // The built directory structure
 //
@@ -103,10 +102,7 @@ app && app.whenReady().then(() => {
        }
     }
   })
-  ipcMain.handle('generateAvatar', async (_, avatar, audioPath) => {
-    const avatarUrl = await generateAvatar(avatar, audioPath)
-    return avatarUrl
-  })
+
 
 
   createWindow()

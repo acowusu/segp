@@ -37,6 +37,18 @@ const endpoints = [
 export const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
+const statusServiceEndpoint = (serviceName: string) => "https://iguana.alexo.uk/v8/status/" + serviceName
+interface ServiceStatusResponse {
+    status: string;
+    isInactive: boolean;
+    isRunning: boolean;
+    memoryUsage: string;
+    uptime: string;
+    lastCalled: string;
+    LastStatusCode: string;
+    last_line: string;
+    isCudaError: boolean;
+}
 export const getServiceStatus = async (): Promise<Status[]> => {
     const statuses: Status[] = []
     for (const endpoint of endpoints) {
@@ -44,10 +56,20 @@ export const getServiceStatus = async (): Promise<Status[]> => {
         const controller = new AbortController();
         const { signal } = controller;
 
-        
+
 
         try {
-            const response = await Promise.race( [fetch(endpoint.url, { signal }), delay(1000).then(() => { controller.abort(); throw new Error("AbortError") })] );
+            const statusServiceResponse = await fetch(statusServiceEndpoint(endpoint.name));
+            const statusService = await statusServiceResponse.json() as ServiceStatusResponse
+            if (statusService.isCudaError) {
+                console.log("Cuda error RESTART THE SERVICE:", endpoint.name)
+                statuses.push({ url: endpoint.url, name: endpoint.name, status: "Offline" });
+                console.log("Shutting down service ", endpoint.name)
+                shutdownService(endpoint.name)
+                continue
+            }
+
+            const response = await Promise.race([fetch(endpoint.url, { signal }), delay(1000).then(() => { controller.abort(); throw new Error("AbortError") })]);
             statuses.push({ url: endpoint.url, name: endpoint.name, status: response.status === 200 ? "Online" : "Offline" });
             // Handle the response
         } catch (error) {

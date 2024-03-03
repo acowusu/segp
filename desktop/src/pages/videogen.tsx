@@ -47,37 +47,6 @@ function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
   });
 }
 
-async function addSadTalkerLayers(sections: ScriptData[], movie: etro.Movie) {
-  for (const section of sections) {
-    if (!section.scriptMedia) throw new Error("No media found");
-    if (!section.scriptDuration) throw new Error("No duration found");
-    const layer = new etro.layer.Video({
-      startTime: 0,
-      duration: section.scriptDuration,
-      source: await window.api.toDataURL(
-        `C:\\Users\\alexa\\Downloads\\mail2\\cat.mp4`,
-        "video/mp4"
-      ),
-      // sourceWidth: 1920,
-      // sourceHeight: 1080,
-      destX: 0, // default: 0
-      destY: 0, // default: 0
-      x: 0, // default: 0
-      y: 0, // default: 0
-      destWidth: WIDTH,
-      destHeight: HEIGHT,
-    });
-    const effect = new etro.effect.ChromaKey({
-      target: new etro.Color(0, 255, 0, 0), // default: new etro.Color(1, 0, 0, 1)
-      threshold: 165, // default: 0.5
-      interpolate: false, // default: false
-    })
-    layer.effects.push(
-      effect
-    );
-    movie.layers.push(layer);
-  }
-}
 
 function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
   let start = 0;
@@ -93,12 +62,13 @@ function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
       opacity: 1, // default: 1
       color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
       font: "50px sans-serif", // default: '10px sans-serif'
-      textX: WIDTH / 2, // default: 0
+      textX: (3* WIDTH/4) / 2, // default: 0
       textY: HEIGHT, // default: 0
       textAlign: "center", // default: 'left'
       textBaseline: "alphabetic", // default: 'alphabetic'
       textDirection: "ltr", // default: 'ltr'
       background: new etro.Color(0, 0, 0, 0.0), // default: null (transparent)
+      maxWidth:  3* WIDTH/4, // default: null (no maximum width)
     });
     movie.layers.push(layer);
     console.log("adding layer", layer);
@@ -113,6 +83,19 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
   for (const section of sections) {
     if (!section.scriptAudio) throw new Error("No media found");
     if (!section.scriptDuration) throw new Error("No duration found");
+    if(section.soundEffectPath){
+      console.log("adding sound effect layer", section.soundEffectPath);
+      const soundEffectLayer = new etro.layer.Audio({
+        startTime: start,
+        duration: section.scriptDuration,
+        source: await window.api.toDataURL(section.soundEffectPath, 'audio/wav'),
+        sourceStartTime: 0, // default: 0
+        muted: false, // default: false
+        volume: 0.5, // default: 1
+        playbackRate: 1, //default: 1
+      });
+      movie.layers.push(soundEffectLayer);
+    }
     const layer = new etro.layer.Audio({
       startTime: start,
       duration: section.scriptDuration,
@@ -167,14 +150,20 @@ const generateAudio = async () => {
 };
 
 const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
+  sections = await window.api.getScript()
   if (!window.api.getProjectHasAvatar()) {
     console.log("No Avatar Option Selected. Skipping Avatar Layering... ");
-    return; 
+    return;
   }
   let start = 0;
   for (const section of sections) {
-    if (!section.avatarVideoUrl) throw new Error("No avatarURL found");
-    if (!section.scriptDuration) throw new Error("No duration found");
+    if (!section.avatarVideoUrl) {
+      toast.error("No Avatar Video URL found for section: " + section.sectionName);
+      throw new Error("No avatarURL found")}
+    if (!section.scriptDuration) {
+      toast.error("No duration found for section: " + section.sectionName);
+      throw new Error("No duration found")
+    }
     const avatar = await window.api.getProjectAvatar();
     const layer = new etro.layer.Video({
       startTime: start,
@@ -182,12 +171,21 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
       source: await window.api.toDataURL(section.avatarVideoUrl, 'video/mp4'),
       destX: 0, // default: 0
       destY: 0, // default: 0
-      destWidth: avatar.width, // default: null (full width)
-      destHeight: avatar.height, // default: null (full height)
-      x: 0, // default: 0
-      y: 0, // default: 0
+      destWidth: avatar.width/3, // default: null (full width)
+      destHeight: avatar.height/3, // default: null (full height)
+      x: WIDTH -  avatar.width/3, // default: 0
+      y: HEIGHT- avatar.height/3, // default: 0
       opacity: 1, // default: 1
+      volume: 0, // default: 1
     });
+    const effect = new etro.effect.ChromaKey({
+      target: new etro.Color(0, 0, 0, 0), // default: new etro.Color(1, 0, 0, 1)
+      threshold: 10, // default: 0.5
+      interpolate: false, // default: false
+    })
+    layer.effects.push(
+      effect
+    );
     movie.layers.push(layer);
     console.log("adding layer", layer);
 
@@ -198,13 +196,18 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
 const generateAvatarSections = async () => {
   if (!window.api.getProjectHasAvatar()) {
     console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
-    return; 
+    return;
   }
   try {
     const initial = await window.api.getScript();
     const result = [];
     const avatar = await window.api.getProjectAvatar();
     for (const section of initial) {
+      if(section.avatarVideoUrl){
+        toast.success(`Avatar has already been generated for ${section.sectionName}.`);
+        result.push(section);
+        continue;
+      }
       const modified = window.api.generateAvatar(section, avatar);
       toast.promise(modified, {
         loading: `Generating avatar for ${section.sectionName}...`,
@@ -265,18 +268,23 @@ export const VideoGenerator: React.FC = () => {
     await addAudioLayers(script, movie);
     // const backing = await window.api.getProjectBackingTrack();
     // const backingLayer = new etro.layer.Audio({
-    //   startTime: 0,
-    //   duration: backing.audioDuration,
-    //   source: await window.api.toDataURL(backing.audioSrc),
-    //   sourceStartTime: 0, // default: 0
-    //   muted: false, // default: false
-    //   volume: 0.5, // default: 1
-    //   playbackRate: 1, //default: 1
-    // });
-    // movie.layers.push(backingLayer);
-    addImageLayers(script, movie);
-    await addSadTalkerLayers(script, movie);
-    addSubtitleLayers(script, movie);
+      //   startTime: 0,
+      //   duration: backing.audioDuration,
+      //   source: await window.api.toDataURL(backing.audioSrc),
+      //   sourceStartTime: 0, // default: 0
+      //   muted: false, // default: false
+      //   volume: 0.5, // default: 1
+      //   playbackRate: 1, //default: 1
+      // });
+      // movie.layers.push(backingLayer);
+      addImageLayers(script, movie);
+      await toast.promise(addAvatarLayers(script, movie).then(()=>addSubtitleLayers(script, movie)
+      ), {
+        loading: `Adding Avatar Layers...`,
+        success: `Avatar Layers have been added.  `,
+        error: (error)=> `Error adding Avatar Layers ${error}` ,
+      })
+    // await addSadTalkerLayers(script, movie);
 
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);
@@ -308,7 +316,7 @@ export const VideoGenerator: React.FC = () => {
 
   const generateVideo = async () => {
     setCurrentProcess("Recording");
-   
+
 
     setGenerationProgress(10);
     let interval = setInterval(() => {
@@ -369,7 +377,7 @@ export const VideoGenerator: React.FC = () => {
           <CardTitle>Generate Video</CardTitle>
           <CardDescription>
             You video is ready to be generated and exported.
-            
+
 
           </CardDescription>
         </CardHeader>
@@ -437,7 +445,7 @@ export const VideoGenerator: React.FC = () => {
       {(currentState === "rendering" || currentState === "etro") && (
         <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
           <Progress value={generationProgress} className="w-5/6 mt-4" />
-          <p className="text-yellow-400">{currentProcess}</p>
+          <p>{currentProcess}</p>
         </Skeleton>
       )}
       <div></div>

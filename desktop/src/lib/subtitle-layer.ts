@@ -113,7 +113,7 @@ class SubtitleText extends etro.layer.Visual {
         this.cctx.textAlign = etro.val(this, 'textAlign', this.currentTime)
         this.cctx.textBaseline = etro.val(this, 'textBaseline', this.currentTime)
         this.cctx.direction = etro.val(this, 'textDirection', this.currentTime)
-        const lines = getLines(this.cctx, text, 1900);
+        const lines = getLines(this.cctx, text, maxWidth ?? 1900);
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const { actualBoundingBoxLeft, fontBoundingBoxAscent, fontBoundingBoxDescent, width } = this.cctx.measureText(line);

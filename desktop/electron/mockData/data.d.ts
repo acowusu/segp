@@ -13,6 +13,7 @@ export interface ScriptData {
   scriptPrompt?: string; // path to prompt file
   sadTalkerPath?: string; // path to tmp file on server
   avatarVideoUrl?: string; // avatar video URL
+  soundEffectPath?: string; // path to sound effect file
 }
 
 export interface ScriptSelections {

@@ -5,7 +5,6 @@ import { pool } from "./pool";
 import { generateTopics, generateScript } from "./server"
 import type {
   Audience,
-  BackingTrack,
   ScriptData,
   Topic,
   Visual,
@@ -103,41 +102,7 @@ export async function fetchImages(prompts: Array<string>): Promise<Array<Array<s
 }
 
 
-// Takes in an array of strings and returns an array of AudioInfo
-export async function textToAudio(script: ScriptData): Promise<ScriptData> {
-  console.log("textToAudio", script.scriptTexts);
-  console.log("textToAudio", script.selectedScriptIndex);
 
-  const { destination, headers } = await downloadFile('https://iguana.alexo.uk/v0/generate_audio', getProjectPath(), {
-    method: 'POST',
-    body: JSON.stringify({ script: script.scriptTexts[script.selectedScriptIndex] }),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  })
-
-  const duration = parseFloat(headers.get("audio-duration")!);
-  // Used with sadtalker
-  const location = headers.get("media-location")!; 
-  script.sadTalkerPath = location;
-  script.scriptAudio = destination;
-  script.scriptDuration = duration;
-
-  return script
-
-}
-export async function generateBackingTrack(prompt: string, duration: number): Promise<BackingTrack> {
-
-  const { destination } = await downloadFile('https://iguana.alexo.uk/v6/generate_audio', getProjectPath(), {
-    method: 'POST',
-    body: JSON.stringify({ script: prompt,duration:duration }), 
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  })
-  return {audioSrc:destination, audioDuration:duration}
-
-}
 
 export const toDataURL = (filePath:string, mimetype:string):Promise<string> => {
   const songPromise = new Promise((resolve, reject) => {
@@ -205,9 +170,24 @@ export async function setAudience(audience: Audience): Promise<void> {
   projectData.setProjectAudience(audience);
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
+  console.log("setVoiceover", voiceover);
+  
+ projectData.setProjectScript(
+  projectData.getProjectScript().map((script) => {
+    script.scriptAudio = undefined;
+    script.sadTalkerPath = undefined;
+    return script
+  })
+ )
   projectData.setProjectVoiceover(voiceover);
 }
 export async function setVisual(visuals: Visual): Promise<void> {
+  projectData.setProjectScript(
+    projectData.getProjectScript().map((script) => {
+      script.avatarVideoUrl = undefined;
+      return script
+    })
+   )
   projectData.setProjectVisual(visuals);
 }
 export async function setLength(length: number): Promise<void> {

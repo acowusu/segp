@@ -3,8 +3,7 @@ import { setProjectAvatar } from './projectData';
 import avatars from './mockData/avatars.json';
 import { downloadFile } from './reportProcessing';
 import { getProjectPath } from './metadata';
-import fs from "fs";
-import dataurl from "dataurl";
+
 
 export async function generateAvatar(script: ScriptData, avatar: Avatar): Promise<ScriptData> {
 
@@ -24,7 +23,7 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
         headers: {
             'Content-Type': 'application/json'
         },
-    }); 
+    });
 
     script.avatarVideoUrl = destination;
     return script;
@@ -33,7 +32,7 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
 export async function getAvatars(): Promise<Avatar[]> {
     return avatars;
 }
-  
+
 export async function setAvatar(avatar: Avatar): Promise<void> {
     console.log("setAvatar", avatar);
     setProjectAvatar(avatar);
