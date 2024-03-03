@@ -3,8 +3,7 @@ import { setProjectAvatar } from './projectData';
 import avatars from './mockData/avatars.json';
 import { downloadFile } from './reportProcessing';
 import { getProjectPath } from './metadata';
-import fs from "fs";
-import dataurl from "dataurl";
+
 
 export async function generateAvatar(script: ScriptData, avatar: Avatar): Promise<ScriptData> {
 
