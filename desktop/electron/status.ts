@@ -1,6 +1,6 @@
 import { Status } from "./mockData/data";
 
-const endpoints = [
+export const endpoints = [
     {
         url: "https://iguana.alexo.uk/v0/status",
         name: "Text to speech API",
@@ -37,7 +37,7 @@ const endpoints = [
 export const delay = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
-const statusServiceEndpoint = (serviceName: string) => "https://iguana.alexo.uk/v8/status/" + serviceName
+export const statusServiceEndpoint = (serviceName: string) => "https://iguana.alexo.uk/v8/status/" + serviceName
 interface ServiceStatusResponse {
     status: string;
     isInactive: boolean;
@@ -49,6 +49,10 @@ interface ServiceStatusResponse {
     last_line: string;
     isCudaError: boolean;
 }
+/**
+ * Retrieves the status of multiple services by making HTTP requests to their respective endpoints.
+ * @returns A promise that resolves to an array of Status objects representing the status of each service.
+ */
 export const getServiceStatus = async (): Promise<Status[]> => {
     const statuses: Status[] = []
     for (const endpoint of endpoints) {
@@ -87,7 +91,12 @@ export const getServiceStatus = async (): Promise<Status[]> => {
     return statuses
 }
 
-const controlServiceEndpoint = "https://iguana.alexo.uk/v8/control"
+export const controlServiceEndpoint = "https://iguana.alexo.uk/v8/control"
+/**
+ * Shuts down a service.
+ * @param serviceName - The name of the service to be shutdown.
+ * @throws {Error} If the service is not found or if the shutdown fails.
+ */
 export const shutdownService = async (serviceName: string): Promise<void> => {
     const endpoint = endpoints.find(e => e.name === serviceName);
     if (endpoint === undefined) {
@@ -109,6 +118,11 @@ export const shutdownService = async (serviceName: string): Promise<void> => {
         throw new Error("Failed to shutdown service");
     }
 }
+/**
+ * Launches a service asynchronously.
+ * @param serviceName - The name of the service to launch.
+ * @throws Error if the service is not found or fails to launch.
+ */
 export const launchService = async (serviceName: string): Promise<void> => {
     const endpoint = endpoints.find(e => e.name === serviceName);
     if (endpoint === undefined) {

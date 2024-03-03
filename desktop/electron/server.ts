@@ -70,6 +70,12 @@ const TOPICS_HEADER = `[INST]
 const TOPICS_FOOTER = `Format the response as JSON. Ensure that the script has a good nararive flow
 Ensure each section has at least 3 sentences`
 
+/**
+ * Generates topics based on the provided report.
+ * @param report - The report to generate topics from.
+ * @returns A promise that resolves to an array of Topic objects.
+ * @throws Error if there is an error generating topics.
+ */
 export const generateTopics = async (report: string): Promise<Topic[]> => {
 
     const params = new URLSearchParams();
@@ -109,6 +115,14 @@ const SCRIPT_FOOTER = `Format the response as JSON. Ensure that the script has a
 Ensure each section has at least 3 sentences
 [/INST]`
 
+/**
+ * Generates a script based on the provided report and topic.
+ * 
+ * @param report - The report containing information for the script.
+ * @param topic - The topic for the script.
+ * @returns A promise that resolves to an array of ScriptData objects representing the generated script.
+ * @throws Error if there is an error generating the script.
+ */
 export const generateScript = async (report: string, topic:Topic): Promise<ScriptData[]> => {
 
     const params = new URLSearchParams();
@@ -203,6 +217,12 @@ Now produce the result for the following text below:
 [/INST]
 """`
 
+/**
+ * Generates an open journey prompt based on the provided section.
+ * @param section - The section containing the script data.
+ * @returns A Promise that resolves to the generated open journey prompt as a string.
+ * @throws Error if there is an error generating the script.
+ */
 export const generateOpenJourneyPrompt = async (section: ScriptData): Promise<string> => {
 
     const prompt = IMAGE_GEN_PROMPT.replace("<<<TO BE REPLACED>>>", section.scriptTexts[section.selectedScriptIndex]);
@@ -230,6 +250,11 @@ export const generateOpenJourneyPrompt = async (section: ScriptData): Promise<st
     }
 }
 
+/**
+ * Generates an image using the fastapi-img service based on the provided prompt.
+ * @param prompt - The prompt for generating the image.
+ * @returns A Promise that resolves to the destination path of the generated image.
+ */
 export const generateOpenJourneyImage = async (prompt: string): Promise<string> => {
     const form = new FormData();
     form.append("prompt", prompt);
