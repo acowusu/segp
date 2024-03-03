@@ -32,6 +32,10 @@ const endpoints = [
     {
         url: "https://iguana.alexo.uk/v7/status",
         name: "Sound Effects API",
+    },
+    {
+        url: "https://iguana.alexo.uk/v9/status",
+        name: "Video API",
     }
 ]
 export const delay = (ms: number): Promise<void> => {
