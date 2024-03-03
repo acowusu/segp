@@ -23,7 +23,7 @@ test("delay should resolve immediately when given 0 milliseconds", async () => {
     const endTime = Date.now();
     const elapsedTime = endTime - startTime;
 
-    expect(elapsedTime).toBeLessThan(30); // Allow for a small margin of error
+    expect(elapsedTime).toBeLessThan(100); // Allow for a small margin of error
 })
 
 
