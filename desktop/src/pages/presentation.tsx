@@ -172,7 +172,7 @@ export const PresentationSection: React.FC = () => {
   const param = useParams();
   const id = param.sectionId!;
 
-  type CurrentState = "initial" | "playing" | "playback";
+  type CurrentState = "initial" | "playing" | "playback" | "restyling";
   const [currentState, setCurrentState] = useState<CurrentState>("initial");
 
   const movieRef = useRef<etro.Movie | null>(null);
@@ -242,10 +242,17 @@ export const PresentationSection: React.FC = () => {
     movieRef.current = movie;
   };
 
+  // Currently only moves the avatar around
   const restyleSection = async ({ preset }: { preset: LayerOpts }) => {
     // pause if a movie is playing
     !movieRef.current?.paused && movieRef.current?.pause();
-    setCurrentState("initial");
+    setCurrentState("restyling");
+
+    const { avatar } = sectionData;
+    avatar.then((layer) => {
+      layer.x = preset.x ?? layer.x;
+      layer.y = preset.y ?? layer.y;
+    });
 
     setCurrentState("playback");
   };
@@ -322,7 +329,14 @@ export const PresentationSection: React.FC = () => {
             {" "}
             Style 2{" "}
           </Button>
-          <Button> Style 3 </Button>
+          <Button
+            onClick={() => {
+              restyleSection({ preset: { y: 300 } });
+            }}
+          >
+            {" "}
+            Style 3{" "}
+          </Button>
         </div>
       </div>
     </>
