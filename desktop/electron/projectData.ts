@@ -28,11 +28,11 @@ export function getProjectHasSubtitles(): boolean {
   return getProjectStore().get("subtitles") as boolean;
 }
 
-export function getProjectSubtitleSize(): string {
-  if (!getProjectStore().has("subtitleSize")) {
-    throw new Error("subtitle size not set");
+export function getProjectsubtitleStyle(): string {
+  if (!getProjectStore().has("subtitleStyle")) {
+    throw new Error("subtitle style not set");
   }
-  return getProjectStore().get("subtitleSize") as string;
+  return getProjectStore().get("subtitleStyle") as string;
 }
 
 export function getProjectVoiceover(): Voiceover {
@@ -95,7 +95,7 @@ export function setProjectHasAvatar(hasAvatar: boolean): void {
 export function setProjectHasSubtitles(hasSubtitles: boolean): void {
   getProjectStore().set("subtitles", hasSubtitles);
 }
-export function setProjectSubtitleSize(hasSubtitles: string): void {
+export function setProjectsubtitleStyle(hasSubtitles: string): void {
   getProjectStore().set("subtitles", hasSubtitles);
 }
 export function setProjectVoiceover(voiceover: Voiceover): void {

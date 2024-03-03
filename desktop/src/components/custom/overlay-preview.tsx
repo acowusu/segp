@@ -5,7 +5,7 @@ interface OverlayPreviewProps {
   avatarUrl: string;
   showAvatar?: boolean;
   showSubtitle?: boolean;
-  subtitleSize?: string;
+  subtitleStyle?: string;
 }
 
 export const OverlayPreview: React.FC<OverlayPreviewProps> = ({
@@ -13,7 +13,7 @@ export const OverlayPreview: React.FC<OverlayPreviewProps> = ({
   avatarUrl,
   showAvatar = false,
   showSubtitle = false,
-  subtitleSize = "80px",
+  subtitleStyle = "80px sans-serif",
 }) => {
   return (
     <div className="overflow-hidden rounded-md mt-4 relative   aspect-[16/9] w-full">
@@ -22,7 +22,7 @@ export const OverlayPreview: React.FC<OverlayPreviewProps> = ({
         avatarUrl={avatarUrl}
         showAvatar={showAvatar}
         showSubtitle={showSubtitle}
-        subtitleSize = {subtitleSize}/>
+        subtitleStyle = {subtitleStyle}/>
       {/* <img
         src={backgroundUrl}
         alt={"background"}

@@ -31,7 +31,9 @@ import { useNavigate } from "react-router-dom";
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
   subtitles: z.boolean().default(false).optional(),
+  subtitleStyle: z.string().default("80px sans-serif").optional(),
   subtitleSize: z.string().default("80px").optional(),
+  fontType: z.string().default("sans-serif").optional(),
   audience: z
     .string({ required_error: "Please Select an Audience" })
     .default("").optional(),
@@ -50,7 +52,9 @@ const defaultValues: () => Promise<Partial<FormValues>> = async () => {
   return {
     avatar: await window.api.getProjectHasAvatar().catch(() => false)!,
     subtitles: await window.api.getProjectHasSubtitles().catch(() => false)!,
-    subtitleSize: await window.api.getProjectSubtitleSize().catch(() => "80px")!,
+    subtitleStyle: await window.api.getProjectsubtitleStyle().catch(() => "80px sans-serif")!,
+    subtitleSize: await window.api.getProjectsubtitleStyle().catch(() => "80px")!,
+    fontType: await window.api.getProjectsubtitleStyle().catch(() => "sans-serif")!,
     audience: (await window.api.getProjectAudience().catch(() => ({ name: "" }))).name!,
     voiceover: (await window.api.getProjectVoiceover().catch(() => ({ id: "" }))).id!,
     videoLength: await window.api.getProjectLength(),
@@ -157,9 +161,9 @@ export function SetVisuals() {
     window.api.setProjectHasAvatar(data.avatar || false);
     window.api.setProjectHasSubtitles(data.subtitles || false);
     if (data.subtitles) {
-      window.api.setProjectSubtitleSize(data.subtitleSize || "80px");
+      window.api.setProjectsubtitleStyle((data.subtitleSize + " " + data.fontType) || "80px sans-serif");
     } else {
-      window.api.setProjectSubtitleSize("80px");
+      window.api.setProjectsubtitleStyle("80px sans-serif");
     }
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
@@ -173,7 +177,7 @@ export function SetVisuals() {
     const subscription = watch(() => handleSubmit(onSubmit)())
     return () => subscription.unsubscribe();
   }, [watch, handleSubmit, onSubmit]);
-  const { avatar, subtitles, subtitleSize, avatarSelection } = form.watch();
+  const { avatar, subtitles, subtitleStyle, subtitleSize, fontType, avatarSelection } = form.watch();
   return (
     <>
       <h1 className="text-4xl font-bold pb-8">
@@ -367,6 +371,33 @@ export function SetVisuals() {
                   )}
                 />
               )}
+              <FormField
+                control={form.control}
+                name="fontType"
+                render={({ field }) => (
+                  <div className="flex items-center space-x-4">
+                    <button
+                      className="font-type-button"
+                      style={{
+                        fontWeight: field.value === "sans-serif" ? "bold" : "normal",
+                      }}
+                      onClick={() => field.onChange("sans-serif")}
+                    >
+                      Sans-serif
+                    </button>
+                    <button
+                      className="font-type-button"
+                      style={{
+                        fontWeight: field.value === "serif" ? "bold" : "normal",
+                      }}
+                      onClick={() => field.onChange("serif")}
+                    >
+                      Serif
+                    </button>
+                    {/* Add more font type buttons as needed */}
+                  </div>
+                )}
+              />
             </div>
           </div>
           <h3 className="text-lg font-medium">Preview</h3>
@@ -376,7 +407,7 @@ export function SetVisuals() {
             avatarUrl={selectedAvatar.imagePath ?? "big-person.png"}
             showAvatar={avatar}
             showSubtitle={subtitles}
-            subtitleSize={subtitleSize}
+            subtitleStyle={subtitleSize + " " + fontType}
           />
 
           <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
