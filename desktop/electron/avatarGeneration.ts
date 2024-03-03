@@ -23,7 +23,7 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
         headers: {
             'Content-Type': 'application/json'
         },
-    }); 
+    });
 
     script.avatarVideoUrl = destination;
     return script;
@@ -32,7 +32,7 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
 export async function getAvatars(): Promise<Avatar[]> {
     return avatars;
 }
-  
+
 export async function setAvatar(avatar: Avatar): Promise<void> {
     console.log("setAvatar", avatar);
     setProjectAvatar(avatar);
