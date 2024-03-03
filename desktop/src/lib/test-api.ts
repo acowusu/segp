@@ -1,4 +1,4 @@
-import { Voiceover } from "../../electron/mockData/data";
+import { Audience, Avatar, BackingTrack, ScriptData, Topic, Visual, Voiceover } from "../../electron/mockData/data";
 import { IAPI } from "../../electron/routes";
 
 export const mockApi:IAPI = {
