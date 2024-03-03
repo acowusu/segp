@@ -32,7 +32,7 @@ def img2vid(input_data):
 app = FastAPI(root_path="/v9")
 svc.mount_asgi_app(app)
 
-#@app.get("/status")
+@app.get("/status")
 async def status():
     return {"status": "ok"}
 
