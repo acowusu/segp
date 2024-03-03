@@ -6,7 +6,11 @@ import { Separator } from "@radix-ui/react-menu";
 import React, { useEffect, useRef, useState } from "react";
 import { SidebarNav } from "../components/ui/sidebar-nav";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router";
-import { LayerOpts, ScriptData } from "../../electron/mockData/data";
+import {
+  LayerOpts,
+  ScriptData,
+  SectionData,
+} from "../../electron/mockData/data";
 import { Button } from "../components/ui/button";
 import etro from "etro";
 import { dispatchSectionGeneration } from "../lib/etro-utils";
@@ -26,26 +30,13 @@ type NavHeader = {
 //   assetPromise: Promise<void>;
 // };
 
-// maybe preserce start and end timestamsp??
-type SectionData = {
-  start: number; //might not be needed
-  end: number;
-  script: ScriptData;
-  media: Promise<etro.layer.Visual>; // Essentially Image | Video
-  avatar: Promise<etro.layer.Video>;
-  audio: Promise<etro.layer.Audio>;
-  // subtitles: Promise<SubtitleText>; //  <: etro.layer.Visual
-  // backing: Promise<etro.layer.Audio>;
-  // soundfx: Promise<etro.layer.Audio>;
-};
-
 export const PresentationLayout: React.FC = () => {
   const navigate = useNavigate();
 
   const [isScriptReady, setIsScriptReady] = useState<boolean>(false);
   const [sections, setSections] = useState<NavHeader[]>([]);
   // const [script, setScript] = useState<ScriptData[]>();
-  const [dataMap, setDataMap] = useState<Map<string, SectionData>>();
+  const [dataMap, setDataMap] = useState<Map<string, SectionData>>(new Map());
 
   useEffect(() => {
     window.api
@@ -142,7 +133,7 @@ export const PresentationLayout: React.FC = () => {
               onClick={() =>
                 navigate("/get-video", {
                   state: {
-                    placeholder: "hello", // pass data into videogen?
+                    sections: Array.from(dataMap.values()), // pass data into videogen?
                   },
                 })
               }
