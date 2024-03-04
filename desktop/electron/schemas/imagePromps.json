@@ -4,5 +4,7 @@
   "items": {
     "type": "string"
   },
-  "required": ["Prompt"]
+  "required": [
+    "Prompt"
+  ]
 }
