@@ -11,11 +11,10 @@ import {
   setVoiceover,
   setLength,
   getVoiceovers,
-  textToAudio,
   toDataURL,
   fetchImages,
-  generateBackingTrack,
 } from "./reportProcessing";
+import { generateBackingTrack, textToAudio } from "./audioService";
 import {
   generateAvatar,
   getAvatars,
