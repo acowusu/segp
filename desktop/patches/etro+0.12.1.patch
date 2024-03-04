@@ -1,0 +1,13 @@
+diff --git a/node_modules/etro/dist/layer/video.d.ts b/node_modules/etro/dist/layer/video.d.ts
+index f994c7d..796794f 100644
+--- a/node_modules/etro/dist/layer/video.d.ts
++++ b/node_modules/etro/dist/layer/video.d.ts
+@@ -7,7 +7,7 @@ interface VideoOptions extends Omit<AudioSourceOptions & VisualSourceOptions, 'd
+      */
+     source: string | HTMLVideoElement;
+ }
+-declare const Video_base: new (...args: unknown[]) => import("./audio-source").AudioSource;
++declare const Video_base: new (...args: unknown[]) => import("./visual-source").VisualSource;
+ /**
+  * Layer for an HTML video element
+  * @extends AudioSource

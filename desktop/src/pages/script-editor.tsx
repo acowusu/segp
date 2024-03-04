@@ -40,7 +40,6 @@ export const ScriptEditor: React.FC = () => {
   const [selectedScript, setSelectedScript] = useState<ScriptData>(
     {} as ScriptData
   );
-  const [showOtherDrafts, setShowOtherDrafts] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
   const [scriptLoadingProgress, setScriptLoadingProgress] = useState(0);
@@ -174,15 +173,17 @@ export const ScriptEditor: React.FC = () => {
       items.map((script) => {
         if (script.id === item.id) {
           script.selectedScriptIndex = index;
+          script.avatarVideoUrl = undefined;
+          script.scriptAudio = undefined;
         }
         return script;
       })
     );
+    window.api.setScript(items);
   };
   const handleSetSelectedScript = async (script: ScriptData) => {
     if (disabled) return;
     setDisabled(true);
-    if (selectedScript.id !== script.id) setShowOtherDrafts(false);
 
     if (script !== undefined) {
       setSelectedScript(script);
@@ -193,7 +194,7 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined}}));
+    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
     navigate("/get-video");
   };
   const selectTopic = async () => {
@@ -259,6 +260,7 @@ export const ScriptEditor: React.FC = () => {
             <CardTitle className="text-4xl">Script Editor</CardTitle>
             <div>
               <Badge
+                aria-label="Refresh Scripts"
                 variant={"secondary"}
                 onClick={() =>
                   toast.promise(window.api.getScript(true).then(setItems), {
@@ -277,12 +279,13 @@ export const ScriptEditor: React.FC = () => {
             <div className="flex flex-col gap-2 pt-0  ">
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
-                  <Reorder.Item key={item.id} value={item} className="mb-4">
-                    <div className="flex flex-row gap-4 ">
+                  <Reorder.Item key={item.id} value={item} className="mb-4"  data-testid="script-section">
+                    <div className="flex flex-row gap-2  ">
                       <div
                         key={item.id}
+                        data-testid="script-section-clickable"
                         className={cn(
-                          "flex w-full flex-col items-start gap-2 rounded-lg p-4 text-left text-sm transition-all border-2",
+                          "script-section-clickable flex w-full flex-col items-start gap-2 rounded-lg p-4 text-left text-sm transition-all border-2",
                           selectedScript.id === item.id &&
                           " border-2 border-sky-500",
                           selectedScript.id !== item.id &&
