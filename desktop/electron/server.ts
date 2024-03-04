@@ -27,10 +27,10 @@ interface LLMSentence {
     text: string;
 }
 
-export const generateTextFromLLM = async (
+export async function generateTextFromLLM (
     prompt: string,
     raw: boolean = false
-): Promise<string> => {
+): Promise<string> {
 
     const params = new URLSearchParams();
 
@@ -76,7 +76,7 @@ Ensure each section has at least 3 sentences`
  * @returns A promise that resolves to an array of Topic objects.
  * @throws Error if there is an error generating topics.
  */
-export const generateTopics = async (report: string): Promise<Topic[]> => {
+export async function generateTopics  (report: string): Promise<Topic[]>  {
 
     const params = new URLSearchParams();
     console.log("generating Topics")
@@ -223,7 +223,7 @@ Now produce the result for the following text below:
  * @returns A Promise that resolves to the generated open journey prompt as a string.
  * @throws Error if there is an error generating the script.
  */
-export const generateOpenJourneyPrompt = async (section: ScriptData): Promise<string> => {
+export async function generateOpenJourneyPrompt(section: ScriptData): Promise<string>  {
 
     const prompt = IMAGE_GEN_PROMPT.replace("<<<TO BE REPLACED>>>", section.scriptTexts[section.selectedScriptIndex]);
     const params = new URLSearchParams();
@@ -255,7 +255,7 @@ export const generateOpenJourneyPrompt = async (section: ScriptData): Promise<st
  * @param prompt - The prompt for generating the image.
  * @returns A Promise that resolves to the destination path of the generated image.
  */
-export const generateOpenJourneyImage = async (prompt: string): Promise<string> => {
+export async function  generateOpenJourneyImage (prompt: string): Promise<string>  {
     const form = new FormData();
     form.append("prompt", prompt);
     form.append("temperature", "1");

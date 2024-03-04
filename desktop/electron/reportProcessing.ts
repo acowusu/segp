@@ -104,7 +104,7 @@ export async function fetchImages(prompts: Array<string>): Promise<Array<Array<s
 
 
 
-export const toDataURL = (filePath:string, mimetype:string):Promise<string> => {
+export function toDataURL (filePath:string, mimetype:string):Promise<string>  {
   const songPromise = new Promise((resolve, reject) => {
     fs.readFile(filePath, (err, data) => {
       if (err) { reject(err); }
