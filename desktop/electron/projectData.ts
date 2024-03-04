@@ -28,13 +28,6 @@ export function getProjectHasSubtitles(): boolean {
   return getProjectStore().get("subtitles") as boolean;
 }
 
-export function getProjectsubtitleStyle(): string {
-  if (!getProjectStore().has("subtitleStyle")) {
-    throw new Error("subtitle style not set");
-  }
-  return getProjectStore().get("subtitleStyle") as string;
-}
-
 export function getProjectVoiceover(): Voiceover {
   if (!getProjectStore().has("voiceover")) {
     throw new Error("Voiceover not set");
@@ -93,9 +86,6 @@ export function setProjectHasAvatar(hasAvatar: boolean): void {
   getProjectStore().set("avatar", hasAvatar);
 }
 export function setProjectHasSubtitles(hasSubtitles: boolean): void {
-  getProjectStore().set("subtitles", hasSubtitles);
-}
-export function setProjectsubtitleStyle(hasSubtitles: string): void {
   getProjectStore().set("subtitles", hasSubtitles);
 }
 export function setProjectVoiceover(voiceover: Voiceover): void {
