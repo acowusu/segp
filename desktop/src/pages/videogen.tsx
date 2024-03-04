@@ -1,21 +1,15 @@
-/**
- * @prettier
- */
 import React, { useRef, useState } from "react";
+// import { MediaStore } from "../contexts/media/mediaStore";
 import { Progress } from "../components/ui/progress";
 import etro from "etro";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
+import { SubtitleText } from "../lib/subtitle-layer";
 import { ScriptData } from "../../electron/mockData/data";
 import { MagicWandIcon, PlayIcon } from "@radix-ui/react-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import {
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  FramelessCard,
-} from "../components/ui/card";
+import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../components/ui/card";
 import { addSingleImageLayer } from "../lib/etro-utils";
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -23,7 +17,7 @@ const HEIGHT = 1080;
 function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
   let start = 0;
   sections.forEach((section: ScriptData) => {
-    start = addSingleImageLayer(section, movie, start);
+    start = addSingleImageLayer(section, movie, start)
   });
 }
 
@@ -51,8 +45,10 @@ async function addSadTalkerLayers(sections: ScriptData[], movie: etro.Movie) {
       target: new etro.Color(0, 255, 0, 0), // default: new etro.Color(1, 0, 0, 1)
       threshold: 165, // default: 0.5
       interpolate: false, // default: false
-    });
-    layer.effects.push(effect);
+    })
+    layer.effects.push(
+      effect
+    );
     movie.layers.push(layer);
   }
 }
@@ -94,7 +90,7 @@ async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
     const layer = new etro.layer.Audio({
       startTime: start,
       duration: section.scriptDuration,
-      source: await window.api.toDataURL(section.scriptAudio, "audio/wav"),
+      source: await window.api.toDataURL(section.scriptAudio, 'audio/wav'),
       sourceStartTime: 0, // default: 0
       muted: false, // default: false
       volume: 1, // default: 1
@@ -147,7 +143,7 @@ const generateAudio = async () => {
 const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
   if (!window.api.getProjectHasAvatar()) {
     console.log("No Avatar Option Selected. Skipping Avatar Layering... ");
-    return;
+    return; 
   }
   let start = 0;
   for (const section of sections) {
@@ -157,7 +153,7 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
     const layer = new etro.layer.Video({
       startTime: start,
       duration: section.scriptDuration,
-      source: await window.api.toDataURL(section.avatarVideoUrl, "video/mp4"),
+      source: await window.api.toDataURL(section.avatarVideoUrl, 'video/mp4'),
       destX: 0, // default: 0
       destY: 0, // default: 0
       destWidth: avatar.width, // default: null (full width)
@@ -171,12 +167,12 @@ const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
 
     start += section.scriptDuration;
   }
-};
+}
 
 const generateAvatarSections = async () => {
   if (!window.api.getProjectHasAvatar()) {
     console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
-    return;
+    return; 
   }
   try {
     const initial = await window.api.getScript();
@@ -199,7 +195,7 @@ const generateAvatarSections = async () => {
   } catch (error) {
     console.error("Error generating avatar:", error);
   }
-};
+}
 
 /** TODOs:
  * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
@@ -207,31 +203,27 @@ const generateAvatarSections = async () => {
  * -> overlaiying of visual layers for subtitles on top of the visuals
  */
 export const VideoGenerator: React.FC = () => {
-  const navigate = useNavigate();
-  type CurrentState =
-    | "initial"
-    | "playback"
-    | "playing"
-    | "rendering"
-    | "loading";
-  const [currentState, setCurrentState] = useState<CurrentState>("initial");
-  const [currentProcess, setCurrentProcess] = useState<string>("");
-  const [generationProgress, setGenerationProgress] = useState<number>(0);
-  const movieRef = useRef<etro.Movie | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // Get the sections
-  const { state } = useLocation();
-  const sections: SectionData[] = state.sections;
-  console.log("movies got from state:", sections);
-
-  const createMovie = async () => {
+  const movieRef = useRef<etro.Movie | null>();
+  const [generationProgress, setGenerationProgress] = useState<number>(0);
+  const [currentProcess, setCurrentProcess] = useState<string>("");
+  const [currentState, setCurrentState] = useState<string>("initial");
+  const [script, setScript] = useState<ScriptData[]>([]);
+  const updateScript = async () => {
+    window.api.getScript().then( async (script) => {
+      setScript(script);
+    });
+  };
+  // useEffect(() => {
+  //   setupPlayer();
+  // }, []);
+  const setupPlayer = async () => {
     if (canvasRef.current == undefined) {
-      console.log("No canvas exists, canvasRef is null");
+      console.log("canvas is null");
       return;
     }
     if (movieRef.current != undefined) {
-      console.log("Movie exists: movieRef is not null");
+      console.log("movieRef is not null");
       return;
     }
     const canvas = canvasRef.current;
@@ -242,50 +234,56 @@ export const VideoGenerator: React.FC = () => {
     });
     canvas.width = 1920;
     canvas.height = 1080;
+    console.log("setting up player", movie);
+    const script = await window.api.getScript();
+    // await addAudioLayers(script, movie);
+    // const backing = await window.api.getProjectBackingTrack();
+    // const backingLayer = new etro.layer.Audio({
+    //   startTime: 0,
+    //   duration: backing.audioDuration,
+    //   source: await window.api.toDataURL(backing.audioSrc),
+    //   sourceStartTime: 0, // default: 0
+    //   muted: false, // default: false
+    //   volume: 0.5, // default: 1
+    //   playbackRate: 1, //default: 1
+    // });
+    // movie.layers.push(backingLayer);
+    addImageLayers(script, movie);
+    // await addSadTalkerLayers(script, movie);
+    await addAvatarLayers(script, movie);
+    addSubtitleLayers(script, movie);
+
     movieRef.current = movie;
+    console.log("movieRef", movieRef.current);
   };
 
-  const generateMovie = async () => {
-    setCurrentState("loading");
-    setCurrentProcess("Creating the Movie");
-    console.log("Movie sections:", sections);
+  const generateEtro = async () => {
+    setCurrentProcess("Starting");
+    setCurrentState("etro");
+    // await generateAudio();
+    await generateAvatarSections();
+    console.log("audio generated backing should exist");
 
-    await createMovie();
+    const interval = setInterval(() => {
+      setGenerationProgress((prev) => {
+        if (prev < 95) return prev + 0.1;
+        clearInterval(interval);
+        return prev;
+      });
+    }, 50);
+    await updateScript();
+    console.log("script", script);
+    await setupPlayer();
+    console.log("Movie should be setup", movieRef.current);
 
-    setCurrentProcess("Adding the Assets to the Movie");
-
-    sections.forEach(async (section) => {
-      const { start, script, media, avatar, audio } = section;
-
-      if (movieRef.current == null) {
-        console.log("The Movie didn't get created properly: MovieRef is null");
-        return;
-      }
-
-      const movie = movieRef.current;
-
-      // Need to correc the fake start times!
-
-      // TODO: add toasts here?
-      const mediaTimed = await media;
-      mediaTimed.startTime = start;
-      const avatarTimed = await avatar;
-      avatarTimed.startTime = start;
-      const audioTimed = await audio;
-      audioTimed.startTime = start;
-
-      movie.addLayer(mediaTimed);
-      movie.addLayer(avatarTimed);
-      movie.addLayer(audioTimed);
-      setCurrentProcess(`${script.sectionName} assets added`);
-    });
-
-    setCurrentProcess("Movie Genreated!");
+    setCurrentProcess("Done");
+    setGenerationProgress(0);
     setCurrentState("playback");
   };
 
   const generateVideo = async () => {
     setCurrentProcess("Recording");
+   
 
     setGenerationProgress(10);
     let interval = setInterval(() => {
@@ -297,7 +295,7 @@ export const VideoGenerator: React.FC = () => {
     }, 50);
     const blob: Blob = (await movieRef.current?.record({
       frameRate: 24,
-      type: "video/webm;codecs=h264",
+      type: 'video/webm;codecs=h264',
       // audio: default true,
       // video: default true,
       // duration: default end of video
@@ -341,85 +339,84 @@ export const VideoGenerator: React.FC = () => {
 
   return (
     <div>
-      <FramelessCard>
+      <FramelessCard >
         <CardHeader>
           <CardTitle>Generate Video</CardTitle>
           <CardDescription>
             You video is ready to be generated and exported.
+            
+
           </CardDescription>
         </CardHeader>
-        {currentState === "initial" && (
-          <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-            <Button
-              className="ml-4"
-              onClick={() => {
-                generateEtro();
-              }}
-            >
-              Generate Audio
-              <MagicWandIcon />
-            </Button>
-          </Skeleton>
-        )}
-        {currentState === "playback" && (
-          <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-            <Button
-              className="ml-4"
-              onClick={() => {
-                movieRef.current?.play();
-                setCurrentState("playing");
-                console.log("playing");
-                console.log(movieRef.current);
-              }}
-            >
-              Play
-              <PlayIcon />
-            </Button>
-          </Skeleton>
-        )}
-        <canvas
-          className={`w-full mb-4 ${
-            currentState === "playing" ? "" : "hidden"
-          }`}
-          ref={canvasRef}
-        ></canvas>
+      {currentState === "initial" && (
+        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+          <Button
+            className="ml-4"
+            onClick={() => {
+              generateEtro();
+            }}
+          >
+            Generate Audio
+            <MagicWandIcon />
+          </Button>
+        </Skeleton>
+      )}
+      {currentState === "playback" && (
+        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+          <Button
+            className="ml-4"
+            onClick={() => {
+              movieRef.current?.play();
+              setCurrentState("playing");
+              console.log("playing");
+              console.log(movieRef.current);
+            }}
+          >
+            Play
+            <PlayIcon />
+          </Button>
+        </Skeleton>
+      )}
+      <canvas
+        className={`w-full mb-4 ${currentState === "playing" ? "" : "hidden"}`}
+        ref={canvasRef}
+      ></canvas>
 
-        {currentState === "playing" && (
-          <>
-            <Button
-              className=""
-              onClick={() => {
-                movieRef.current?.pause();
-                setCurrentState("playback");
-              }}
-            >
-              Pause
-            </Button>
-          </>
-        )}
-        {currentState === "playback" && (
-          <>
-            <Button
-              className=""
-              onClick={async () => {
-                setCurrentState("rendering");
-                await generateVideo();
-                setCurrentState("playback");
-              }}
-            >
-              Save as Video file
-            </Button>
-          </>
-        )}
-        {(currentState === "rendering" || currentState === "etro") && (
-          <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-            <Progress value={generationProgress} className="w-5/6 mt-4" />
-            <p className="text-yellow-400">{currentProcess}</p>
-          </Skeleton>
-        )}
-        <div></div>
+      {currentState === "playing" && (
+        <>
+          <Button
+            className=""
+            onClick={() => {
+              movieRef.current?.pause();
+              setCurrentState("playback");
+            }}
+          >
+            Pause
+          </Button>
+        </>
+      )}
+      {currentState === "playback" && (
+        <>
+          <Button
+            className=""
+            onClick={async () => {
+              setCurrentState("rendering");
+              await generateVideo();
+              setCurrentState("playback");
+            }}
+          >
+            Save as Video file
+          </Button>
+        </>
+      )}
+      {(currentState === "rendering" || currentState === "etro") && (
+        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
+          <Progress value={generationProgress} className="w-5/6 mt-4" />
+          <p className="text-yellow-400">{currentProcess}</p>
+        </Skeleton>
+      )}
+      <div></div>
       </FramelessCard>
-      <Button onClick={() => navigate("/presentation")}>Back</Button>
     </div>
   );
 };

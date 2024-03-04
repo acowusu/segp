@@ -37,6 +37,7 @@ export const PresentationLayout: React.FC = () => {
   const [sections, setSections] = useState<NavHeader[]>([]);
   // const [script, setScript] = useState<ScriptData[]>();
   const [dataMap, setDataMap] = useState<Map<string, SectionData>>(new Map());
+  const moviesState = useState<Map<string, etro.Movie>>(new Map());
 
   useEffect(() => {
     window.api
@@ -91,6 +92,14 @@ export const PresentationLayout: React.FC = () => {
       });
   }, []);
 
+  function clearMovies() {
+    Array.from(moviesState[0].values()).forEach((movie) => {
+      movie.stop();
+      // movie.layers.forEach((layer) => layer.detach());
+      // movie.layers.slice(0, movie.layers.length);
+    });
+  }
+
   return (
     <>
       <div className=" space-y-6 p-10 pb-16 md:block">
@@ -112,7 +121,12 @@ export const PresentationLayout: React.FC = () => {
                   <SidebarNav items={sections} />
                 </aside>
                 <div className="flex-1 space-y-10 lg:max-w-2xl">
-                  <Outlet context={{ scriptMap: dataMap }} />
+                  <Outlet
+                    context={{
+                      sectionDataMap: dataMap,
+                      moviesState: moviesState,
+                    }}
+                  />
                 </div>
               </div>
             </>
@@ -130,16 +144,20 @@ export const PresentationLayout: React.FC = () => {
               Back
             </Button>
             <Button
-              onClick={() =>
+              onClick={() => {
+                console.log("movies", moviesState[0]);
+                console.log("info:", dataMap);
+                clearMovies(); // not convinced this is doing anything
+                console.log("movies", moviesState[0]);
+                console.log("info:", dataMap);
                 navigate("/get-video", {
                   state: {
                     sections: Array.from(dataMap.values()), // pass data into videogen?
                   },
-                })
-              }
+                });
+              }}
             >
-              {" "}
-              Next{" "}
+              Next
             </Button>
           </div>
         </div>
@@ -168,10 +186,20 @@ export const PresentationSection: React.FC = () => {
 
   const movieRef = useRef<etro.Movie | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [movies, setMovies] = useState<Map<string, etro.Movie>>(new Map());
+
   // get from parent element
-  const { scriptMap: dataMap }: { scriptMap: Map<string, SectionData> } =
-    useOutletContext();
+  const {
+    sectionDataMap: dataMap,
+    moviesState,
+  }: {
+    sectionDataMap: Map<string, SectionData>;
+    moviesState: [
+      Map<string, etro.Movie>,
+      React.Dispatch<React.SetStateAction<Map<string, etro.Movie>>>
+    ];
+  } = useOutletContext();
+
+  const [movies, setMovies] = moviesState;
 
   console.log("id of the section", id);
   const sectionData: SectionData = dataMap.get(id)!;
@@ -179,12 +207,12 @@ export const PresentationSection: React.FC = () => {
   console.log("given Section", section);
 
   useEffect(() => {
+    console.log("in use effect of child, movies", movies);
     setCurrentState("initial");
     if (canvasRef.current == undefined) {
       console.log("canvas is null");
       return;
     }
-    console.log("here", id);
 
     setupPlayer().then(() => setCurrentState("playback"));
   }, [id]);
@@ -196,6 +224,7 @@ export const PresentationSection: React.FC = () => {
       console.log("movie exist", movieRef.current);
       console.log("pausing if playing");
       !movieRef.current.paused && movieRef.current.pause();
+      // movieRef.current.stop();
     }
     let movie: etro.Movie;
     const existingMovie = movies.get(id); // check if new section has a movie created

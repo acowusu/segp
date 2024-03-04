@@ -115,6 +115,7 @@ export function setProjectVisual(visual: Visual): void {
 
 // Strictly for updating an already existing script section, probably not the most efficient way
 export function updateProjectScriptSection(new_section: ScriptData): void {
+  
   const currentScript = getProjectScript();
   let found = false;
   for (let i = 0; i < currentScript.length; i++) {

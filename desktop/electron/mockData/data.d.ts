@@ -81,6 +81,19 @@ export interface LayerOpts { // can be migrated to etro-utils thought this made 
   // add others as needed to later manipulate the layer
 }
 
+// maybe preserce start and end timestamsp??
+type SectionData = {
+  start: number; //might not be needed
+  end: number;
+  script: ScriptData;
+  media: Promise<etro.layer.Image | etro.layer.Video>; // Essentially Image | Video
+  avatar: Promise<etro.layer.Video>;
+  audio: Promise<etro.layer.Audio>;
+  // subtitles: Promise<SubtitleText>; //  <: etro.layer.Visual
+  // backing: Promise<etro.layer.Audio>;
+  // soundfx: Promise<etro.layer.Audio>;
+};
+
 interface Status {
   url: string;
   name: string;

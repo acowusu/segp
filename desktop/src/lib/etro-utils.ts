@@ -6,12 +6,39 @@ import etro from "etro";
 import { ScriptData } from "../../electron/mockData/data";
 import { LayerOpts } from "../../electron/mockData/data";
 import { toast } from "sonner";
+import { LucideGalleryVerticalEnd } from "lucide-react";
+import { useAsyncError } from "react-router-dom";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
 
 function lerp(a: number, b: number, t: number, p: number) {
   return a + (b - a) * (t / p);
+}
+
+export function fixLerpForMediaLayer(
+  layer: etro.layer.Image | etro.layer.Video,
+  newStart: number
+): etro.layer.Image | etro.layer.Video {
+  layer.startTime = newStart;
+
+  layer.destX = (_element: etro.EtroObject, time: number) => {
+    return lerp(0, -WIDTH / 10, time, layer.duration);
+  };
+
+  layer.destY = (_element: etro.EtroObject, time: number) => {
+    return lerp(0, -HEIGHT / 10, time, layer.duration);
+  };
+
+  layer.destWidth = (_element: etro.EtroObject, time: number) => {
+    return lerp(WIDTH, WIDTH * 1.2, time, layer.duration);
+  };
+
+  layer.destHeight = (_element: etro.EtroObject, time: number) => {
+    return lerp(HEIGHT, HEIGHT * 1.2, time, layer.duration);
+  };
+
+  return layer;
 }
 
 export function addSingleImageLayer(
@@ -86,7 +113,8 @@ export function dispatchSectionGeneration(section: ScriptData, start: number) {
 
   //dependence on audio gen being done first
   const audioLayer = audioGen.then(() => {
-    return getAudioLayer(section, start);
+    // return getAudioLayer(section, start); // integrate later
+    return;
   });
 
   const avatarLayer = audioGen.then(() => {
