@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { ScriptData } from "../../electron/mockData/data";
 import { SubtitleText } from "./subtitle-layer";
 import bgAudio from "../../electron/mockData/music.json"
+import { makeImageOpts } from "./etro-utils";
 
 export const WIDTH = 1920;
 export const HEIGHT = 1080;
@@ -29,78 +30,17 @@ export function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
     sections.forEach((section: ScriptData) => {
       if (!section.scriptMedia) throw new Error("No media found");
       if (!section.scriptDuration) throw new Error("No duration found");
-      var layer = null;
-      const randNum = Math.floor(Math.random() * 3); // random number 0 - 2
-      switch (randNum) {
-        case (0): {
-          layer = new etro.layer.Image({
-            startTime: start,
-            duration: section.scriptDuration,
-            source: section.scriptMedia,
-            destX: (_element: etro.EtroObject, time: number) => {
-              return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
-            }, // default: 0
-            destY: (_element: etro.EtroObject, time: number) => {
-              return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
-            }, // default: 0
-            destWidth: (_element: etro.EtroObject, time: number) => {
-              return lerp(WIDTH, WIDTH * 1.2, time, section.scriptDuration!);
-            }, // default: null (full width)
-            destHeight: (_element: etro.EtroObject, time: number) => {
-              return lerp(HEIGHT, HEIGHT * 1.2, time, section.scriptDuration!);
-            },
-            x: 0, // default: 0
-            y: 0, // default: 0
-            sourceWidth: WIDTH,
-            sourceHeight: HEIGHT,
-            opacity: 1, // default: 1
-          });
-          break;
-        }
-        case (1): {
-          layer = new etro.layer.Image({
-            startTime: start,
-            duration: section.scriptDuration,
-            source: section.scriptMedia,
-            destX: (_element: etro.EtroObject, time: number) => {
-              return lerp(-WIDTH / 10, 0, time, section.scriptDuration!);
-            }, // default: 0
-            destY: (_element: etro.EtroObject, time: number) => {
-              return lerp(-HEIGHT / 10, 0, time, section.scriptDuration!);
-            }, // default: 0
-            destWidth: (_element: etro.EtroObject, time: number) => {
-              return lerp(WIDTH * 1.2, WIDTH, time, section.scriptDuration!);
-            }, // default: null (full width)
-            destHeight: (_element: etro.EtroObject, time: number) => {
-              return lerp(HEIGHT * 1.2, HEIGHT, time, section.scriptDuration!);
-            },
-            x: 0, // default: 0
-            y: 0, // default: 0
-            sourceWidth: WIDTH,
-            sourceHeight: HEIGHT,
-            opacity: 1, // default: 1
-          });
-          break;
-        }
-        default: {
-          layer = new etro.layer.Image({
-            startTime: start,
-            duration: section.scriptDuration,
-            source: section.scriptMedia,
-            destX: (_element: etro.EtroObject, time: number) => {
-              return lerp(0, -WIDTH / 5, time, section.scriptDuration!);
-            }, // default: 0
-            destY: 0, // default: 0
-            destWidth: WIDTH * 1.2, // default: null (full width)
-            destHeight: HEIGHT  *1.2,
-            x: 0, // default: 0
-            y: 0, // default: 0
-            sourceWidth: WIDTH,
-            sourceHeight: HEIGHT,
-            opacity: 1, // default: 1
-          });
-        }
-      }
+
+      const layer = new etro.layer.Image(
+        makeImageOpts(
+          start,
+          section.scriptDuration,
+          section.scriptMedia,
+          WIDTH,
+          HEIGHT
+        )
+      );
+
       console.log("adding layer", layer);
       start += section.scriptDuration;
       movie.layers.push(layer!);

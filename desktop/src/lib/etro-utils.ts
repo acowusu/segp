@@ -3,17 +3,135 @@
  */
 
 import etro from "etro";
-import { ScriptData } from "../../electron/mockData/data";
+import { PromisedLayerOpts, ScriptData } from "../../electron/mockData/data";
 import { LayerOpts } from "../../electron/mockData/data";
 import { toast } from "sonner";
 import { LucideGalleryVerticalEnd } from "lucide-react";
 import { useAsyncError } from "react-router-dom";
+import { AudioOptions, ImageOptions, VideoOptions } from "etro/dist/layer";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
 
 function lerp(a: number, b: number, t: number, p: number) {
   return a + (b - a) * (t / p);
+}
+
+/** Select the aimation type for media */
+function mediaAnimationSelector(
+  duration: number,
+  w: number,
+  h: number
+): {
+  destX?: etro.Dynamic<number>; // technically not optional all paths have this tho ill keep it
+  destY?: etro.Dynamic<number>;
+  destWidth?: etro.Dynamic<number>;
+  destHeight?: etro.Dynamic<number>;
+} {
+  const randNum = Math.floor(Math.random() * 3); // random number 0 - 2
+  switch (randNum) {
+    case 0: {
+      return {
+        destX: (_element: etro.EtroObject, time: number) => {
+          return lerp(0, -w / 10, time, duration);
+        }, // default: 0
+        destY: (_element: etro.EtroObject, time: number) => {
+          return lerp(0, -h / 10, time, duration);
+        }, // default: 0
+        destWidth: (_element: etro.EtroObject, time: number) => {
+          return lerp(w, w * 1.2, time, duration);
+        }, // default: null (full width)
+        destHeight: (_element: etro.EtroObject, time: number) => {
+          return lerp(h, h * 1.2, time, duration);
+        },
+      };
+    }
+    case 1: {
+      return {
+        destX: (_element: etro.EtroObject, time: number) => {
+          return lerp(-w / 10, 0, time, duration);
+        }, // default: 0
+        destY: (_element: etro.EtroObject, time: number) => {
+          return lerp(-h / 10, 0, time, duration);
+        }, // default: 0
+        destWidth: (_element: etro.EtroObject, time: number) => {
+          return lerp(w * 1.2, w, time, duration);
+        }, // default: null (full width)
+        destHeight: (_element: etro.EtroObject, time: number) => {
+          return lerp(h * 1.2, h, time, duration);
+        },
+      };
+    }
+    default: {
+      return {
+        destX: (_element: etro.EtroObject, time: number) => {
+          return lerp(0, -w / 5, time, duration);
+        },
+      };
+    }
+  }
+}
+
+/** Make Image Opts object from the given values */
+export function makeImageOpts(
+  start: number,
+  duration: number,
+  src: string,
+  w: number,
+  h: number
+): ImageOptions {
+  return {
+    startTime: start,
+    duration: duration,
+    source: src,
+    x: 0, // default: 0
+    y: 0, // default: 0
+    sourceWidth: w,
+    sourceHeight: h,
+    opacity: 1, // default: 1
+    ...mediaAnimationSelector(duration, w, h),
+  };
+}
+
+export function makeAudioOpts(
+  start: number,
+  duration: number,
+  src: string
+): AudioOptions {
+  return {
+    startTime: start,
+    duration: duration,
+    source: src,
+    sourceStartTime: 0, // default: 0
+    muted: false, // default: false
+    volume: 1, // default: 1
+    playbackRate: 1, //default:
+  };
+}
+
+export function makeVideoOpts(
+  start: number,
+  duration: number,
+  src: string,
+  sourceWidth: number,
+  sourceHeight: number,
+  canvasWidth: number,
+  canvasHeight: number
+): VideoOptions {
+  return {
+    startTime: start,
+    duration: duration,
+    source: src,
+    destX: 0, // default: 0
+    destY: 0, // default: 0
+    destWidth: sourceWidth / 3, // default: null (full width)
+    destHeight: sourceHeight / 3, // default: null (full height)
+    x: canvasWidth - sourceWidth / 3, // default: 0
+    y: canvasHeight - sourceHeight / 3, // default: 0
+    opacity: 1, // default: 1
+    volume: 0, // default: 1
+    // muted: false, //default: false
+  };
 }
 
 export function addSingleImageLayer(
@@ -83,23 +201,33 @@ export async function addSectionAvatar(
 }
 
 // Layer Promises //
-export function dispatchSectionGeneration(section: ScriptData, start: number) {
+export function dispatchSectionGeneration(
+  section: ScriptData,
+  start: number
+): PromisedLayerOpts {
   const audioGen = generateAudio(section);
 
   //dependence on audio gen being done first
-  const audioLayer = audioGen.then(() => {
+  const audioOpts = audioGen.then(() => {
     // return getAudioLayer(section, start); // integrate later
     return;
   });
 
-  const avatarLayer = audioGen.then(() => {
+  const avatarOpts = audioGen.then(() => {
     return getAvatarLayer(section, start);
   });
 
-  return [getMediaLayer(section, start), avatarLayer, audioLayer];
+  return {
+    p_mediaOpts: getMediaOpts(section, start),
+    p_audioOpts: audioOpts,
+    p_avatarOpts: avatarOpts,
+    //   p_subtitleOpts?: ,
+    //   p_backingOpts?: ,
+    //   p_soundfxOpts?: ,
+  };
 }
 
-export async function getMediaLayer(
+export async function getMediaOpts(
   section: ScriptData,
   start: number
   // opts?: LayerOpts
@@ -136,6 +264,44 @@ export async function getMediaLayer(
     resolve(layer);
   });
 }
+
+// export async function getMediaLayer(
+//   section: ScriptData,
+//   start: number
+//   // opts?: LayerOpts
+// ): Promise<etro.layer.Visual> {
+//   // const effectiveOpts = { ...defaultLayerOpts, ...opts };
+
+//   return new Promise<etro.layer.Visual>((resolve, reject) => {
+//     if (!section.scriptMedia) reject(new Error("No media found"));
+//     if (!section.scriptDuration) reject(new Error("No duration found"));
+
+//     const layer = new etro.layer.Image({
+//       startTime: start,
+//       duration: section.scriptDuration!,
+//       source: "local:///" + section.scriptMedia,
+//       destX: (_element: etro.EtroObject, time: number) => {
+//         return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
+//       }, // default: 0
+//       destY: (_element: etro.EtroObject, time: number) => {
+//         return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
+//       }, // default: 0
+//       destWidth: (_element: etro.EtroObject, time: number) => {
+//         return lerp(WIDTH, WIDTH * 1.2, time, section.scriptDuration!);
+//       }, // default: null (full width)
+//       destHeight: (_element: etro.EtroObject, time: number) => {
+//         return lerp(HEIGHT, HEIGHT * 1.2, time, section.scriptDuration!);
+//       },
+//       x: 0, // default: 0
+//       y: 0, // default: 0
+//       sourceWidth: WIDTH,
+//       sourceHeight: HEIGHT,
+//       opacity: 1, // default: 1
+//     });
+//     console.log("Created the media layer");
+//     resolve(layer);
+//   });
+// }
 
 // TODO: I think the toasts should not be here as this would bombard the user
 
