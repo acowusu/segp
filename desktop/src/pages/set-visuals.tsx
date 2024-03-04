@@ -31,6 +31,9 @@ import { useNavigate } from "react-router-dom";
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
   subtitles: z.boolean().default(false).optional(),
+  subtitleStyle: z.string().default("80px sans-serif").optional(),
+  subtitleSize: z.string().default("80px").optional(),
+  fontType: z.string().default("sans-serif").optional(),
   audience: z
     .string({ required_error: "Please Select an Audience" })
     .default("").optional(),
@@ -38,8 +41,8 @@ const formSchema = z.object({
     .string({ required_error: "Please Select an Voiceover" })
     .default("").optional(),
   videoLength: z.coerce
-  .number({ required_error: "Please Select a video length" })
-  .default(1).optional(),
+    .number({ required_error: "Please Select a video length" })
+    .default(1).optional(),
   avatarSelection: z.string().default("").optional(),
 });
 
@@ -47,12 +50,15 @@ type FormValues = z.infer<typeof formSchema>;
 
 const defaultValues: () => Promise<Partial<FormValues>> = async () => {
   return {
-    avatar: await window.api.getProjectHasAvatar().catch(()=>false)!,
-    subtitles:  await window.api.getProjectHasSubtitles().catch(()=>false)!,
-    audience: ( await window.api.getProjectAudience().catch(()=>({name:""}))).name!,
-    voiceover: (await window.api.getProjectVoiceover().catch(()=>({id:""}))).id!,
+    avatar: await window.api.getProjectHasAvatar().catch(() => false)!,
+    subtitles: await window.api.getProjectHasSubtitles().catch(() => false)!,
+    subtitleStyle: await window.api.getProjectsubtitleStyle().catch(() => "80px sans-serif")!,
+    subtitleSize: await window.api.getProjectsubtitleStyle().catch(() => "80px")!,
+    fontType: await window.api.getProjectsubtitleStyle().catch(() => "sans-serif")!,
+    audience: (await window.api.getProjectAudience().catch(() => ({ name: "" }))).name!,
+    voiceover: (await window.api.getProjectVoiceover().catch(() => ({ id: "" }))).id!,
     videoLength: await window.api.getProjectLength(),
-    avatarSelection: (await window.api.getProjectAvatar().catch(()=>({id:""}))).id!,
+    avatarSelection: (await window.api.getProjectAvatar().catch(() => ({ id: "" }))).id!,
   }
 };
 
@@ -150,23 +156,28 @@ export function SetVisuals() {
     defaultValues,
   });
 
-  const onSubmit = useCallback((data: FormValues) =>  {
+  const onSubmit = useCallback((data: FormValues) => {
     console.log(data);
     window.api.setProjectHasAvatar(data.avatar || false);
     window.api.setProjectHasSubtitles(data.subtitles || false);
+    if (data.subtitles) {
+      window.api.setProjectsubtitleStyle((data.subtitleSize + " " + data.fontType) || "80px sans-serif");
+    } else {
+      window.api.setProjectsubtitleStyle("80px sans-serif");
+    }
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
     setAvatar(avatarItems.find(item => item.id === data.avatarSelection)!)
 
   }, [audienceItems, setAudience, setVoiceover, voiceoverItems, avatarItems, setAvatar])
 
-  const {watch,handleSubmit }  = form
+  const { watch, handleSubmit } = form
   useEffect(() => {
     // TypeScript users 
     const subscription = watch(() => handleSubmit(onSubmit)())
     return () => subscription.unsubscribe();
-}, [watch, handleSubmit,  onSubmit]);
-  const { avatar, subtitles, avatarSelection } = form.watch();
+  }, [watch, handleSubmit, onSubmit]);
+  const { avatar, subtitles, subtitleStyle, subtitleSize, fontType, avatarSelection } = form.watch();
   return (
     <>
       <h1 className="text-4xl font-bold pb-8">
@@ -177,21 +188,21 @@ export function SetVisuals() {
           <div>
             <h3 className="mb-4 text-lg font-medium">Configuration</h3>
             <FormField
-            control={form.control}
-            name="videoLength"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Video Length</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="1" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Select Video Length
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              control={form.control}
+              name="videoLength"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Video Length</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="1" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Select Video Length
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="audience"
@@ -224,24 +235,24 @@ export function SetVisuals() {
             />
             {avatar && (
               <div className="grid grid-cols-3 gap-4 ">
-              {avatarItems.map((avatar, index) => (
-                <FormField
-                  key={index}
-                  control={form.control}
-                  name="avatarSelection"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl> 
-                          <AvatarFrame 
-                            isSelected={avatarSelection===avatar.id} 
-                            label={avatar.name} 
-                            imagePath={avatar.imagePath} 
-                            onClick={() => field.onChange(avatar.id)}/>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              ))}
+                {avatarItems.map((avatar, index) => (
+                  <FormField
+                    key={index}
+                    control={form.control}
+                    name="avatarSelection"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <AvatarFrame
+                            isSelected={avatarSelection === avatar.id}
+                            label={avatar.name}
+                            imagePath={avatar.imagePath}
+                            onClick={() => field.onChange(avatar.id)} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                ))}
               </div>
             )}
             <FormField
@@ -255,7 +266,7 @@ export function SetVisuals() {
                     defaultValue={field.value}
                   >
                     <SelectTrigger>
-                    <SelectValue placeholder={selectedVoiceover?.name || " Select a Voiceover"} />
+                      <SelectValue placeholder={selectedVoiceover?.name || " Select a Voiceover"} />
                     </SelectTrigger>
                     <SelectContent>
                       {voiceoverItems.map((voiceoverItem) => (
@@ -316,16 +327,88 @@ export function SetVisuals() {
                   </FormItem>
                 )}
               />
+              {subtitles && ( // Render subtitle size selector only if subtitles are enabled
+                <FormField
+                  control={form.control}
+                  name="subtitleSize"
+                  render={({ field }) => (
+                    <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <FormLabel className="text-base">Subtitle Size</FormLabel>
+                      <div className="flex items-center space-x-4">
+                        <button
+                          className="subtitle-size-button"
+                          style={{
+                            border: field.value === "60px" ? "2px solid #4299e1" : "2px solid transparent",
+                            boxShadow: field.value === "60px" ? "0 0 5px rgba(66, 153, 225, 0.5)" : "none",
+                          }}
+                          onClick={() => field.onChange("60px")}
+                        >
+                          <div className="subtitle-size-icon small-icon" style={{ fontSize: "12px" }}>T</div>
+                        </button>
+                        <button
+                          className="subtitle-size-button"
+                          style={{
+                            border: field.value === "80px" ? "2px solid #4299e1" : "2px solid transparent",
+                            boxShadow: field.value === "80px" ? "0 0 5px rgba(66, 153, 225, 0.5)" : "none",
+                          }}
+                          onClick={() => field.onChange("80px")}
+                        >
+                          <div className="subtitle-size-icon medium-icon" style={{ fontSize: "16px" }}>T</div>
+                        </button>
+                        <button
+                          className="subtitle-size-button"
+                          style={{
+                            border: field.value === "100px" ? "2px solid #4299e1" : "2px solid transparent",
+                            boxShadow: field.value === "100px" ? "0 0 5px rgba(66, 153, 225, 0.5)" : "none",
+                          }}
+                          onClick={() => field.onChange("100px")}
+                        >
+                          <div className="subtitle-size-icon large-icon" style={{ fontSize: "20px" }}>T</div>
+                        </button>
+                      </div>
+                      {/* Add description or any other relevant information */}
+                    </div>
+                  )}
+                />
+              )}
+              <FormField
+                control={form.control}
+                name="fontType"
+                render={({ field }) => (
+                  <div className="flex items-center space-x-4">
+                    <button
+                      className="font-type-button"
+                      style={{
+                        fontWeight: field.value === "sans-serif" ? "bold" : "normal",
+                      }}
+                      onClick={() => field.onChange("sans-serif")}
+                    >
+                      Sans-serif
+                    </button>
+                    <button
+                      className="font-type-button"
+                      style={{
+                        fontWeight: field.value === "serif" ? "bold" : "normal",
+                      }}
+                      onClick={() => field.onChange("serif")}
+                    >
+                      Serif
+                    </button>
+                    {/* Add more font type buttons as needed */}
+                  </div>
+                )}
+              />
             </div>
           </div>
           <h3 className="text-lg font-medium">Preview</h3>
 
-        <OverlayPreview
-          backgroundUrl={"example2-min.jpg"}
-          avatarUrl={selectedAvatar.imagePath ?? "big-person.png"}
-          showAvatar={avatar}
-          showSubtitle={subtitles}
-        />
+          <OverlayPreview
+            backgroundUrl={"example2-min.jpg"}
+            avatarUrl={selectedAvatar.imagePath ?? "big-person.png"}
+            showAvatar={avatar}
+            showSubtitle={subtitles}
+            subtitleStyle={subtitleSize + " " + fontType}
+          />
 
           <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
         </form>
