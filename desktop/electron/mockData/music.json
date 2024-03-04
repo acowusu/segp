@@ -1,0 +1,38 @@
+[
+  {
+    "path": "./backingTracks/sad_unfair_ambient.mp3",
+    "tags": ["sad", "unfair"]
+  },
+  {
+    "path": "./backingTracks/sad_hope_ambient.mp3",
+    "tags": ["sad", "hope"]
+  },
+  {
+    "path": "./backingTracks/mysterious_scary_ambient.mp3",
+    "tags": ["mysterious", "scary"]
+  },
+  {
+    "path": "./backingTracks/love_heartwarming_ambient.mp3",
+    "tags": ["love", "heartwarming"]
+  },
+  {
+    "path": "./backingTracks/corporate_ambient.mp3",
+    "tags": ["corporate", "upbeat"]
+  },
+  {
+    "path": "./backingTracks/corporate_innovative_ambient.mp3",
+    "tags": ["innovative", "corporate"]
+  },
+  {
+    "path": "./backingTracks/cool_innovative_ambient.mp3",
+    "tags": ["innovative", "cool"]
+  },
+  {
+    "path": "./backingTracks/calming_ambient.mp3",
+    "tags": ["calming"]
+  },
+  {
+    "path": "./backingTracks/upbeat_culture_ambient.mp3",
+    "tags": ["upbeat", "innovative", "corporate"]
+  }
+]

@@ -2,6 +2,7 @@ import etro from "etro";
 import { toast } from "sonner";
 import { ScriptData } from "../../electron/mockData/data";
 import { SubtitleText } from "./subtitle-layer";
+import bgAudio from "../../electron/mockData/music.json"
 
 export const WIDTH = 1920;
 export const HEIGHT = 1080;
@@ -26,35 +27,85 @@ export function lerp(a: number, b: number, t: number, p: number) {
 export function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
     let start = 0;
     sections.forEach((section: ScriptData) => {
-        if (!section.scriptMedia) throw new Error("No media found");
-        if (!section.scriptDuration) throw new Error("No duration found");
-        const layer = new etro.layer.Image({
+      if (!section.scriptMedia) throw new Error("No media found");
+      if (!section.scriptDuration) throw new Error("No duration found");
+      var layer = null;
+      const randNum = Math.floor(Math.random() * 3); // random number 0 - 2
+      switch (randNum) {
+        case (0): {
+          layer = new etro.layer.Image({
             startTime: start,
             duration: section.scriptDuration,
-            source: "local:///" + section.scriptMedia,
+            source: section.scriptMedia,
             destX: (_element: etro.EtroObject, time: number) => {
-                return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
+              return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
             }, // default: 0
             destY: (_element: etro.EtroObject, time: number) => {
-                return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
+              return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
             }, // default: 0
             destWidth: (_element: etro.EtroObject, time: number) => {
-                return lerp(WIDTH, WIDTH * 1.2, time, section.scriptDuration!);
+              return lerp(WIDTH, WIDTH * 1.2, time, section.scriptDuration!);
             }, // default: null (full width)
             destHeight: (_element: etro.EtroObject, time: number) => {
-                return lerp(HEIGHT, HEIGHT * 1.2, time, section.scriptDuration!);
+              return lerp(HEIGHT, HEIGHT * 1.2, time, section.scriptDuration!);
             },
             x: 0, // default: 0
             y: 0, // default: 0
             sourceWidth: WIDTH,
             sourceHeight: HEIGHT,
             opacity: 1, // default: 1
-        });
-        console.log("adding layer", layer);
-        start += section.scriptDuration;
-        movie.layers.push(layer);
+          });
+          break;
+        }
+        case (1): {
+          layer = new etro.layer.Image({
+            startTime: start,
+            duration: section.scriptDuration,
+            source: section.scriptMedia,
+            destX: (_element: etro.EtroObject, time: number) => {
+              return lerp(-WIDTH / 10, 0, time, section.scriptDuration!);
+            }, // default: 0
+            destY: (_element: etro.EtroObject, time: number) => {
+              return lerp(-HEIGHT / 10, 0, time, section.scriptDuration!);
+            }, // default: 0
+            destWidth: (_element: etro.EtroObject, time: number) => {
+              return lerp(WIDTH * 1.2, WIDTH, time, section.scriptDuration!);
+            }, // default: null (full width)
+            destHeight: (_element: etro.EtroObject, time: number) => {
+              return lerp(HEIGHT * 1.2, HEIGHT, time, section.scriptDuration!);
+            },
+            x: 0, // default: 0
+            y: 0, // default: 0
+            sourceWidth: WIDTH,
+            sourceHeight: HEIGHT,
+            opacity: 1, // default: 1
+          });
+          break;
+        }
+        default: {
+          layer = new etro.layer.Image({
+            startTime: start,
+            duration: section.scriptDuration,
+            source: section.scriptMedia,
+            destX: (_element: etro.EtroObject, time: number) => {
+              return lerp(0, -WIDTH / 5, time, section.scriptDuration!);
+            }, // default: 0
+            destY: 0, // default: 0
+            destWidth: WIDTH * 1.2, // default: null (full width)
+            destHeight: HEIGHT  *1.2,
+            x: 0, // default: 0
+            y: 0, // default: 0
+            sourceWidth: WIDTH,
+            sourceHeight: HEIGHT,
+            opacity: 1, // default: 1
+          });
+        }
+      }
+      console.log("adding layer", layer);
+      start += section.scriptDuration;
+      movie.layers.push(layer!);
     });
-}
+  }
 
 
 /**
@@ -98,40 +149,59 @@ export function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
  * @param movie - The movie object to which the audio layers will be added.
  * @throws {Error} - If no media or duration is found in a section.
  */
+
 export async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) {
     let start = 0;
     console.log("adding audio layers", sections);
     for (const section of sections) {
-        if (!section.scriptAudio) throw new Error("No media found");
-        if (!section.scriptDuration) throw new Error("No duration found");
-        if (section.soundEffectPath) {
-            console.log("adding sound effect layer", section.soundEffectPath);
-            const soundEffectLayer = new etro.layer.Audio({
-                startTime: start,
-                duration: section.scriptDuration,
-                source: await window.api.toDataURL(section.soundEffectPath, 'audio/wav'),
-                sourceStartTime: 0, // default: 0
-                muted: false, // default: false
-                volume: 0.5, // default: 1
-                playbackRate: 1, //default: 1
-            });
-            movie.layers.push(soundEffectLayer);
-        }
-        const layer = new etro.layer.Audio({
-            startTime: start,
-            duration: section.scriptDuration,
-            source: await window.api.toDataURL(section.scriptAudio, 'audio/wav'),
-            sourceStartTime: 0, // default: 0
-            muted: false, // default: false
-            volume: 1, // default: 1
-            playbackRate: 1, //default: 1
-        });
-        movie.layers.push(layer);
-        console.log("adding layer", layer);
-
-        start += section.scriptDuration;
+      if (!section.scriptAudio) throw new Error("No media found");
+      if (!section.scriptDuration) throw new Error("No duration found");
+      const layer = new etro.layer.Audio({
+        startTime: start,
+        duration: section.scriptDuration,
+        source: await window.api.toDataURL(section.scriptAudio, "audio/wav"),
+        sourceStartTime: 0, // default: 0
+        muted: false, // default: false
+        volume: 1, // default: 1
+        playbackRate: 1, //default: 1
+      });
+      movie.layers.push(layer);
+      console.log("adding layer", layer);
+  
+      if (section.soundEffect) {
+        const effectLayer = new etro.layer.Audio({
+          startTime: start,
+          duration: Math.min(4, section.scriptDuration),
+          source: await window.api.toDataURL(section.soundEffect, "audio/wav"),
+          sourceStartTime: 0, // default: 0
+          muted: false, // default: false
+          volume: 0.6, // default: 1
+        playbackRate: 1, //default: 1
+      });
+      movie.layers.push(effectLayer);
+      console.log("adding sound effect layer", effectLayer);
+    };
+      start += section.scriptDuration;
+  
+  
     }
-}
+    
+    if (await window.api.getProjectHasBackgroundAudio()) {
+      const effectLayer = new etro.layer.Audio({
+        startTime: 0,
+        duration: start,
+        source: bgAudio[0].path,
+        sourceStartTime: 0, // default: 0
+        muted: false, // default: false
+        volume: 0.3, // default: 1
+      playbackRate: 1, //default: 1
+    });
+    movie.layers.push(effectLayer);
+    console.log("adding bg music layer", effectLayer);
+    }
+  
+  }
+  
 /**
  * Generates audio for each section in the script and saves the audio to the section.
  * @returns {Promise<void>} A promise that resolves when the audio generation is complete.
@@ -139,41 +209,54 @@ export async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) 
  */
 export const generateAudio = async () => {
     try {
-        const initial = await window.api.getScript();
-        const result = [];
-        for (const section of initial) {
-            if (section.scriptAudio) {
-                result.push(section);
-                continue;
-            }
-            const modified = window.api.textToAudio(section);
-            toast.promise(modified, {
-                loading: `Generating audio for ${section.sectionName}...`,
-                success: (newSection) => {
-                    return `Audio has been generated for ${section.sectionName}. ${newSection.scriptAudio} has been saved.`;
-                },
-                error: "Error generating audio for section: " + section.sectionName,
-            });
-            const resolvedModified = await modified;
-            result.push(resolvedModified);
+      const initial = await window.api.getScript();
+      const result = [];
+      for (const section of initial) {
+        if (section.scriptAudio) {
+          result.push(section);
+          continue;
         }
-        // const length = result.reduce((acc, val) => {
-        //   return acc + val.scriptDuration!;
-        // }, 0);
-        // const track =  window.api.generateBackingTrack("inspiring emotionally charged uplidting corportate music vocals tones",length/2 )
-        // toast.promise(track, {
-        //   loading: `Generating backing track...`,
-        //   success: (newSection) => {
-        //     return `Backing track has been generated. ${newSection.audioSrc} has been saved.`;
-        //   },
-        //   error: (error)=>`Error generating backing track <em>${error}</em>` ,
-        // });
-        // await window.api.setProjectBackingTrack(await track);
-        await window.api.setScript(result);
+        let modified = window.api.textToAudio(section);
+        toast.promise(modified, {
+          loading: `Generating audio for ${section.sectionName}...`,
+          success: (newSection) => {
+            return `Audio has been generated for ${section.sectionName}. ${newSection.scriptAudio} has been saved.`;
+          },
+          error: "Error generating audio for section: " + section.sectionName,
+        });
+        let resolvedModified = await modified
+        
+        if (await window.api.getProjectHasSoundEffect()) {
+          modified = window.api.generateSoundEffect(resolvedModified);
+          toast.promise(modified, {
+            loading: `Generating sound effects for ${section.sectionName}...`,
+            success: (newSection) => {
+              return `Sound effect has been generated for ${section.sectionName}. ${newSection.soundEffect} has been saved.`;
+            },
+            error: "Error generating sound effect for section: " + section.sectionName,
+          });
+          resolvedModified = await modified;
+        }
+        
+        result.push(resolvedModified);
+      }
+      // const length = result.reduce((acc, val) => {
+      //   return acc + val.scriptDuration!;
+      // }, 0);
+      // const track =  window.api.generateBackingTrack("inspiring emotionally charged uplidting corportate music vocals tones",length/2 )
+      // toast.promise(track, {
+      //   loading: `Generating backing track...`,
+      //   success: (newSection) => {
+      //     return `Backing track has been generated. ${newSection.audioSrc} has been saved.`;
+      //   },
+      //   error: (error)=>`Error generating backing track <em>${error}</em>` ,
+      // });
+      // await window.api.setProjectBackingTrack(await track);
+      await window.api.setScript(result);
     } catch (error) {
-        console.error("Error generating audio:", error);
+      console.error("Error generating audio:", error);
     }
-};
+  };
 
 /**
  * Adds avatar layers to the movie based on the provided sections.
