@@ -155,7 +155,7 @@ export const generateScript = async (report: string, topic:Topic): Promise<Scrip
     }
 }
 
-export const genNewScript = async (script: string): Promise<string> => {
+export const generateExtraScript = async (script: string): Promise<string> => {
     console.log("gening new script")
     const params = new URLSearchParams();
 
@@ -424,10 +424,3 @@ export const generateSoundEffect = async (section: ScriptData): Promise<ScriptDa
         throw Error("Error generating Audio Effect")
     }
 }
-
-
-
-
-
-
-

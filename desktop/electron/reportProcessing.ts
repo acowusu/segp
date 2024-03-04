@@ -2,7 +2,7 @@
 import { getProjectPath, getTextReportPath } from "./metadata";
 import audiences from "./mockData/audiences.json";
 import { pool } from "./pool";
-import { generateTopics, generateScript, genNewScript } from "./server"
+import { generateTopics, generateScript, generateExtraScript } from "./server"
 import type {
   Audience,
   BackingTrack,
@@ -88,16 +88,6 @@ export async function fetchImages(prompts: Array<string>): Promise<Array<Array<s
 
     imageFilePaths.push(unsplashPhotos);
     
-    // const promptFilePaths: Array<string> = [];
-
-    // for (let i = 0; i < unsplashPhotos.length; i++) {
-    //   const imageUrl = unsplashPhotos[i];
-    //   const filename = `${prompt}${i}.jpg`;
-    //   const response = await downloadFile(imageUrl, getProjectPath(), { method: 'GET' }, filename);
-    //   promptFilePaths.push(response.destination);
-    // }
-    // imageFilePaths.push(promptFilePaths);
-
     if (unsplashAccessKey !== undefined) {
       unsplashAccessKeys.push(unsplashAccessKey);
     }
@@ -173,7 +163,7 @@ export async function getScript(force?:boolean): Promise<ScriptData[]> {
 }
 
 export async function generateNewScript(script: string): Promise<string> {
-  return await genNewScript(script)
+  return await generateExtraScript(script)
 }
 export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);

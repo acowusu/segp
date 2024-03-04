@@ -219,7 +219,7 @@ const generateAudio = async () => {
         result.push(section);
         continue;
       }
-      var modified = window.api.textToAudio(section);
+      let modified = window.api.textToAudio(section);
       toast.promise(modified, {
         loading: `Generating audio for ${section.sectionName}...`,
         success: (newSection) => {
@@ -227,10 +227,10 @@ const generateAudio = async () => {
         },
         error: "Error generating audio for section: " + section.sectionName,
       });
-      var resolvedModified = await modified
+      let resolvedModified = await modified
       
       if (await window.api.getProjectHasSoundEffect()) {
-        var modifed = window.api.generateSoundEffect(resolvedModified);
+        modified = window.api.generateSoundEffect(resolvedModified);
         toast.promise(modified, {
           loading: `Generating sound effects for ${section.sectionName}...`,
           success: (newSection) => {
@@ -238,7 +238,7 @@ const generateAudio = async () => {
           },
           error: "Error generating sound effect for section: " + section.sectionName,
         });
-        resolvedModified = await modifed;
+        resolvedModified = await modified;
       }
       
       result.push(resolvedModified);
@@ -360,17 +360,6 @@ export const VideoGenerator: React.FC = () => {
     console.log("setting up player", movie);
     const script = await window.api.getScript();
     await addAudioLayers(script, movie);
-    // const backing = await window.api.getProjectBackingTrack();
-    // const backingLayer = new etro.layer.Audio({
-    //   startTime: 0,
-    //   duration: backing.audioDuration,
-    //   source: await window.api.toDataURL(backing.audioSrc),
-    //   sourceStartTime: 0, // default: 0
-    //   muted: false, // default: false
-    //   volume: 0.5, // default: 1
-    //   playbackRate: 1, //default: 1
-    // });
-    // movie.layers.push(backingLayer);
     addImageLayers(script, movie);
     // await addSadTalkerLayers(script, movie);
     addSubtitleLayers(script, movie);
