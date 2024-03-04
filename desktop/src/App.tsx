@@ -10,6 +10,7 @@ import { Upload } from "./pages/upload";
 import { ThemeProvider } from "./components/theme";
 import { VideoGenerator } from "./pages/videogen";
 import { PresentationLayout, PresentationSection } from "./pages/presentation";
+import { NewVideoGenerator } from "./pages/new-vidgen";
 function App() {
 
   return (
@@ -24,7 +25,7 @@ function App() {
             <Route path="presentation" element={<PresentationLayout />}>
               <Route path=":sectionId" element={<PresentationSection />} />
             </Route>
-            <Route path="get-video" element={<VideoGenerator />} />
+            <Route path="get-video" element={<NewVideoGenerator />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
