@@ -3,7 +3,7 @@ import { getProjectPath } from "./metadata";
 import { readFile } from "node:fs/promises";
 import mime from "mime-types";
 
-export async function imageToVideo(imagePath: string, fps: number=7, videoLength: number=10): Promise<string> { 
+export async function imageToVideo(imagePath: string, fps: number=7, videoLength: number=10): Promise<string> {
 
     const endpoint = 'https://iguana.alexo.uk/v9/video';
 
