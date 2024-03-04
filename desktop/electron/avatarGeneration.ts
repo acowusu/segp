@@ -1,6 +1,9 @@
 import type { Avatar, ScriptData } from './mockData/data';
 import { setProjectAvatar } from './projectData';
 import avatars from './mockData/avatars.json';
+import { downloadFile } from './reportProcessing';
+import { getProjectPath } from './metadata';
+
 
 export async function generateAvatar(script: ScriptData, avatar: Avatar): Promise<ScriptData> {
 
@@ -13,27 +16,23 @@ export async function generateAvatar(script: ScriptData, avatar: Avatar): Promis
         source_image: avatar.sadtalkerPath,
     }
     console.log("Request body: ", body);
-    const reponse = await fetch(endpoint, {
+
+    const { destination } = await downloadFile(endpoint, getProjectPath(), {
         method: 'POST',
+        body: JSON.stringify(body),
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body),
     });
 
-    if (!reponse.ok) {
-        throw new Error(`Failed to generate avatar. Status: ${reponse.status} - ${reponse.statusText}`);
-    }
-
-    const avatarData = await reponse.json();
-    script.avatarVideoUrl = avatarData.data_url;
+    script.avatarVideoUrl = destination;
     return script;
 }
 
 export async function getAvatars(): Promise<Avatar[]> {
     return avatars;
 }
-  
+
 export async function setAvatar(avatar: Avatar): Promise<void> {
     console.log("setAvatar", avatar);
     setProjectAvatar(avatar);

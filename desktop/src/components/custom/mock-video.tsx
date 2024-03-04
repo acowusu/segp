@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import etro from "etro";
+import { SubtitleText } from "../../lib/subtitle-layer";
 
 const WIDTH = 1920; 
 const HEIGHT = 1080;
@@ -32,15 +33,15 @@ export const MockVideo: React.FC<MockVideoProps> = ({
     });
 
     // Add a video layer to the movie and play it
-    const backgroundImage = new Image(WIDTH, HEIGHT);
-    backgroundImage.src = backgroundUrl;
-    const avatarImage = new Image(WIDTH, HEIGHT);
-    avatarImage.src = avatarUrl;
+    // const backgroundImage = new Image(WIDTH, HEIGHT);
+    // backgroundImage.src = backgroundUrl;
+    // const avatarImage = new Image(WIDTH, HEIGHT);
+    // avatarImage.src = avatarUrl;
 
     const backgroundLayer = new etro.layer.Image({
       startTime: 0,
       duration: 3,
-      source: backgroundImage,
+      source: backgroundUrl,
       sourceX: 0, // default: 0
       sourceY: 0, // default: 0
       x: 0, // default: 0
@@ -49,19 +50,19 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       height: HEIGHT, // default: null (full height)
       opacity: 0.8, // default: 1
     });
-
     const avatarLayer = new etro.layer.Image({
       startTime: 0,
       duration: 9,
-      source: avatarImage,
-      sourceX: 0, // default: 0
-      sourceY: 0, // default: 0
-      x: 0, // default: 0
-      y: 0, // default: 0
-      width: WIDTH, // default: null (full width)
-      height: HEIGHT, // default: null (full height)
-      opacity: 0.8, // default: 1
+      source: avatarUrl,
+      destX: 0, // default: 0
+      destY: 0, // default: 0
+      destWidth: 1080/3, // default: null (full width)
+      destHeight: 1080/3, // default: null (full height)
+      x: WIDTH -  1080/3, // default: 0
+      y: HEIGHT- 1080/3, // default: 0
+      opacity: 1, // default: 1
     });
+   
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
@@ -75,38 +76,32 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       duration: 3,
       background: etro.parseColor("#010101"),
     });
-
-    const subtitleLayer = new etro.layer.Text({
+    const subtitleLayer = new SubtitleText({
       startTime: 0,
       duration: 9,
       text:  (_element: etro.EtroObject, time: number) => {
-        return Math.round(time) % 2 ==0 ? "Hello" : "World";
+        return Math.round(time) % 2 ==0 ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation" : "llamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
       },
-      x: WIDTH/2-WIDTH/4, // default: 0
-      y: HEIGHT-200, // default: 0
-      width: WIDTH/2, // default: null (full width)
-      height: 120, // default: null (full height)
+      x: 0, // default: 0
+      y: 0, // default: 0
       opacity: 1, // default: 1
-      color: etro.parseColor('white'), // default: new etro.Color(0, 0, 0, 1)
-      font: '100px sans-serif', // default: '10px sans-serif'
-      textX: WIDTH/4, // default: 0
-      textY: 100, // default: 0
-      textAlign: 'center', // default: 'left'
-      textBaseline: 'alphabetic', // default: 'alphabetic'
-      textDirection: 'ltr', // default: 'ltr'
-      background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
-
-      // textStroke: { // default: null (no stroke)
-      //   color: etro.parseColor('black'),
-      //   thickness: 5, // default: 1
-      // },
+      color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
+      font: "50px sans-serif", // default: '10px sans-serif'
+      textX: WIDTH / 2, // default: 0
+      textY: HEIGHT, // default: 0
+      textAlign: "center", // default: 'left'
+      textBaseline: "alphabetic", // default: 'alphabetic'
+      textDirection: "ltr", // default: 'ltr'
+      background: new etro.Color(0, 0, 0, 0.0), // default: null (transparent)
+      maxWidth:  WIDTH, // default: null (no maximum width)
     });
+    
 
     movie.addLayer(layer1);
     movie.addLayer(layer2);
     movie.addLayer(backgroundLayer);
-    showSubtitle && movie.addLayer(subtitleLayer);
     showAvatar && movie.addLayer(avatarLayer);
+    showSubtitle && movie.addLayer(subtitleLayer);
 
     movie.play();
     movieRef.current = movie;
