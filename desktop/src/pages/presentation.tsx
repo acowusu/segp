@@ -6,14 +6,16 @@ import { Separator } from "@radix-ui/react-menu";
 import React, { useEffect, useRef, useState } from "react";
 import { SidebarNav } from "../components/ui/sidebar-nav";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router";
-import {
-  LayerOpts,
-  ScriptData,
-  SectionData,
-} from "../../electron/mockData/data";
+import { LocOps, ScriptData, SectionData } from "../../electron/mockData/data";
 import { Button } from "../components/ui/button";
 import etro from "etro";
-import { dispatchSectionGeneration } from "../lib/etro-utils";
+import {
+  addAudioLayer,
+  addAvatarLayer,
+  addImageLayer,
+  addVideoLayer,
+  dispatchSectionGeneration,
+} from "../lib/etro-utils";
 import { Skeleton } from "../components/ui/skeleton";
 import { PlayIcon } from "lucide-react";
 import { SubtitleText } from "../lib/subtitle-layer";
@@ -24,11 +26,6 @@ type NavHeader = {
   title: string;
   href: string;
 };
-
-// type SectionData = {
-//   section: ScriptData;
-//   assetPromise: Promise<void>;
-// };
 
 export const PresentationLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -57,26 +54,18 @@ export const PresentationLayout: React.FC = () => {
               "The duration of the script Section is not defined"
             );
           }
-
-          const [media, avatar, audio] = dispatchSectionGeneration(
-            entry,
-            0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
-          );
-
-          const end = entry.scriptDuration;
+          // TODO: default to reading from script data if not present make defaults
+          // can delegate this to the dispatch function?
           map.set(id, {
             start: start, // real start time this is cached for later to videogen can quickly convert the layers
-            end: end,
             script: entry,
-            media: media,
-            avatar: avatar,
-            audio: audio,
-            // subtitles:
-            // backing:
-            // soundfx:
+            layerOptions: dispatchSectionGeneration(
+              entry,
+              0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
+            ),
           });
 
-          start += end; // should exist get sections will fail (do check!)
+          start += entry.scriptDuration; // should exist get sections will fail (do check!)
 
           temp.push({
             title: sectionName,
@@ -241,18 +230,22 @@ export const PresentationSection: React.FC = () => {
       canvas.height = 1080;
 
       // add the assets to the movie:
-      const { media, avatar, audio } = sectionData;
+      const { p_mediaOpts, p_avatarOpts, p_audioOpts } =
+        sectionData.layerOptions;
 
       // Primary Media
-      toastNotif(media, section, "Media");
-      movie.addLayer(await media);
+      toastNotif(p_mediaOpts, section, "Media");
+      addImageLayer(movie, await p_mediaOpts);
 
-      // Avatar layers
-      toastNotif(avatar, section, "Avatar");
-      movie.addLayer(await avatar);
-
+      // Avatar
+      if (p_avatarOpts) {
+        // avatar option might not be set in the project!
+        toastNotif(p_avatarOpts, section, "Avatar");
+        addAvatarLayer(movie, await p_avatarOpts);
+      }
       // Audio
-      // toastNotif(audio, section, "Audio");
+      // toastNotif(p_audioOpts, section, "Audio");
+      // addAudioLayer(movie, await p_audioOpts)
 
       setMovies((map) => new Map(map.set(id, movie)));
     } else {
@@ -263,17 +256,46 @@ export const PresentationSection: React.FC = () => {
   };
 
   // Currently only moves the avatar around
-  const restyleSection = async ({ preset }: { preset: LayerOpts }) => {
+  const restyleSection = async ({ preset }: { preset: LocOps }) => {
     // pause if a movie is playing
     !movieRef.current?.paused && movieRef.current?.pause();
     setCurrentState("restyling");
 
-    const { avatar } = sectionData;
-    avatar.then((layer) => {
-      layer.x = preset.x ?? layer.x;
-      layer.y = preset.y ?? layer.y;
+    console.log("1");
+    const canvas = canvasRef.current!;
+    console.log("2");
+    const movie = new etro.Movie({
+      canvas: canvas,
+      repeat: false,
+      background: etro.parseColor("#ccc"),
     });
+    console.log("3");
 
+    const { p_mediaOpts, p_avatarOpts, p_audioOpts } = sectionData.layerOptions;
+
+    // Primary Media
+    toastNotif(p_mediaOpts, section, "Media");
+    addImageLayer(movie, await p_mediaOpts);
+
+    console.log("4");
+
+    // Avatar
+    if (p_avatarOpts) {
+      p_avatarOpts.then((opts) => {
+        opts.x = preset.x ?? opts.x;
+        opts.y = preset.y ?? opts.y;
+        addAvatarLayer(movie, opts);
+        console.log("5");
+      });
+    }
+    console.log("6");
+
+    // Audio
+    // toastNotif(p_audioOpts, section, "Audio");
+    // addAudioLayer(movie, await p_audioOpts)
+
+    setMovies((map) => new Map(map.set(id, movie)));
+    movieRef.current = movie;
     setCurrentState("playback");
   };
 

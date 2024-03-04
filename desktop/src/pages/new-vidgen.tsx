@@ -16,7 +16,13 @@ import {
 } from "../components/ui/card";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SectionData } from "../../electron/mockData/data";
-import { fixLerpForMediaLayer, getMediaLayer } from "../lib/etro-utils";
+import {
+  addAudioLayer,
+  addAvatarLayer,
+  addImageLayer,
+  fixLerpForMediaLayer,
+  getMediaLayer,
+} from "../lib/etro-utils";
 
 export const NewVideoGenerator: React.FC = () => {
   const navigate = useNavigate();
@@ -67,7 +73,8 @@ export const NewVideoGenerator: React.FC = () => {
     setCurrentProcess("Adding the Assets to the Movie");
 
     sections.forEach(async (section) => {
-      const { start, script, media, avatar, audio } = section;
+      const { start, script, layerOptions } = section;
+      const { p_mediaOpts, p_audioOpts, p_avatarOpts } = layerOptions;
 
       if (movieRef.current == null) {
         console.log("The Movie didn't get created properly: MovieRef is null");
@@ -79,26 +86,24 @@ export const NewVideoGenerator: React.FC = () => {
       // Need to correc the fake start times!
 
       // TODO: add toasts here?
-      const mediaLayer = await media;
-      // const mediaLayer = fixLerpForMediaLayer(await media, start);
-      mediaLayer.startTime = start;
-      const avatarLayer = await avatar;
-      avatarLayer.startTime = start;
-      // const audioLayer = await audio;
-      // audioLayer.startTime = start;
-      // console.log("before detach");
-      // mediaLayer.detach();
-      // console.log("after detach");
 
-      // mediaLayer.seek(start);
-      // avatarLayer.seek(start);
-      // audioLayer.seek(start);
+      // Primary Media
+      p_mediaOpts.then((opts) => {
+        opts.startTime = start;
+        addImageLayer(movie, opts);
+      });
 
-      console.log("medias time", mediaLayer.currentTime);
+      // Avatar
+      p_avatarOpts?.then((opts) => {
+        opts.startTime = start;
+        addAvatarLayer(movie, opts);
+      });
 
-      movie.addLayer(mediaLayer);
-      movie.addLayer(avatarLayer);
-      // movie.addLayer(audioLayer);
+      // Audio
+      // p_audioOpts.then((opts) => {
+      //   opts.startTime = start;
+      //   addAudioLayer(movie, opts);
+      // });
 
       setCurrentProcess(`${script.sectionName} assets added`);
     });

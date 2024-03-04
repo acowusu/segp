@@ -1,4 +1,5 @@
 import etro from "etro";
+import { AudioOptions, AudioSourceOptions, TextOptions } from "etro/dist/layer";
 
 export interface Topic {
   topic: string;
@@ -19,7 +20,9 @@ export interface ScriptData {
   aiImages?: string[]; // list of ai generated images
   soundEffectPrompt?: string; // sound effect prompt
   soundEffect?: string; // path to generated sound effect
+  assetLayerOptions?: LayerOpts // options for every existing asset to create layers accordingly
 }
+
 
 export interface ImageData {
   prompt: string;
@@ -75,23 +78,34 @@ export interface BackingTrack {
 }
 
 /* Etro Related */
-export interface LayerOpts { // can be migrated to etro-utils thought this made more sense here
-  x?: etro.Dynamic<number>
-  y?: etro.Dynamic<number>
-  // add others as needed to later manipulate the layer
+export interface LayerOpts { 
+  mediaOpts: ImageOptions; // Assumes the primary media is never a video
+  audioOpts: AudioOptions;
+  avatarOpts?: VideoOptions;
+  subtitleOpts?: TextOptions;
+  backingOpts?: AudioOptions;
+  soundfxOpts?: AudioOptions;  
 }
 
-// maybe preserce start and end timestamsp??
+export interface LocOps {
+  x?: number;
+  y?: number;
+}
+
+export interface PromisedLayerOpts { 
+  p_mediaOpts: Promise<ImageOptions>; // Assumes the primary media is never a video
+  p_audioOpts?: Promise<AudioOptions>;
+  p_avatarOpts?: Promise<VideoOptions>;
+  p_subtitleOpts?: Promise<TextOptions>;
+  p_backingOpts?: Promise<AudioOptions>;
+  p_soundfxOpts?: Promise<AudioOptions>;  
+}
+
+
 type SectionData = {
   start: number; //might not be needed
-  end: number;
   script: ScriptData;
-  media: Promise<etro.layer.Image | etro.layer.Video>; // Essentially Image | Video
-  avatar: Promise<etro.layer.Video>;
-  audio: Promise<etro.layer.Audio>;
-  // subtitles: Promise<SubtitleText>; //  <: etro.layer.Visual
-  // backing: Promise<etro.layer.Audio>;
-  // soundfx: Promise<etro.layer.Audio>;
+  layerOptions: PromisedLayerOpts;
 };
 
 interface Status {
