@@ -35,15 +35,15 @@ export const MockVideo: React.FC<MockVideoProps> = ({
     });
 
     // Add a video layer to the movie and play it
-    const backgroundImage = new Image(WIDTH, HEIGHT);
-    backgroundImage.src = backgroundUrl;
-    const avatarImage = new Image(WIDTH, HEIGHT);
-    avatarImage.src = avatarUrl;
+    // const backgroundImage = new Image(WIDTH, HEIGHT);
+    // backgroundImage.src = backgroundUrl;
+    // const avatarImage = new Image(WIDTH, HEIGHT);
+    // avatarImage.src = avatarUrl;
 
     const backgroundLayer = new etro.layer.Image({
       startTime: 0,
       duration: 3,
-      source: backgroundImage,
+      source: backgroundUrl,
       sourceX: 0, // default: 0
       sourceY: 0, // default: 0
       x: 0, // default: 0
@@ -52,19 +52,19 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       height: HEIGHT, // default: null (full height)
       opacity: 0.8, // default: 1
     });
-
     const avatarLayer = new etro.layer.Image({
       startTime: 0,
       duration: 9,
-      source: avatarImage,
-      sourceX: 0, // default: 0
-      sourceY: 0, // default: 0
-      x: 0, // default: 0
-      y: 0, // default: 0
-      width: WIDTH, // default: null (full width)
-      height: HEIGHT, // default: null (full height)
-      opacity: 0.8, // default: 1
+      source: avatarUrl,
+      destX: 0, // default: 0
+      destY: 0, // default: 0
+      destWidth: 1080/3, // default: null (full width)
+      destHeight: 1080/3, // default: null (full height)
+      x: WIDTH -  1080/3, // default: 0
+      y: HEIGHT- 1080/3, // default: 0
+      opacity: 1, // default: 1
     });
+   
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
@@ -78,12 +78,11 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       duration: 3,
       background: etro.parseColor("#010101"),
     });
-
     const subtitleLayer = new SubtitleText({
       startTime: 0,
       duration: 9,
       text:  (_element: etro.EtroObject, time: number) => {
-        return Math.round(time) % 2 ==0 ? "Hello" : "World";
+        return Math.round(time) % 2 ==0 ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation" : "llamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
       },
       x: WIDTH/2-WIDTH/4, // default: 0
       y: HEIGHT-200, // default: 0
@@ -98,18 +97,18 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       textBaseline: 'alphabetic', // default: 'alphabetic'
       textDirection: 'ltr', // default: 'ltr'
       background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
-
       // textStroke: { // default: null (no stroke)
       //   color: etro.parseColor('black'),
       //   thickness: 5, // default: 1
       // },
     });
+    
 
     movie.addLayer(layer1);
     movie.addLayer(layer2);
     movie.addLayer(backgroundLayer);
-    showSubtitle && movie.addLayer(subtitleLayer);
     showAvatar && movie.addLayer(avatarLayer);
+    showSubtitle && movie.addLayer(subtitleLayer);
 
     movie.play();
     movieRef.current = movie;
