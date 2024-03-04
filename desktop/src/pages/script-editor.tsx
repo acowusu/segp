@@ -157,7 +157,7 @@ export const ScriptEditor: React.FC = () => {
     await window.api.setScript(items);
     // START PIPELINE
 
-    // put ur stuff here 
+    // put ur stuff here
   };
   const selectTopic = async () => {
     navigate("/set-topic");
@@ -200,6 +200,7 @@ export const ScriptEditor: React.FC = () => {
             <CardTitle>Script Editor</CardTitle>
             <div>
               <Badge
+                aria-label="Refresh Scripts"
                 variant={"secondary"}
                 onClick={() =>
                   toast.promise(window.api.getScript(true).then(setItems), {
@@ -217,12 +218,13 @@ export const ScriptEditor: React.FC = () => {
             <div className="flex flex-col gap-2 p-4 pt-0">
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
-                  <Reorder.Item key={item.id} value={item} className="mb-4">
+                  <Reorder.Item key={item.id} value={item} className="mb-4"  data-testid="script-section">
                     <div className="flex flex-row gap-2  ">
                       <div
                         key={item.id}
+                        data-testid="script-section-clickable"
                         className={cn(
-                          "flex grow flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
+                          "script-section-clickable flex grow flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
                           selectedScript.id === item.id &&
                             " border-2 border-sky-500",
                           selectedScript.id !== item.id &&
@@ -239,6 +241,8 @@ export const ScriptEditor: React.FC = () => {
                           )}
                         >
                           <Badge
+                            aria-label="Delete Script"
+                            data-testid="delete-script"
                             variant={
                               selectedScript.id === item.id
                                 ? "destructive"
@@ -250,6 +254,7 @@ export const ScriptEditor: React.FC = () => {
                           </Badge>
                           {/* View Other Drafts */}
                           <Badge
+                            aria-label="Show Drafts"
                             variant={
                               showOtherDrafts && selectedScript.id === item.id
                                 ? "cloud"
@@ -271,6 +276,7 @@ export const ScriptEditor: React.FC = () => {
                               >
                                 <div>
                                   <Badge
+                                  aria-label="Draft Selection"
                                     variant={
                                       index == item.selectedScriptIndex
                                         ? "cloud"
@@ -375,12 +381,14 @@ export const ScriptEditor: React.FC = () => {
                 ))}
               </Reorder.Group>
             </div>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button onClick={selectTopic} variant="outline">Back</Button>
-          <Button onClick={setScript}>Next</Button>
-        </CardFooter>
-      </FramelessCard> 
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button onClick={selectTopic} variant="outline">
+              Back
+            </Button>
+            <Button onClick={setScript}>Next</Button>
+          </CardFooter>
+        </FramelessCard>
       )}
     </div>
   );
