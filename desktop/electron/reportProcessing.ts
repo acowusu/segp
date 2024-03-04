@@ -133,10 +133,6 @@ export async function updateScriptSection(section: ScriptData): Promise<void> {
   projectData.updateProjectScriptSection(section);
 }
 
-export async function updateScriptSection(section: ScriptData): Promise<void> {
-  projectData.updateProjectScriptSection(section);
-}
-
 export async function generateNewScript(script: string): Promise<string> {
   return await generateExtraScript(script)
 }

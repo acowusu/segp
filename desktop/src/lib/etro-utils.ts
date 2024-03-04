@@ -16,31 +16,6 @@ function lerp(a: number, b: number, t: number, p: number) {
   return a + (b - a) * (t / p);
 }
 
-export function fixLerpForMediaLayer(
-  layer: etro.layer.Image | etro.layer.Video,
-  newStart: number
-): etro.layer.Image | etro.layer.Video {
-  layer.startTime = newStart;
-
-  layer.destX = (_element: etro.EtroObject, time: number) => {
-    return lerp(0, -WIDTH / 10, time, layer.duration);
-  };
-
-  layer.destY = (_element: etro.EtroObject, time: number) => {
-    return lerp(0, -HEIGHT / 10, time, layer.duration);
-  };
-
-  layer.destWidth = (_element: etro.EtroObject, time: number) => {
-    return lerp(WIDTH, WIDTH * 1.2, time, layer.duration);
-  };
-
-  layer.destHeight = (_element: etro.EtroObject, time: number) => {
-    return lerp(HEIGHT, HEIGHT * 1.2, time, layer.duration);
-  };
-
-  return layer;
-}
-
 export function addSingleImageLayer(
   section: ScriptData,
   movie: etro.Movie,
