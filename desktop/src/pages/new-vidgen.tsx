@@ -23,6 +23,8 @@ import {
   fixLerpForMediaLayer,
   getMediaLayer,
 } from "../lib/etro-utils";
+import { ImageOptions, VideoOptions } from "etro/dist/layer";
+import { layer } from "etro/dist/etro";
 
 export const NewVideoGenerator: React.FC = () => {
   const navigate = useNavigate();
@@ -71,39 +73,51 @@ export const NewVideoGenerator: React.FC = () => {
     await createMovie();
 
     setCurrentProcess("Adding the Assets to the Movie");
+    if (movieRef.current == null) {
+      console.log("The Movie didn't get created properly: MovieRef is null");
+      return;
+    }
+    const movie = movieRef.current;
 
     sections.forEach(async (section) => {
-      const { start, script, layerOptions } = section;
-      const { p_mediaOpts, p_audioOpts, p_avatarOpts } = layerOptions;
+      const { start, script, promisedLayerOptions, layerOptions } = section;
+      const { p_mediaOpts, p_audioOpts, p_avatarOpts } = promisedLayerOptions;
 
-      if (movieRef.current == null) {
-        console.log("The Movie didn't get created properly: MovieRef is null");
-        return;
+      // !!Need to correc the fake start times!
+
+      if (layerOptions) {
+        // if these exist then all the generation is completed, so just load these options
+        const {
+          mediaOpts,
+          audioOpts,
+          avatarOpts,
+          subtitleOpts,
+          backingOpts,
+          soundfxOpts,
+        } = layerOptions;
+        console.log("Existing layerOptions", layerOptions);
+        addImageLayer(movie, mediaOpts, { startTime: start } as ImageOptions);
+        addAvatarLayer(movie, avatarOpts, { startTime: start } as VideoOptions);
+      } else {
+        // TODO: add toasts here?
+        // Primary Media
+        p_mediaOpts.then((opts) => {
+          opts.startTime = start;
+          addImageLayer(movie, opts);
+        });
+
+        // Avatar
+        p_avatarOpts?.then((opts) => {
+          opts.startTime = start;
+          addAvatarLayer(movie, opts);
+        });
+
+        // Audio
+        // p_audioOpts.then((opts) => {
+        //   opts.startTime = start;
+        //   addAudioLayer(movie, opts);
+        // });
       }
-
-      const movie = movieRef.current;
-
-      // Need to correc the fake start times!
-
-      // TODO: add toasts here?
-
-      // Primary Media
-      p_mediaOpts.then((opts) => {
-        opts.startTime = start;
-        addImageLayer(movie, opts);
-      });
-
-      // Avatar
-      p_avatarOpts?.then((opts) => {
-        opts.startTime = start;
-        addAvatarLayer(movie, opts);
-      });
-
-      // Audio
-      // p_audioOpts.then((opts) => {
-      //   opts.startTime = start;
-      //   addAudioLayer(movie, opts);
-      // });
 
       setCurrentProcess(`${script.sectionName} assets added`);
     });

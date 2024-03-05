@@ -1,5 +1,7 @@
 import etro from "etro";
 import { AudioOptions, AudioSourceOptions, TextOptions } from "etro/dist/layer";
+import { SubtitleText } from "../../src/lib/subtitle-layer";
+import { layer } from "etro/dist/etro";
 
 export interface Topic {
   topic: string;
@@ -101,11 +103,20 @@ export interface PromisedLayerOpts {
   p_soundfxOpts?: Promise<AudioOptions>;  
 }
 
+export interface Layers {
+  media?: etro.layer.Image;
+  audio?: etro.layer.Audio;
+  avatar?: etro.layer.Video;
+  subtitle?: SubtitleText;
+  backing?: etro.layer.Audio;
+  soundfx?: etro.layer.Audio;
+}
 
 type SectionData = {
   start: number; //might not be needed
   script: ScriptData;
   promisedLayerOptions: PromisedLayerOpts;
+  layers?: Layers;
   layerOptions?: LayerOpts;
 };
 

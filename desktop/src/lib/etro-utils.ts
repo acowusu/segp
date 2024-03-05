@@ -366,25 +366,27 @@ export function addImageLayer(
   movie: etro.Movie,
   opts: ImageOptions,
   overrideOpts?: ImageOptions
-): ImageOptions {
+): [ImageOptions, etro.layer.Image] {
   console.log("Adding image layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
-  movie.addLayer(new etro.layer.Image(effectiveOpts));
+  const layer = new etro.layer.Image(effectiveOpts);
+  movie.addLayer(layer);
   console.log("Added image layer");
-  return effectiveOpts;
+  return [effectiveOpts, layer];
 }
 
 export function addAudioLayer(
   movie: etro.Movie,
   opts: AudioOptions,
   overrideOpts?: AudioOptions
-): AudioOptions {
+): [AudioOptions, etro.layer.Audio] {
   console.log("Adding audio layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
-  movie.addLayer(new etro.layer.Audio(effectiveOpts));
+  const layer = new etro.layer.Audio(effectiveOpts);
+  movie.addLayer(layer);
   console.log("Added audio layer");
 
-  return effectiveOpts;
+  return [effectiveOpts, layer];
 }
 
 // export function addVideoLayer(movie: etro.Movie, opts: VideoOptions) {
@@ -397,7 +399,7 @@ export function addAvatarLayer(
   movie: etro.Movie,
   opts: VideoOptions,
   overrideOpts?: VideoOptions
-): VideoOptions {
+): [VideoOptions, etro.layer.Video] {
   console.log("Adding avatar layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
   const layer = new etro.layer.Video(effectiveOpts);
@@ -406,21 +408,23 @@ export function addAvatarLayer(
     threshold: 10, // default: 0.5
     interpolate: false, // default: false
   });
+  console.log("adding chroma to avatar");
   layer.effects.push(chromaKey);
-  movie.addLayer(layer);
+  console.log("added chroma to avatar");
+  movie.layers.push(layer);
   console.log("Added avatar layer");
-  return effectiveOpts;
+  return [effectiveOpts, layer];
 }
 
 export function addSubtitleLayer(
   movie: etro.Movie,
   opts: TextOptions,
   overrideOpts?: TextOptions
-): TextOptions {
+): [TextOptions, SubtitleText] {
   console.log("Adding subtitle layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
   const layer = new SubtitleText(effectiveOpts);
   movie.addLayer(layer);
   console.log("Added subtitle layer");
-  return effectiveOpts;
+  return [effectiveOpts, layer];
 }
