@@ -12,13 +12,15 @@ allowed_services = [
     "fastapi-llm",
     "fastapi-music",
     "fastapi-audiofx",
+    "fastapi-vid",
 ]
 mapping = {
     "Image API": "fastapi-img",
     "Text to speech API": "fastapi-tts",
     "LLM API": "fastapi-llm",
     "Music API": "fastapi-music",
-    "Sound Effects API": "fastapi-audiofx"
+    "Sound Effects API": "fastapi-audiofx",
+    "Video API": "fastapi-vid",
 }
 
 
@@ -58,7 +60,6 @@ async def get_service_status(service_name: str):
         service_name = mapping.get(service_name, service_name)
     try:
         output = subprocess.run(
-
             ["/usr/bin/sudo", "systemctl", "status", service_name],
             capture_output=True,
             text=True,
@@ -104,4 +105,5 @@ async def get_service_status(service_name: str):
 # Start the server (for development)
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8898)

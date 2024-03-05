@@ -150,7 +150,7 @@ test("getServiceStatus should return an array of status objects", async () => {
 
     // Assert
     expect(result).toEqual(expectedStatuses);
-    expect(mockFetch).toHaveBeenCalledTimes(6);
+    expect(mockFetch).toHaveBeenCalledTimes(7);
 });
 
 
@@ -172,7 +172,7 @@ test("getServiceStatus should handle request abort error", async () => {
 
     // Assert
     expect(result).toEqual(expectedStatuses);
-    expect(mockFetch).toHaveBeenCalledTimes(6);
+    expect(mockFetch).toHaveBeenCalledTimes(7);
 });
 
 test("getServiceStatus should handle other errors", async () => {
@@ -192,5 +192,5 @@ test("getServiceStatus should handle other errors", async () => {
 
     // Assert
     expect(result).toEqual(expectedStatuses);
-    expect(mockFetch).toHaveBeenCalledTimes(6);
+    expect(mockFetch).toHaveBeenCalledTimes(7);
 });
