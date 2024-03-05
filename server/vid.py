@@ -17,7 +17,7 @@ from fastapi import UploadFile
 from fastapi.responses import FileResponse
 from typing_extensions import Annotated
 
-os.environ["HF_HOME"] = "/hf"
+os.environ["HF_HOME"] = "/hf/svd"
 
 MODEL_ID = "stabilityai/stable-video-diffusion-img2vid-xt"
 
