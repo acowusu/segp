@@ -6,20 +6,24 @@ import { Separator } from "@radix-ui/react-menu";
 import React, { useEffect, useRef, useState } from "react";
 import { SidebarNav } from "../components/ui/sidebar-nav";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router";
-import { LocOps, ScriptData, SectionData } from "../../electron/mockData/data";
+import {
+  LayerOpts,
+  ScriptData,
+  SectionData,
+} from "../../electron/mockData/data";
 import { Button } from "../components/ui/button";
 import etro from "etro";
 import {
   addAudioLayer,
   addAvatarLayer,
   addImageLayer,
-  addVideoLayer,
+  addSubtitleLayer,
   dispatchSectionGeneration,
 } from "../lib/etro-utils";
 import { Skeleton } from "../components/ui/skeleton";
 import { PlayIcon } from "lucide-react";
-import { SubtitleText } from "../lib/subtitle-layer";
 import { toast } from "sonner";
+import { TextOptions, VideoOptions } from "etro/dist/layer";
 
 type NavHeader = {
   // id: string;
@@ -34,6 +38,8 @@ export const PresentationLayout: React.FC = () => {
   const [sections, setSections] = useState<NavHeader[]>([]);
   // const [script, setScript] = useState<ScriptData[]>();
   const [dataMap, setDataMap] = useState<Map<string, SectionData>>(new Map());
+
+  // movieState cannot be removed this allows me to allow seemless switching between section tabs
   const moviesState = useState<Map<string, etro.Movie>>(new Map());
 
   useEffect(() => {
@@ -59,7 +65,7 @@ export const PresentationLayout: React.FC = () => {
           map.set(id, {
             start: start, // real start time this is cached for later to videogen can quickly convert the layers
             script: entry,
-            layerOptions: dispatchSectionGeneration(
+            promisedLayerOptions: dispatchSectionGeneration(
               entry,
               0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
             ),
@@ -81,11 +87,9 @@ export const PresentationLayout: React.FC = () => {
       });
   }, []);
 
-  function clearMovies() {
+  function stopMovies() {
     Array.from(moviesState[0].values()).forEach((movie) => {
       movie.stop();
-      // movie.layers.forEach((layer) => layer.detach());
-      // movie.layers.slice(0, movie.layers.length);
     });
   }
 
@@ -113,6 +117,7 @@ export const PresentationLayout: React.FC = () => {
                   <Outlet
                     context={{
                       sectionDataMap: dataMap,
+                      setSectionDataMap: setDataMap,
                       moviesState: moviesState,
                     }}
                   />
@@ -134,11 +139,7 @@ export const PresentationLayout: React.FC = () => {
             </Button>
             <Button
               onClick={() => {
-                console.log("movies", moviesState[0]);
-                console.log("info:", dataMap);
-                clearMovies(); // not convinced this is doing anything
-                console.log("movies", moviesState[0]);
-                console.log("info:", dataMap);
+                stopMovies(); // not convinced this is doing anything
                 navigate("/get-video", {
                   state: {
                     sections: Array.from(dataMap.values()), // pass data into videogen?
@@ -179,9 +180,13 @@ export const PresentationSection: React.FC = () => {
   // get from parent element
   const {
     sectionDataMap: dataMap,
+    setSectionDataMap: setDataMap,
     moviesState,
   }: {
     sectionDataMap: Map<string, SectionData>;
+    setSectionDataMap: React.Dispatch<
+      React.SetStateAction<Map<string, SectionData>>
+    >;
     moviesState: [
       Map<string, etro.Movie>,
       React.Dispatch<React.SetStateAction<Map<string, etro.Movie>>>
@@ -215,87 +220,173 @@ export const PresentationSection: React.FC = () => {
       !movieRef.current.paused && movieRef.current.pause();
       // movieRef.current.stop();
     }
-    let movie: etro.Movie;
-    const existingMovie = movies.get(id); // check if new section has a movie created
-
-    if (!existingMovie) {
-      const canvas = canvasRef.current!;
-      movie = new etro.Movie({
-        canvas: canvas,
-        repeat: false,
-        background: etro.parseColor("#ccc"),
-      });
-
-      canvas.width = 1920;
-      canvas.height = 1080;
-
-      // add the assets to the movie:
-      const { p_mediaOpts, p_avatarOpts, p_audioOpts } =
-        sectionData.layerOptions;
-
-      // Primary Media
-      toastNotif(p_mediaOpts, section, "Media");
-      addImageLayer(movie, await p_mediaOpts);
-
-      // Avatar
-      if (p_avatarOpts) {
-        // avatar option might not be set in the project!
-        toastNotif(p_avatarOpts, section, "Avatar");
-        addAvatarLayer(movie, await p_avatarOpts);
-      }
-      // Audio
-      // toastNotif(p_audioOpts, section, "Audio");
-      // addAudioLayer(movie, await p_audioOpts)
-
-      setMovies((map) => new Map(map.set(id, movie)));
-    } else {
-      movie = existingMovie;
-    }
-
-    movieRef.current = movie;
+    await updateMovie(); // makes new layers with the default given sectionData
   };
 
-  // Currently only moves the avatar around
-  const restyleSection = async ({ preset }: { preset: LocOps }) => {
-    // pause if a movie is playing
-    !movieRef.current?.paused && movieRef.current?.pause();
-    setCurrentState("restyling");
-
-    console.log("1");
+  const updateMovie = async (opts?: LayerOpts) => {
     const canvas = canvasRef.current!;
-    console.log("2");
     const movie = new etro.Movie({
       canvas: canvas,
       repeat: false,
       background: etro.parseColor("#ccc"),
     });
-    console.log("3");
 
-    const { p_mediaOpts, p_avatarOpts, p_audioOpts } = sectionData.layerOptions;
+    canvas.width = 1920;
+    canvas.height = 1080;
 
-    // Primary Media
-    toastNotif(p_mediaOpts, section, "Media");
-    addImageLayer(movie, await p_mediaOpts);
-
-    console.log("4");
-
-    // Avatar
-    if (p_avatarOpts) {
-      p_avatarOpts.then((opts) => {
-        opts.x = preset.x ?? opts.x;
-        opts.y = preset.y ?? opts.y;
-        addAvatarLayer(movie, opts);
-        console.log("5");
-      });
-    }
-    console.log("6");
-
-    // Audio
-    // toastNotif(p_audioOpts, section, "Audio");
-    // addAudioLayer(movie, await p_audioOpts)
-
-    setMovies((map) => new Map(map.set(id, movie)));
     movieRef.current = movie;
+
+    // call with values that will be overrides
+    await addAssets(opts);
+
+    // movies map should be kept up to date, discard old movie
+    setMovies((map) => new Map(map.set(id, movie)));
+  };
+
+  const addAssets = async (opts?: LayerOpts) => {
+    // overrries, if they don't exist do givens
+    const {
+      mediaOpts: overrideMediaOpts,
+      audioOpts: overrideAudioOpts,
+      avatarOpts: overrideAvatarOpts,
+      subtitleOpts: overrideSubtitleOpts,
+      backingOpts: overrideBackingOpts,
+      soundfxOpts: overrideSoundFxOpts,
+    } = opts ?? {};
+
+    // populate as the promises resolve
+    const finalOpts: LayerOpts = {};
+
+    if (!movieRef.current) {
+      throw new Error(
+        "presentation/addAssets: Movie should definitely be defined by now!"
+      );
+    }
+    const movie = movieRef.current!;
+    if (sectionData.layerOptions) {
+      // all promises must have been already reslved
+      const {
+        mediaOpts,
+        audioOpts,
+        avatarOpts,
+        subtitleOpts,
+        backingOpts,
+        soundfxOpts,
+      } = sectionData.layerOptions ?? {};
+
+      mediaOpts &&
+        (finalOpts.mediaOpts = addImageLayer(
+          movie,
+          mediaOpts,
+          overrideMediaOpts
+        ));
+
+      audioOpts &&
+        (finalOpts.audioOpts = addAudioLayer(
+          movie,
+          audioOpts,
+          overrideAudioOpts
+        ));
+
+      avatarOpts &&
+        (finalOpts.avatarOpts = addAvatarLayer(
+          movie,
+          avatarOpts,
+          overrideAvatarOpts
+        ));
+
+      // do subs after avatar
+      subtitleOpts &&
+        (finalOpts.subtitleOpts = addSubtitleLayer(
+          movie,
+          subtitleOpts,
+          overrideSubtitleOpts
+        ));
+
+      backingOpts &&
+        (finalOpts.backingOpts = addAudioLayer(
+          movie,
+          backingOpts,
+          overrideBackingOpts
+        ));
+
+      soundfxOpts &&
+        (finalOpts.soundfxOpts = addAudioLayer(
+          movie,
+          soundfxOpts,
+          overrideSoundFxOpts
+        ));
+    } else {
+      // otherwise the layeroptions are not yet resolved must wait for them
+      // TODO add toasts here
+      const {
+        p_mediaOpts,
+        p_avatarOpts,
+        p_audioOpts,
+        p_subtitleOpts,
+        p_backingOpts,
+        p_soundfxOpts,
+      } = sectionData.promisedLayerOptions;
+
+      // Change the Optionalness of some of these layers
+      const waitMedia = p_mediaOpts.then((opts) => {
+        finalOpts.mediaOpts = addImageLayer(movie, opts, overrideMediaOpts);
+      });
+
+      const waitAudio = p_audioOpts?.then((opts) => {
+        finalOpts.audioOpts = addAudioLayer(movie, opts, overrideAudioOpts);
+      });
+
+      const waitAvatar = p_avatarOpts?.then((opts) => {
+        finalOpts.avatarOpts = addAvatarLayer(movie, opts, overrideAvatarOpts);
+      });
+
+      const waitSubtitle = p_subtitleOpts?.then((opts) => {
+        // subtitles must be displayed above avatar
+        waitAvatar?.then(() => {
+          finalOpts.subtitleOpts = addSubtitleLayer(
+            movie,
+            opts,
+            overrideSubtitleOpts
+          );
+        });
+      });
+
+      const waitBacking = p_backingOpts?.then((opts) => {
+        finalOpts.backingOpts = addAudioLayer(movie, opts, overrideBackingOpts);
+      });
+
+      const waitSoundFx = p_soundfxOpts?.then((opts) => {
+        finalOpts.soundfxOpts = addAudioLayer(movie, opts, overrideSoundFxOpts);
+      });
+
+      await Promise.all([
+        waitMedia,
+        waitAudio,
+        waitAvatar,
+        waitSubtitle,
+        waitBacking,
+        waitSoundFx,
+      ]);
+    }
+
+    console.log("all asset layers are loaded into movie", movie);
+    console.log("final asset options", finalOpts);
+    sectionData.layerOptions = finalOpts;
+    // setDataMap((map) => map.set(id, sectionData));
+
+    // TODO: once settings are added we also want to save them to metadata,
+    // add here with an await and then add that promise to big waiter
+  };
+
+  // Currently only moves the avatar around
+  const restyleSection = async ({ preset }: { preset: LayerOpts }) => {
+    // pause if a movie is playing
+    !movieRef.current?.paused && movieRef.current?.pause();
+    setCurrentState("restyling");
+
+    await updateMovie(preset);
+
     setCurrentState("playback");
   };
 
@@ -357,7 +448,7 @@ export const PresentationSection: React.FC = () => {
           <h3> Styles: </h3>
           <Button
             onClick={() => {
-              restyleSection({ preset: { x: 1408, y: 632 } });
+              restyleSection({ preset: { avatarOpts: { x: 1408, y: 632 } } });
             }}
           >
             {" "}
@@ -365,7 +456,7 @@ export const PresentationSection: React.FC = () => {
           </Button>
           <Button
             onClick={() => {
-              restyleSection({ preset: { x: 0, y: 0 } });
+              restyleSection({ preset: { avatarOpts: { x: 0, y: 0 } } });
             }}
           >
             {" "}
@@ -373,7 +464,7 @@ export const PresentationSection: React.FC = () => {
           </Button>
           <Button
             onClick={() => {
-              restyleSection({ preset: { y: 300 } });
+              restyleSection({ preset: { avatarOpts: { y: 300 } } });
             }}
           >
             {" "}

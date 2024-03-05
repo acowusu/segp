@@ -10,6 +10,8 @@ import { LucideGalleryVerticalEnd } from "lucide-react";
 import { useAsyncError } from "react-router-dom";
 import { AudioOptions, ImageOptions, VideoOptions } from "etro/dist/layer";
 import { ChromaKey } from "etro/dist/effect";
+import { effect } from "zod";
+import { SubtitleText, TextOptions } from "./subtitle-layer";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -360,27 +362,45 @@ async function generateAvatar(section: ScriptData) {
  * ========================================================
  */
 
-export function addImageLayer(movie: etro.Movie, opts: ImageOptions) {
+export function addImageLayer(
+  movie: etro.Movie,
+  opts: ImageOptions,
+  overrideOpts?: ImageOptions
+): ImageOptions {
   console.log("Adding image layer");
-  movie.addLayer(new etro.layer.Image(opts));
+  const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
+  movie.addLayer(new etro.layer.Image(effectiveOpts));
   console.log("Added image layer");
+  return effectiveOpts;
 }
 
-export function addAudioLayer(movie: etro.Movie, opts: AudioOptions) {
+export function addAudioLayer(
+  movie: etro.Movie,
+  opts: AudioOptions,
+  overrideOpts?: AudioOptions
+): AudioOptions {
   console.log("Adding audio layer");
-  movie.addLayer(new etro.layer.Audio(opts));
+  const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
+  movie.addLayer(new etro.layer.Audio(effectiveOpts));
   console.log("Added audio layer");
+
+  return effectiveOpts;
 }
 
-export function addVideoLayer(movie: etro.Movie, opts: VideoOptions) {
-  console.log("Adding video layer");
-  movie.addLayer(new etro.layer.Video(opts));
-  console.log("Added video layer");
-}
+// export function addVideoLayer(movie: etro.Movie, opts: VideoOptions) {
+//   console.log("Adding video layer");
+//   movie.addLayer(new etro.layer.Video(opts));
+//   console.log("Added video layer");
+// }
 
-export function addAvatarLayer(movie: etro.Movie, opts: VideoOptions) {
+export function addAvatarLayer(
+  movie: etro.Movie,
+  opts: VideoOptions,
+  overrideOpts?: VideoOptions
+): VideoOptions {
   console.log("Adding avatar layer");
-  const layer = new etro.layer.Video(opts);
+  const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
+  const layer = new etro.layer.Video(effectiveOpts);
   const chromaKey = new etro.effect.ChromaKey({
     target: new etro.Color(0, 0, 0, 0), // default: new etro.Color(1, 0, 0, 1)
     threshold: 10, // default: 0.5
@@ -389,4 +409,18 @@ export function addAvatarLayer(movie: etro.Movie, opts: VideoOptions) {
   layer.effects.push(chromaKey);
   movie.addLayer(layer);
   console.log("Added avatar layer");
+  return effectiveOpts;
+}
+
+export function addSubtitleLayer(
+  movie: etro.Movie,
+  opts: TextOptions,
+  overrideOpts?: TextOptions
+): TextOptions {
+  console.log("Adding subtitle layer");
+  const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
+  const layer = new SubtitleText(effectiveOpts);
+  movie.addLayer(layer);
+  console.log("Added subtitle layer");
+  return effectiveOpts;
 }

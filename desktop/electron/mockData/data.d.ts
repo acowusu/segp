@@ -79,8 +79,8 @@ export interface BackingTrack {
 
 /* Etro Related */
 export interface LayerOpts { 
-  mediaOpts: ImageOptions; // Assumes the primary media is never a video
-  audioOpts: AudioOptions;
+  mediaOpts?: ImageOptions; // Assumes the primary media is never a video
+  audioOpts?: AudioOptions;
   avatarOpts?: VideoOptions;
   subtitleOpts?: TextOptions;
   backingOpts?: AudioOptions;
@@ -105,7 +105,8 @@ export interface PromisedLayerOpts {
 type SectionData = {
   start: number; //might not be needed
   script: ScriptData;
-  layerOptions: PromisedLayerOpts;
+  promisedLayerOptions: PromisedLayerOpts;
+  layerOptions?: LayerOpts;
 };
 
 interface Status {
