@@ -22,10 +22,10 @@ import { ImageData } from "../../../electron/mockData/data"
 
 export function MediaChoices({prompts, callback}: {prompts: ImageData[], callback: (name: string)=>void}) {
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState(prompts[0].prompt)
+  const [value, setValue] = React.useState(prompts[0]?.prompt)
 
   React.useEffect(() => {
-    setValue(prompts[0].prompt)
+    if (prompts.length > 0) setValue(prompts[0]?.prompt)
   }, [prompts])
 
   return (
