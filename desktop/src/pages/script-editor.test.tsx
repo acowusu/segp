@@ -3,7 +3,7 @@ import { ScriptEditor } from "./script-editor";
 import { MemoryRouter } from "react-router-dom";
 import { mockApi } from "../lib/test-api";
 import { vi } from "vitest";
-
+import topics from "../../electron/mockData/topics.json"
 vi.stubGlobal("api", {});
 
 describe("ScriptEditor", () => {
@@ -12,7 +12,8 @@ describe("ScriptEditor", () => {
   //   });
 
   it("should render the Title", async () => {
-    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi });
+    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi,
+    getProjectTopic: vi.fn().mockResolvedValue(topics[0])});
     await act(async () =>
       render(
         <MemoryRouter>
@@ -28,11 +29,15 @@ describe("ScriptEditor", () => {
 
 describe("ScriptEditor", () => {
   beforeEach(() => {
-    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi });
+    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi,
+      getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+    });
   });
 
   it("should render the Title", async () => {
-    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi });
+    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi,
+      getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+    });
     await act(async () =>
       render(
         <MemoryRouter>
@@ -48,6 +53,7 @@ describe("ScriptEditor", () => {
   it("should handle showing drafts", async () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
+      getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
       getScript: async () => [
         {
           id: "1",
@@ -80,6 +86,7 @@ describe("ScriptEditor", () => {
   it("should handle deleting current script", async () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
+      getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
       getScript: vi
         .fn()
         .mockResolvedValueOnce([
@@ -138,6 +145,7 @@ describe("ScriptEditor", () => {
   it("should handle selecting a script", async () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
+      getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
       getScript: async () => [
         {
           id: "1",
