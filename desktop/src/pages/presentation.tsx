@@ -28,6 +28,7 @@ import { Skeleton } from "../components/ui/skeleton";
 import { PlayIcon } from "lucide-react";
 import { toast } from "sonner";
 import { TextOptions, VideoOptions } from "etro/dist/layer";
+import { s } from "vitest/dist/reporters-1evA5lom.js";
 
 type NavHeader = {
   // id: string;
@@ -51,6 +52,7 @@ export const PresentationLayout: React.FC = () => {
       console.log("setting script to", data);
       const temp: NavHeader[] = [];
 
+      // this must be sync so the topics are in given order
       data.forEach((entry: ScriptData) => {
         const { id, sectionName } = entry;
         temp.push({
@@ -60,47 +62,55 @@ export const PresentationLayout: React.FC = () => {
         setSections(temp);
       });
 
-      const map = new Map();
+      const map = new Map(); // map of the id -> SectionData (consists of what the child will need later)
       let start = 0;
+
+      // must be async as the dispatch needs to wait for audio get of the section
       const waitDispatch = data.map(async (entry: ScriptData) => {
         // no need to dispatch if these already exist just load layers
         const { id } = entry;
 
         // TODO: default to reading from script data if not present make defaults
         // can delegate this to the dispatch function?
-        // if (entry.assetLayerOptions) {
-        //   parseLayerOptions(start, entry).then((opts) => {
-        //     map.set(id, {
-        //       start: start,
-        //       script: entry,
-        //       layerOptions: opts,
-        //     });
-        //   });
-        // } else {
-        const { promisedOpts, modifiedSection: newEntry } =
-          await dispatchSectionGeneration(
-            // this await is for the initial audiogen, dration depends on it
-            entry,
-            0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
-          );
-        map.set(id, {
-          start: start, // real start time this is cached for later to videogen can quickly convert the layers
-          script: newEntry, //has duration
-          promisedLayerOptions: promisedOpts,
-        });
+        if (entry.assetLayerOptions) {
+          const parsedOpts = await parseLayerOptions(0, entry);
+          map.set(id, {
+            start: start,
+            script: entry,
+            layerOptions: parsedOpts,
+          });
 
-        if (!newEntry.scriptDuration) {
-          throw new Error(
-            "The duration of the script Section is not defined, audioGen should have done this"
-          );
+          if (!entry.scriptDuration) {
+            throw new Error(
+              "presentation/useEffect-Parent: The duration of the script Section is not defined, should exist in metadata"
+            );
+          }
+
+          start += entry.scriptDuration;
+        } else {
+          const { promisedOpts, modifiedSection: newEntry } =
+            await dispatchSectionGeneration(
+              // this await is for the initial audiogen, dration depends on it
+              entry,
+              0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
+            );
+          map.set(id, {
+            start: start, // real start time this is cached for later to videogen can quickly convert the layers
+            script: newEntry, //has duration
+            promisedLayerOptions: promisedOpts,
+          });
+
+          if (!newEntry.scriptDuration) {
+            throw new Error(
+              "presentation/useEffect-Parent: The duration of the script Section is not defined, audioGen should have done this"
+            );
+          }
+          start += newEntry.scriptDuration; // should exist get sections will fail (do check!)
         }
 
-        start += newEntry.scriptDuration; // should exist get sections will fail (do check!)
-        // }
-
-        setDataMap(map);
         return;
       });
+      setDataMap(map);
       Promise.all(waitDispatch).then(() => {
         setIsScriptReady(true);
       });

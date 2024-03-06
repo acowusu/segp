@@ -144,72 +144,6 @@ export function makeVideoOpts(
 
 // TODO make TextOpts?
 
-export function addSingleImageLayer(
-  section: ScriptData,
-  movie: etro.Movie,
-  start: number
-): number {
-  if (!section.scriptMedia) throw new Error("No media found");
-  if (!section.scriptDuration) throw new Error("No duration found");
-  const layer = new etro.layer.Image({
-    startTime: start,
-    duration: section.scriptDuration,
-    source: "local:///" + section.scriptMedia,
-    destX: (_element: etro.EtroObject, time: number) => {
-      return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
-    }, // default: 0
-    destY: (_element: etro.EtroObject, time: number) => {
-      return lerp(0, -HEIGHT / 10, time, section.scriptDuration!);
-    }, // default: 0
-    destWidth: (_element: etro.EtroObject, time: number) => {
-      return lerp(WIDTH, WIDTH * 1.2, time, section.scriptDuration!);
-    }, // default: null (full width)
-    destHeight: (_element: etro.EtroObject, time: number) => {
-      return lerp(HEIGHT, HEIGHT * 1.2, time, section.scriptDuration!);
-    },
-    x: 0, // default: 0
-    y: 0, // default: 0
-    sourceWidth: WIDTH,
-    sourceHeight: HEIGHT,
-    opacity: 1, // default: 1
-  });
-  console.log("adding layer", layer);
-  movie.layers.push(layer);
-  return start + section.scriptDuration;
-}
-const defaultLayerOpts: LayerOpts = {
-  x: 0,
-  y: 0,
-};
-export async function addSectionAvatar(
-  section: ScriptData,
-  movie: etro.Movie,
-  start: number,
-  opts?: LayerOpts
-): Promise<number> {
-  const effectiveOpts = { ...defaultLayerOpts, ...opts };
-
-  if (!section.avatarVideoUrl) throw new Error("No avatarURL found");
-  if (!section.scriptDuration) throw new Error("No duration found");
-  const avatar = await window.api.getProjectAvatar();
-  const layer = new etro.layer.Video({
-    startTime: start,
-    duration: section.scriptDuration,
-    source: await window.api.toDataURL(section.avatarVideoUrl, "video/mp4"),
-    destX: 0, // default: 0
-    destY: 0, // default: 0
-    destWidth: avatar.width, // default: null (full width)
-    destHeight: avatar.height, // default: null (full height)
-    x: effectiveOpts.x, // default: 0
-    y: effectiveOpts.y, // default: 0
-    opacity: 1, // default: 1
-  });
-  movie.layers.push(layer);
-  console.log("adding layer", layer);
-
-  return start + section.scriptDuration;
-}
-
 // Layer Promises //
 export async function dispatchSectionGeneration(
   section: ScriptData,
@@ -309,14 +243,6 @@ export async function getAvatarOpts(
         WIDTH,
         HEIGHT
       );
-
-      // TODO: migrate chroma keying to the addition function
-      // const effect = new etro.effect.ChromaKey({
-      //   target: new etro.Color(0, 0, 0, 0), // default: new etro.Color(1, 0, 0, 1)
-      //   threshold: 10, // default: 0.5
-      //   interpolate: false, // default: false
-      // });
-
       console.log("created avatar options", opts);
       resolve(opts);
     });
@@ -334,7 +260,7 @@ export async function generateAudio(section: ScriptData): Promise<ScriptData> {
     }
 
     const modifiedScript = await window.api.textToAudio(section);
-    window.api.updateProjectScriptSection(modifiedScript);
+    await window.api.updateProjectScriptSection(modifiedScript);
     return modifiedScript;
   } catch (error) {
     console.error(
@@ -357,7 +283,7 @@ async function generateAvatar(section: ScriptData): Promise<ScriptData> {
     }
     const avatar = await window.api.getProjectAvatar();
     const modifiedScript = await window.api.generateAvatar(section, avatar);
-    window.api.updateProjectScriptSection(modifiedScript);
+    await window.api.updateProjectScriptSection(modifiedScript);
     return modifiedScript;
   } catch (error) {
     console.error(`Error generating avatar for section ${section}:`, error);
@@ -378,6 +304,7 @@ export function addImageLayer(
 ): [ImageOptions, etro.layer.Image] {
   console.log("Adding image layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
+  console.log("!!!! MEDIA OPTS:", effectiveOpts); // first load https://images.unsplash.com/38/QoR8Bv1S2SEqH6UcSJC…x8fDE3MDk3NTIwNDR8MA&ixlib=rb-4.0.3&w=1920&h=1080
   const layer = new etro.layer.Image(effectiveOpts);
   movie.addLayer(layer);
   console.log("Added image layer");
@@ -456,15 +383,19 @@ export async function parseLayerOptions(
     );
   }
   const layerOpts: LayerOpts = {};
-  const parsedOpts: LayerOpts = JSON.parse(section.assetLayerOptions);
+  const parsedOpts: LayerOpts = JSON.parse(
+    section.assetLayerOptions
+  ) as LayerOpts;
+
   const {
-    mediaOpts,
+    mediaOpts, // no idea why this type is not being inferred (there was an issue of me accessing the wrong item in obj)
     audioOpts,
     avatarOpts,
     subtitleOpts,
     backingOpts,
     soundfxOpts,
-  } = parsedOpts;
+  }: LayerOpts = parsedOpts;
+
   // stuff needs to be fixed after parsing, for example media lerp and srcs
   // fix media
   const duration = section.scriptDuration!; // must exist
@@ -474,8 +405,8 @@ export async function parseLayerOptions(
       start,
       duration,
       section.scriptMedia!,
-      mediaOpts.w,
-      mediaOpts.h,
+      mediaOpts.sourceWidth!,
+      mediaOpts.sourceHeight!,
       mediaOpts
     ));
 
@@ -487,17 +418,17 @@ export async function parseLayerOptions(
       audioOpts
     ));
 
-  avatarOpts &&
-    (layerOpts.avatarOpts = makeVideoOpts(
-      start,
-      duration,
-      await window.api.toDataURL(section.avatarVideoUrl!, "video/mp4"),
-      avatarOpts.sourceWidth,
-      avatarOpts.sourceHeight,
-      avatarOpts.canvasWidth,
-      avatarOpts.canvasHeight,
-      avatarOpts
-    ));
+  // avatarOpts &&
+  //   (layerOpts.avatarOpts = makeVideoOpts(
+  //     start,
+  //     duration,
+  //     await window.api.toDataURL(section.avatarVideoUrl!, "video/mp4"),
+  //     avatarOpts.sourceWidth,
+  //     avatarOpts.sourceHeight,
+  //     avatarOpts.canvasWidth,
+  //     avatarOpts.canvasHeight,
+  //     avatarOpts
+  //   ));
 
   // TODO do the rest of the layers
 
