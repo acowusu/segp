@@ -121,6 +121,11 @@ export const NewVideoGenerator: React.FC = () => {
       } else {
         // TODO: add toasts here?
         // Primary Media
+        if (!promisedLayerOptions) {
+          throw new Error(
+            "new-vidgen/generateMovie: the promises must now exist as the layer/options dont"
+          );
+        }
         const {
           p_mediaOpts,
           p_avatarOpts,
@@ -128,13 +133,13 @@ export const NewVideoGenerator: React.FC = () => {
           p_subtitleOpts,
           p_backingOpts,
           p_soundfxOpts,
-        } = promisedLayerOptions;
+        } = promisedLayerOptions!; // if no layers or opts exist promises must exist
 
         const finalOpts: LayerOpts = {};
         const finalLayers: Layers = {};
 
         // Change the Optionalness of some of these layers
-        const waitMedia = p_mediaOpts.then((opts) => {
+        const waitMedia = p_mediaOpts?.then((opts) => {
           const [effOpts, layer] = addImageLayer(movie, opts, {
             startTime: start,
           } as ImageOptions);

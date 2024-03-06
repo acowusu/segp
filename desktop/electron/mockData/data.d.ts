@@ -95,7 +95,7 @@ export interface LocOps {
 }
 
 export interface PromisedLayerOpts { 
-  p_mediaOpts: Promise<ImageOptions>; // Assumes the primary media is never a video
+  p_mediaOpts?: Promise<ImageOptions>; // Assumes the primary media is never a video
   p_audioOpts?: Promise<AudioOptions>;
   p_avatarOpts?: Promise<VideoOptions>;
   p_subtitleOpts?: Promise<TextOptions>;
@@ -115,7 +115,7 @@ export interface Layers {
 type SectionData = {
   start: number; //might not be needed
   script: ScriptData;
-  promisedLayerOptions: PromisedLayerOpts;
+  promisedLayerOptions?: PromisedLayerOpts;
   layers?: Layers;
   layerOptions?: LayerOpts;
 };

@@ -82,17 +82,18 @@ export function makeImageOpts(
   duration: number,
   src: string,
   w: number,
-  h: number
+  h: number,
+  overrideOpts?: ImageOptions
 ): ImageOptions {
   return {
     startTime: start,
     duration: duration,
     source: "local:///" + src,
-    x: 0, // default: 0
-    y: 0, // default: 0
+    x: overrideOpts?.x ?? 0, // default: 0
+    y: overrideOpts?.y ?? 0, // default: 0
     sourceWidth: w,
     sourceHeight: h,
-    opacity: 1, // default: 1
+    opacity: overrideOpts?.opacity ?? 1, // default: 1
     ...mediaAnimationSelector(duration, w, h),
   };
 }
@@ -100,16 +101,17 @@ export function makeImageOpts(
 export function makeAudioOpts(
   start: number,
   duration: number,
-  src: string
+  src: string,
+  overrideOpts?: AudioOptions
 ): AudioOptions {
   return {
     startTime: start,
     duration: duration,
     source: src,
     sourceStartTime: 0, // default: 0
-    muted: false, // default: false
-    volume: 1, // default: 1
-    playbackRate: 1, //default:
+    muted: overrideOpts?.muted ?? false, // default: false
+    volume: overrideOpts?.volume ?? 1, // default: 1
+    playbackRate: overrideOpts?.playbackRate ?? 1, //default:
   };
 }
 
@@ -120,24 +122,27 @@ export function makeVideoOpts(
   sourceWidth: number,
   sourceHeight: number,
   canvasWidth: number,
-  canvasHeight: number
+  canvasHeight: number,
+  overrideOpts?: VideoOptions
 ): VideoOptions {
   return {
     startTime: start,
     duration: duration,
     source: src,
-    destX: 0, // default: 0
-    destY: 0, // default: 0
+    destX: overrideOpts?.destX ?? 0, // default: 0
+    destY: overrideOpts?.destY ?? 0, // default: 0
     destWidth: sourceWidth, // default: null (full width)
     destHeight: sourceHeight, // default: null (full height)
     // following places bottom right
-    x: canvasWidth - sourceWidth, // default: 0
-    y: canvasHeight - sourceHeight, // default: 0
-    opacity: 1, // default: 1
-    volume: 0, // default: 1
+    x: overrideOpts?.x ?? canvasWidth - sourceWidth, // default: 0
+    y: overrideOpts?.y ?? canvasHeight - sourceHeight, // default: 0
+    opacity: overrideOpts?.opacity ?? 1, // default: 1
+    volume: overrideOpts?.volume ?? 0, // default: 1 //0  for avatar layer can change
     // muted: false, //default: false
   };
 }
+
+// TODO make TextOpts?
 
 export function addSingleImageLayer(
   section: ScriptData,
@@ -435,4 +440,64 @@ export async function updateMetadataWithOpts(
   opts: LayerOpts
 ): Promise<void> {
   await window.api.setSectionOpts(section, JSON.stringify(opts));
+}
+
+export async function parseLayerOptions(
+  start: number,
+  section: ScriptData
+): Promise<LayerOpts> {
+  if (!section.assetLayerOptions) {
+    throw new Error(
+      "utils/paseLayerOptions: Options don't exist, cannot parse"
+    );
+  }
+  const layerOpts: LayerOpts = {};
+  const parsedOpts: LayerOpts = JSON.parse(section.assetLayerOptions);
+  const {
+    mediaOpts,
+    audioOpts,
+    avatarOpts,
+    subtitleOpts,
+    backingOpts,
+    soundfxOpts,
+  } = parsedOpts;
+  // stuff needs to be fixed after parsing, for example media lerp and srcs
+  // fix media
+  const duration = section.scriptDuration!; // must exist
+
+  mediaOpts &&
+    (layerOpts.mediaOpts = makeImageOpts(
+      start,
+      duration,
+      section.scriptMedia!,
+      mediaOpts.w,
+      mediaOpts.h,
+      mediaOpts
+    ));
+
+  audioOpts &&
+    (layerOpts.audioOpts = makeAudioOpts(
+      start,
+      duration,
+      await window.api.toDataURL(section.scriptAudio!, "audio/wav"),
+      audioOpts
+    ));
+
+  avatarOpts &&
+    (layerOpts.avatarOpts = makeVideoOpts(
+      start,
+      duration,
+      await window.api.toDataURL(section.avatarVideoUrl!, "video/mp4"),
+      avatarOpts.sourceWidth,
+      avatarOpts.sourceHeight,
+      avatarOpts.canvasWidth,
+      avatarOpts.canvasHeight,
+      avatarOpts
+    ));
+
+  // TODO do the rest of the layers
+
+  console.log("parsed options: ", parsedOpts);
+  console.log("fixed options: ", layerOpts);
+  return layerOpts;
 }

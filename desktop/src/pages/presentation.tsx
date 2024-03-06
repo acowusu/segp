@@ -20,6 +20,7 @@ import {
   addImageLayer,
   addSubtitleLayer,
   dispatchSectionGeneration,
+  parseLayerOptions,
   updateMetadataWithOpts,
 } from "../lib/etro-utils";
 import { Skeleton } from "../components/ui/skeleton";
@@ -55,6 +56,7 @@ export const PresentationLayout: React.FC = () => {
 
         let start = 0;
         data.forEach((entry: ScriptData) => {
+          // no need to dispatch if these already exist just load layers
           const { id, sectionName } = entry;
 
           if (!entry.scriptDuration) {
@@ -64,6 +66,16 @@ export const PresentationLayout: React.FC = () => {
           }
           // TODO: default to reading from script data if not present make defaults
           // can delegate this to the dispatch function?
+          // if (entry.assetLayerOptions) {
+          //   parseLayerOptions(start, entry).then((opts) => {
+          //     map.set(id, {
+          //       start: start,
+          //       script: entry,
+          //       //layers: CHECK DO THE LAYERS NEED TO BE SET HERE?
+          //       layerOptions: opts,
+          //     });
+          //   });
+          // } else {
           map.set(id, {
             start: start, // real start time this is cached for later to videogen can quickly convert the layers
             script: entry,
@@ -72,6 +84,7 @@ export const PresentationLayout: React.FC = () => {
               0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
             ),
           });
+          // }
 
           start += entry.scriptDuration; // should exist get sections will fail (do check!)
 
@@ -296,7 +309,7 @@ export const PresentationSection: React.FC = () => {
     // overrries, if they don't exist do givens
 
     // populate as the promises resolve
-    const finalOpts: LayerOpts = {};
+    let finalOpts: LayerOpts = {};
     const finalLayers: Layers = {};
 
     if (!movieRef.current) {
@@ -304,90 +317,146 @@ export const PresentationSection: React.FC = () => {
         "presentation/addAssets: Movie should definitely be defined by now!"
       );
     }
+
     const movie = movieRef.current!;
 
-    console.log("sectionData", sectionData.layerOptions);
-    // TODO add toasts here
-    const {
-      p_mediaOpts,
-      p_avatarOpts,
-      p_audioOpts,
-      p_subtitleOpts,
-      p_backingOpts,
-      p_soundfxOpts,
-    } = sectionData.promisedLayerOptions;
+    if (sectionData.layerOptions) {
+      const {
+        mediaOpts,
+        audioOpts,
+        avatarOpts,
+        subtitleOpts,
+        backingOpts,
+        soundfxOpts,
+      }: LayerOpts = sectionData.layerOptions!;
 
-    // Change the Optionalness of some of these layers
-    const waitMedia = p_mediaOpts.then((opts) => {
-      const [effOpts, layer] = addImageLayer(movie, opts);
-      finalOpts.mediaOpts = effOpts;
-      finalLayers.media = layer;
-    });
-    console.log("passed media");
+      // no overrides these are the only truths we know now only need the layers
+      finalOpts = sectionData.layerOptions;
 
-    const waitAudio = p_audioOpts?.then((opts) => {
-      const [effOpts, layer] = addAudioLayer(movie, opts);
-      finalOpts.audioOpts = effOpts;
-      finalLayers.audio = layer;
-    });
-    console.log("passed audio");
+      if (mediaOpts) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, mediaLayer] = addImageLayer(movie, mediaOpts);
+        finalLayers.media = mediaLayer;
+      }
 
-    const waitAvatar = p_avatarOpts?.then((opts) => {
-      const [effOpts, layer] = addAvatarLayer(movie, opts);
-      finalOpts.avatarOpts = effOpts;
-      finalLayers.avatar = layer;
-    });
-    console.log("passed avatar");
+      if (audioOpts) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, audioLayer] = addAudioLayer(movie, audioOpts);
+        finalLayers.audio = audioLayer;
+      }
 
-    const waitSubtitle = p_subtitleOpts?.then((opts) => {
-      // subtitles must be displayed above avatar
-      waitAvatar?.then(() => {
-        const [effOpts, layer] = addSubtitleLayer(movie, opts);
-        finalOpts.subtitleOpts = effOpts;
-        finalLayers.subtitle = layer;
+      if (avatarOpts) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, avatarLayer] = addAvatarLayer(movie, avatarOpts);
+        finalLayers.avatar = avatarLayer;
+      }
+
+      if (subtitleOpts) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, subtitleLayer] = addSubtitleLayer(movie, subtitleOpts);
+        finalLayers.subtitle = subtitleLayer;
+      }
+
+      if (backingOpts) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, backingLayer] = addAudioLayer(movie, backingOpts);
+        finalLayers.backing = backingLayer;
+      }
+
+      if (soundfxOpts) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, soundfxLayer] = addAudioLayer(movie, soundfxOpts);
+        finalLayers.soundfx = soundfxLayer;
+      }
+    } else {
+      // TODO add toasts here
+      if (!sectionData.promisedLayerOptions) {
+        throw new Error(
+          "presentation/addAssets: the promises must now exist as the layer/options dont"
+        );
+      }
+
+      const {
+        p_mediaOpts,
+        p_avatarOpts,
+        p_audioOpts,
+        p_subtitleOpts,
+        p_backingOpts,
+        p_soundfxOpts,
+      } = sectionData.promisedLayerOptions!;
+
+      // Change the Optionalness of some of these layers
+      const waitMedia = p_mediaOpts?.then((opts) => {
+        const [effOpts, layer] = addImageLayer(movie, opts);
+        finalOpts.mediaOpts = effOpts;
+        finalLayers.media = layer;
       });
-    });
-    console.log("passed subtitle");
+      console.log("passed media");
 
-    const waitBacking = p_backingOpts?.then((opts) => {
-      const [effOpts, layer] = addAudioLayer(movie, opts);
-      finalOpts.backingOpts = effOpts;
-      finalLayers.backing = layer;
-    });
+      const waitAudio = p_audioOpts?.then((opts) => {
+        const [effOpts, layer] = addAudioLayer(movie, opts);
+        finalOpts.audioOpts = effOpts;
+        finalLayers.audio = layer;
+      });
+      console.log("passed audio");
 
-    console.log("passed backing");
-    const waitSoundFx = p_soundfxOpts?.then((opts) => {
-      const [effOpts, layer] = addAudioLayer(movie, opts);
-      finalOpts.soundfxOpts = effOpts;
-      finalLayers.soundfx = layer;
-    });
-    console.log("passed soundfx");
+      const waitAvatar = p_avatarOpts?.then((opts) => {
+        const [effOpts, layer] = addAvatarLayer(movie, opts);
+        finalOpts.avatarOpts = effOpts;
+        finalLayers.avatar = layer;
+      });
+      console.log("passed avatar");
 
-    await Promise.all([
-      waitMedia,
-      waitAudio,
-      waitAvatar,
-      waitSubtitle,
-      waitBacking,
-      waitSoundFx,
-    ]);
-    // }
+      const waitSubtitle = p_subtitleOpts?.then((opts) => {
+        // subtitles must be displayed above avatar
+        waitAvatar?.then(() => {
+          const [effOpts, layer] = addSubtitleLayer(movie, opts);
+          finalOpts.subtitleOpts = effOpts;
+          finalLayers.subtitle = layer;
+        });
+      });
+      console.log("passed subtitle");
 
-    console.log("all asset layers are loaded into movie", movie);
-    console.log("final asset options", finalOpts);
-    sectionData.layerOptions = finalOpts;
-    sectionData.layers = finalLayers;
-    console.log("Secion looks like:", sectionData);
-    setDataMap((map) => map.set(id, sectionData));
-    setMovies((map) => map.set(id, movie));
+      const waitBacking = p_backingOpts?.then((opts) => {
+        const [effOpts, layer] = addAudioLayer(movie, opts);
+        finalOpts.backingOpts = effOpts;
+        finalLayers.backing = layer;
+      });
 
-    // TODO: once settings are added we also want to save them to metadata,
-    // add here with an await and then add that promise to big waiter
-    // sectionData.script.assetLayerOptions = finalOpts; // DO THIS anyway?
-    // const newScript: ScriptData = sectionData.script;
-    // console.log("new script with opts", newScript);
-    console.log("starting update opts");
-    await updateMetadataWithOpts(sectionData.script, finalOpts);
+      console.log("passed backing");
+      const waitSoundFx = p_soundfxOpts?.then((opts) => {
+        const [effOpts, layer] = addAudioLayer(movie, opts);
+        finalOpts.soundfxOpts = effOpts;
+        finalLayers.soundfx = layer;
+      });
+      console.log("passed soundfx");
+
+      await Promise.all([
+        waitMedia,
+        waitAudio,
+        waitAvatar,
+        waitSubtitle,
+        waitBacking,
+        waitSoundFx,
+      ]);
+      // }
+
+      console.log("all asset layers are loaded into movie", movie);
+      console.log("final asset options", finalOpts);
+      sectionData.layerOptions = finalOpts;
+      sectionData.layers = finalLayers;
+      console.log("Secion looks like:", sectionData);
+      setDataMap((map) => map.set(id, sectionData));
+      setMovies((map) => map.set(id, movie));
+
+      // TODO: once settings are added we also want to save them to metadata,
+      // add here with an await and then add that promise to big waiter
+      // sectionData.script.assetLayerOptions = finalOpts; // DO THIS anyway?
+      // const newScript: ScriptData = sectionData.script;
+      // console.log("new script with opts", newScript);
+      console.log("starting update opts");
+      await updateMetadataWithOpts(sectionData.script, finalOpts);
+    }
   };
 
   // Currently only moves the avatar around
