@@ -429,3 +429,10 @@ export function addSubtitleLayer(
   console.log("Added subtitle layer");
   return [effectiveOpts, layer];
 }
+
+export async function updateMetadataWithOpts(
+  section: ScriptData,
+  opts: LayerOpts
+): Promise<void> {
+  await window.api.setSectionOpts(section, JSON.stringify(opts));
+}

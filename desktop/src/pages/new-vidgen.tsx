@@ -15,15 +15,23 @@ import {
   FramelessCard,
 } from "../components/ui/card";
 import { useLocation, useNavigate } from "react-router-dom";
-import { SectionData } from "../../electron/mockData/data";
+import { LayerOpts, Layers, SectionData } from "../../electron/mockData/data";
 import {
   addAudioLayer,
   addAvatarLayer,
   addImageLayer,
+  addSubtitleLayer,
   fixLerpForMediaLayer,
   getMediaLayer,
+  updateMetadataWithOpts,
 } from "../lib/etro-utils";
-import { ImageOptions, VideoOptions } from "etro/dist/layer";
+import {
+  AudioOptions,
+  BaseOptions,
+  ImageOptions,
+  TextOptions,
+  VideoOptions,
+} from "etro/dist/layer";
 import { layer } from "etro/dist/etro";
 
 export const NewVideoGenerator: React.FC = () => {
@@ -82,7 +90,6 @@ export const NewVideoGenerator: React.FC = () => {
     sections.forEach(async (section) => {
       const { start, script, promisedLayerOptions, layerOptions, layers } =
         section;
-      const { p_mediaOpts, p_audioOpts, p_avatarOpts } = promisedLayerOptions;
 
       // !!Need to correc the fake start times!
 
@@ -114,22 +121,93 @@ export const NewVideoGenerator: React.FC = () => {
       } else {
         // TODO: add toasts here?
         // Primary Media
-        p_mediaOpts.then((opts) => {
-          opts.startTime = start;
-          addImageLayer(movie, opts);
+        const {
+          p_mediaOpts,
+          p_avatarOpts,
+          p_audioOpts,
+          p_subtitleOpts,
+          p_backingOpts,
+          p_soundfxOpts,
+        } = promisedLayerOptions;
+
+        const finalOpts: LayerOpts = {};
+        const finalLayers: Layers = {};
+
+        // Change the Optionalness of some of these layers
+        const waitMedia = p_mediaOpts.then((opts) => {
+          const [effOpts, layer] = addImageLayer(movie, opts, {
+            startTime: start,
+          } as ImageOptions);
+          finalOpts.mediaOpts = effOpts;
+          finalLayers.media = layer;
+        });
+        console.log("passed media");
+
+        const waitAudio = p_audioOpts?.then((opts) => {
+          const [effOpts, layer] = addAudioLayer(movie, opts, {
+            startTime: start,
+          } as AudioOptions);
+          finalOpts.audioOpts = effOpts;
+          finalLayers.audio = layer;
+        });
+        console.log("passed audio");
+
+        const waitAvatar = p_avatarOpts?.then((opts) => {
+          const [effOpts, layer] = addAvatarLayer(movie, opts, {
+            startTime: start,
+          } as VideoOptions);
+          finalOpts.avatarOpts = effOpts;
+          finalLayers.avatar = layer;
+        });
+        console.log("passed avatar");
+
+        const waitSubtitle = p_subtitleOpts?.then((opts) => {
+          // subtitles must be displayed above avatar
+          waitAvatar?.then(() => {
+            const [effOpts, layer] = addSubtitleLayer(movie, opts, {
+              startTime: start,
+            } as TextOptions);
+            finalOpts.subtitleOpts = effOpts;
+            finalLayers.subtitle = layer;
+          });
+        });
+        console.log("passed subtitle");
+
+        const waitBacking = p_backingOpts?.then((opts) => {
+          const [effOpts, layer] = addAudioLayer(movie, opts, {
+            startTime: start,
+          } as AudioOptions);
+          finalOpts.backingOpts = effOpts;
+          finalLayers.backing = layer;
         });
 
-        // Avatar
-        p_avatarOpts?.then((opts) => {
-          opts.startTime = start;
-          addAvatarLayer(movie, opts);
+        console.log("passed backing");
+        const waitSoundFx = p_soundfxOpts?.then((opts) => {
+          const [effOpts, layer] = addAudioLayer(movie, opts, {
+            startTime: start,
+          } as AudioOptions);
+          finalOpts.soundfxOpts = effOpts;
+          finalLayers.soundfx = layer;
         });
+        console.log("passed soundfx");
 
-        // Audio
-        // p_audioOpts.then((opts) => {
-        //   opts.startTime = start;
-        //   addAudioLayer(movie, opts);
-        // });
+        await Promise.all([
+          waitMedia,
+          waitAudio,
+          waitAvatar,
+          waitSubtitle,
+          waitBacking,
+          waitSoundFx,
+        ]);
+        // }
+
+        console.log("Vidgen: all asset layers are loaded into movie", movie);
+        console.log("Vidgen: final asset options", finalOpts);
+        // sectionData.layerOptions = finalOpts;
+        // sectionData.layers = finalLayers;
+
+        console.log("starting update opts");
+        await updateMetadataWithOpts(script, finalOpts);
       }
 
       setCurrentProcess(`${script.sectionName} assets added`);
