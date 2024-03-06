@@ -88,7 +88,7 @@ export function makeImageOpts(
   return {
     startTime: start,
     duration: duration,
-    source: "local:///" + src,
+    source: src, // "local:///" + for local files
     x: overrideOpts?.x ?? 0, // default: 0
     y: overrideOpts?.y ?? 0, // default: 0
     sourceWidth: w,
@@ -222,9 +222,9 @@ export async function dispatchSectionGeneration(
 
   return {
     promisedOpts: {
-      p_mediaOpts: getMediaOpts(section, start),
-      p_audioOpts: getAudioOpts(section, start),
-      p_avatarOpts: getAvatarOpts(section, start),
+      p_mediaOpts: getMediaOpts(modifiedScript, start),
+      p_audioOpts: getAudioOpts(modifiedScript, start),
+      p_avatarOpts: getAvatarOpts(modifiedScript, start),
       //   p_subtitleOpts: ,
       //   p_backingOpts: ,
       //   p_soundfxOpts: ,
@@ -284,18 +284,19 @@ export async function getAvatarOpts(
     return;
   }
   // Generate the avatar for this section
-  await generateAvatar(section);
+  const newSection = await generateAvatar(section);
+  // newSection should have the avatarURLs
 
   return new Promise((resolve, reject) => {
-    if (!section.avatarVideoUrl) reject(new Error("No avatarURL found"));
-    if (!section.scriptDuration) reject(new Error("No duration found"));
+    if (!newSection.avatarVideoUrl) reject(new Error("No avatarURL found"));
+    if (!newSection.scriptDuration) reject(new Error("No duration found"));
 
     // not sure about this async to be checked!
     window.api.getProjectAvatar().then(async (avatar) => {
       const opts = makeVideoOpts(
         start,
-        section.scriptDuration!,
-        await window.api.toDataURL(section.avatarVideoUrl!, "video/mp4"),
+        newSection.scriptDuration!,
+        await window.api.toDataURL(newSection.avatarVideoUrl!, "video/mp4"),
         avatar.width,
         avatar.height,
         WIDTH,
@@ -337,10 +338,10 @@ export async function generateAudio(section: ScriptData): Promise<ScriptData> {
   }
 }
 
-async function generateAvatar(section: ScriptData) {
+async function generateAvatar(section: ScriptData): Promise<ScriptData> {
   if (!window.api.getProjectHasAvatar()) {
     console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
-    return; // undefined if the avatar is not selected for the project
+    return section; // undefined if the avatar is not selected for the project, return what is given
   }
   try {
     // similar issue with changing avatar is URL changed??
@@ -348,13 +349,15 @@ async function generateAvatar(section: ScriptData) {
       console.log(
         `Avatar for ${section.sectionName} already exists, no need to generate`
       );
-      return;
+      return section; //already has videoURL
     }
     const avatar = await window.api.getProjectAvatar();
     const modifiedScript = await window.api.generateAvatar(section, avatar);
     window.api.updateProjectScriptSection(modifiedScript);
+    return modifiedScript;
   } catch (error) {
     console.error(`Error generating avatar for section ${section}:`, error);
+    return section; // probably an error later on anyway
   }
 }
 
