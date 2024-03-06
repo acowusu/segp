@@ -172,6 +172,13 @@ function toastNotif<T>(promise: Promise<T>, section: ScriptData, type: string) {
   });
 }
 
+async function updateMetadataWithOpts(
+  section: ScriptData,
+  opts: LayerOpts
+): Promise<void> {
+  await window.api.setSectionOpts(section, JSON.stringify(opts));
+}
+
 // export const PresentationSection: React.FC<{id: number; title: string;}> = ({id, title}) => {
 export const PresentationSection: React.FC = () => {
   const param = useParams();
@@ -470,8 +477,14 @@ export const PresentationSection: React.FC = () => {
     console.log("Secion looks like:", sectionData);
     setDataMap((map) => map.set(id, sectionData));
     setMovies((map) => map.set(id, movie));
+
     // TODO: once settings are added we also want to save them to metadata,
     // add here with an await and then add that promise to big waiter
+    // sectionData.script.assetLayerOptions = finalOpts; // DO THIS anyway?
+    // const newScript: ScriptData = sectionData.script;
+    // console.log("new script with opts", newScript);
+    console.log("starting update opts");
+    await updateMetadataWithOpts(sectionData.script, finalOpts);
   };
 
   // Currently only moves the avatar around

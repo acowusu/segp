@@ -16,6 +16,7 @@ import {
   fetchImages,
   generateBackingTrack,
   updateScriptSection,
+  updateScriptSectionWithLayerOpts
 } from "./reportProcessing";
 import { generateBackingTrack, textToAudio } from "./audioService";
 import {
@@ -82,6 +83,8 @@ const api = {
   fetchImages,
   //
   setScriptSection: updateScriptSection,
+  setSectionOpts: updateScriptSectionWithLayerOpts,
+  
 };
 export default api;
 

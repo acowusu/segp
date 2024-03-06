@@ -5,6 +5,7 @@ import { pool } from "./pool";
 import { generateTopics, generateScript, generateExtraScript } from "./server"
 import type {
   Audience,
+  LayerOpts,
   ScriptData,
   Topic,
   Visual,
@@ -127,6 +128,11 @@ export async function getScript(force?:boolean): Promise<ScriptData[]> {
   return script
 
 
+}
+
+export async function updateScriptSectionWithLayerOpts(section: ScriptData, opts: string): Promise<void> {
+  console.log("In report process")
+  projectData.updateSectionWithLayerOptions(section, opts);
 }
 
 export async function updateScriptSection(section: ScriptData): Promise<void> {

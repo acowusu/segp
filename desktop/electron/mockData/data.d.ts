@@ -22,7 +22,7 @@ export interface ScriptData {
   aiImages?: string[]; // list of ai generated images
   soundEffectPrompt?: string; // sound effect prompt
   soundEffect?: string; // path to generated sound effect
-  assetLayerOptions?: LayerOpts // options for every existing asset to create layers accordingly
+  assetLayerOptions?: string // options for every existing asset to create layers accordingly
 }
 
 

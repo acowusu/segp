@@ -1,4 +1,4 @@
-import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar, ScriptSelections, BackingTrack } from "./mockData/data";
+import { Audience, ScriptData, Topic, Visual, Voiceover, Avatar, ScriptSelections, BackingTrack, LayerOpts } from "./mockData/data";
 import { getProjectStore } from "./store";
 
 export function getProjectTopic(): Topic {
@@ -112,6 +112,27 @@ export function setProjectVisual(visual: Visual): void {
   getProjectStore().set("visual", visual);
 }
 
+// must stringify before call
+export function updateSectionWithLayerOptions(section: ScriptData, opts: string ): void {
+  console.log("in project data")
+  const currentScript = getProjectScript();
+  let found = false;
+  for (let i = 0; i < currentScript.length; i++) {
+    if (currentScript[i].id === section.id) {
+      currentScript[i] = section
+      currentScript[i].assetLayerOptions = opts
+      found = true;
+      break;
+    }
+  }
+  if (found) {
+    console.log("setProjectScriptSection: found the section, replacing it")
+    setProjectScript(currentScript);
+  }
+
+  console.log("updateSectionWithLayerOptions: did not find the section, no replacement")
+}
+
 
 // Strictly for updating an already existing script section, probably not the most efficient way
 export function updateProjectScriptSection(new_section: ScriptData): void {
@@ -126,7 +147,7 @@ export function updateProjectScriptSection(new_section: ScriptData): void {
     }
   }
   if (found) {
-    console.log("setProjectScriptSection: found the section, replacing it")
+    console.log("updateProjectScriptSection: found the section, replacing it")
     setProjectScript(currentScript);
   }
 
