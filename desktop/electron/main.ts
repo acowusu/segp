@@ -1,9 +1,9 @@
-import { app, BrowserWindow, ipcMain, dialog , screen, protocol, net } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, screen, protocol, net } from 'electron'
 import path from 'node:path'
 // import { getDatabase } from './database'
 import api, { IAPI } from './routes'
 
-import { extractTextFromPDF} from './reportProcessing'
+import { extractTextFromPDF } from './reportProcessing'
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -21,7 +21,7 @@ let win: BrowserWindow | null
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
-async function handleFileOpen () {
+async function handleFileOpen() {
   const { canceled, filePaths } = await dialog.showOpenDialog(win as BrowserWindow)
   let path = ""
   if (!canceled) {
@@ -37,7 +37,7 @@ async function handleFileOpen () {
 function createWindow() {
   // console.log("CREATING WINDOW")
   // console.log(JSON.stringify(screen.getAllDisplays(), null, 2))
-  const monitor = ( screen.getAllDisplays().find(monitor => monitor.label === "HP 27f")) || screen.getPrimaryDisplay()
+  const monitor = (screen.getAllDisplays().find(monitor => monitor.label === "HP 27f")) || screen.getPrimaryDisplay()
   const { x, y } = monitor.bounds
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
@@ -79,10 +79,29 @@ app && app.on('activate', () => {
   }
 })
 
-app && app.whenReady().then(() => {
-  protocol.handle('local', (request) =>{
-    console.log( request.url.slice('local:///'.length))
-    return net.fetch("file:///" + request.url.slice('local:///'.length))
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'local',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      bypassCSP: true,
+      stream: true,
+    },
+  },
+]);
+
+app && app.whenReady().then( () => {
+  protocol.handle('local', async (request) => {
+    console.log(request.url.slice('local:///'.length).replace(/%20/g, ' '))
+    const url = request.url.slice('local:///'.length).replace(/%20/g, ' ')
+
+    try {
+      return await net.fetch("file:///" + url)
+    } catch {
+      return await net.fetch("file:///C:" + url)
+    }
   })
   ipcMain.handle('dialog:openFile', handleFileOpen)
   ipcMain.handle('api:generic', (_, { property, args }) => {
@@ -97,9 +116,9 @@ app && app.whenReady().then(() => {
     }
     else {
       return {
-          error: `api.${property} is not a function`,
-          hint: `have you defined ${property} in ./electron/routes.ts?`
-       }
+        error: `api.${property} is not a function`,
+        hint: `have you defined ${property} in ./electron/routes.ts?`
+      }
     }
   })
 
