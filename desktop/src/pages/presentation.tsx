@@ -20,6 +20,7 @@ import {
   addImageLayer,
   addSubtitleLayer,
   dispatchSectionGeneration,
+  updateMetadataWithOpts,
 } from "../lib/etro-utils";
 import { Skeleton } from "../components/ui/skeleton";
 import { PlayIcon } from "lucide-react";
@@ -172,13 +173,6 @@ function toastNotif<T>(promise: Promise<T>, section: ScriptData, type: string) {
   });
 }
 
-async function updateMetadataWithOpts(
-  section: ScriptData,
-  opts: LayerOpts
-): Promise<void> {
-  await window.api.setSectionOpts(section, JSON.stringify(opts));
-}
-
 // export const PresentationSection: React.FC<{id: number; title: string;}> = ({id, title}) => {
 export const PresentationSection: React.FC = () => {
   const param = useParams();
@@ -313,97 +307,6 @@ export const PresentationSection: React.FC = () => {
     const movie = movieRef.current!;
 
     console.log("sectionData", sectionData.layerOptions);
-    // if (sectionData.layers) {
-    //   const { avatar } = sectionData.layers;
-    //   // avatar.x = preset.avatarO
-    // }
-    // if (sectionData.layerOptions) {
-    //   // all promises must have been already reslved
-
-    //   // if these layer options already exist I think we want to
-    //   // just adjust the layers
-
-    //   const {
-    //     mediaOpts,
-    //     audioOpts,
-    //     avatarOpts,
-    //     subtitleOpts,
-    //     backingOpts,
-    //     soundfxOpts,
-    //   } = sectionData.layerOptions ?? {};
-
-    //   console.log("starting image");
-    //   if (mediaOpts) {
-    //     const [effOpts, layer] = addImageLayer(
-    //       movie,
-    //       mediaOpts,
-    //       overrideMediaOpts
-    //     );
-    //     finalOpts.mediaOpts = effOpts;
-    //     finalLayers.media = layer;
-    //   }
-
-    //   console.log("passed media");
-
-    //   if (audioOpts) {
-    //     const [effOpts, layer] = addAudioLayer(
-    //       movie,
-    //       audioOpts,
-    //       overrideAudioOpts
-    //     );
-    //     finalOpts.audioOpts = effOpts;
-    //     finalLayers.audio = layer;
-    //   }
-
-    //   console.log("passed audio");
-
-    //   if (avatarOpts) {
-    //     const [effOpts, layer] = addAvatarLayer(
-    //       movie,
-    //       avatarOpts,
-    //       overrideAvatarOpts
-    //     );
-    //     finalOpts.avatarOpts = effOpts;
-    //     finalLayers.avatar = layer;
-    //   }
-
-    //   console.log("passed avatar");
-    //   // do subs after avatar
-    //   if (subtitleOpts) {
-    //     const [effOpts, layer] = addSubtitleLayer(
-    //       movie,
-    //       subtitleOpts,
-    //       overrideSubtitleOpts
-    //     );
-    //     finalOpts.subtitleOpts = effOpts;
-    //     finalLayers.subtitle = layer;
-    //   }
-
-    //   console.log("passed subtitle");
-    //   if (backingOpts) {
-    //     const [effOpts, layer] = addAudioLayer(
-    //       movie,
-    //       backingOpts,
-    //       overrideBackingOpts
-    //     );
-    //     finalOpts.backingOpts = effOpts;
-    //     finalLayers.backing = layer;
-    //   }
-    //   console.log("passed backing");
-
-    //   if (soundfxOpts) {
-    //     const [effOpts, layer] = addAudioLayer(
-    //       movie,
-    //       soundfxOpts,
-    //       overrideSoundFxOpts
-    //     );
-    //     finalOpts.soundfxOpts = effOpts;
-    //     finalLayers.soundfx = layer;
-    //   }
-    //   console.log("passed soundfx");
-    // } else {
-    // else {
-    // otherwise the layeroptions are not yet resolved must wait for them
     // TODO add toasts here
     const {
       p_mediaOpts,
