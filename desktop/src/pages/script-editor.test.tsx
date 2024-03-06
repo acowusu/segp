@@ -3,17 +3,16 @@ import { ScriptEditor } from "./script-editor";
 import { MemoryRouter } from "react-router-dom";
 import { mockApi } from "../lib/test-api";
 import { vi } from "vitest";
-import topics from "../../electron/mockData/topics.json"
+import topics from "../../electron/mockData/topics.json";
 vi.stubGlobal("api", {});
 
 describe("ScriptEditor", () => {
-  //   beforeEach(() => {
-  //     window.api = mockApi;
-  //   });
 
   it("should render the Title", async () => {
-    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi,
-    getProjectTopic: vi.fn().mockResolvedValue(topics[0])});
+    vi.spyOn(window, "api", "get").mockReturnValue({
+      ...mockApi,
+      getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+    });
     await act(async () =>
       render(
         <MemoryRouter>
@@ -29,13 +28,16 @@ describe("ScriptEditor", () => {
 
 describe("ScriptEditor", () => {
   beforeEach(() => {
-    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi,
+    vi.spyOn(window, "api", "get").mockReturnValue({
+      ...mockApi,
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+      // setScript: vi.fn().mockResolvedValue({}),
     });
   });
 
   it("should render the Title", async () => {
-    vi.spyOn(window, "api", "get").mockReturnValue({ ...mockApi,
+    vi.spyOn(window, "api", "get").mockReturnValue({
+      ...mockApi,
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
     });
     await act(async () =>
@@ -53,6 +55,7 @@ describe("ScriptEditor", () => {
   it("should handle showing drafts", async () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
+      setScript: vi.fn().mockResolvedValue({}),
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
       getScript: async () => [
         {
@@ -73,8 +76,7 @@ describe("ScriptEditor", () => {
         </MemoryRouter>
       )
     );
-
-    const viewOtherDraftsButton = screen.getByText("View Other Drafts");
+    const viewOtherDraftsButton = screen.getAllByTestId("add-draft")[0];
     expect(viewOtherDraftsButton).toBeInTheDocument();
 
     act(() => {
@@ -87,15 +89,17 @@ describe("ScriptEditor", () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+      setScript: vi.fn().mockResolvedValue({}),
       getScript: vi
         .fn()
         .mockResolvedValueOnce([
           {
             id: "1",
             selectedScriptIndex: 0,
-            scriptTexts: [],
+            scriptTexts: [""],
             sectionName: "Section 1",
             scriptMedia: "image1.jpg",
+            imagePrompts: [{ prompt: "A prompt", imageURLS: ["example.com"] }],
             scriptDuration: 5,
           },
           {
@@ -104,7 +108,8 @@ describe("ScriptEditor", () => {
             scriptDuration: 10,
             sectionName: "Section 2",
             selectedScriptIndex: 0,
-            scriptTexts: [],
+            imagePrompts: [{ prompt: "A prompt", imageURLS: ["example.com"] }],
+            scriptTexts: [""],
           },
           // Add more sections as needed
         ])
@@ -115,11 +120,11 @@ describe("ScriptEditor", () => {
             scriptDuration: 10,
             sectionName: "Section 2",
             selectedScriptIndex: 0,
-            scriptTexts: [],
+            imagePrompts: [{ prompt: "A prompt", imageURLS: ["example.com"] }],
+            scriptTexts: [""],
           },
           // Add more sections as needed
         ]),
-      setScript: vi.fn().mockResolvedValue({}),
     });
     await act(async () =>
       render(
@@ -141,16 +146,16 @@ describe("ScriptEditor", () => {
 
     expect(window.api.setScript).toHaveBeenCalledTimes(1);
   });
-
   it("should handle selecting a script", async () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
+      setScript: vi.fn().mockResolvedValue({}),
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
       getScript: async () => [
         {
           id: "1",
           selectedScriptIndex: 0,
-          scriptTexts: [],
+          scriptTexts: [""],
           sectionName: "Section 1",
           scriptMedia: "image1.jpg",
           scriptDuration: 5,
@@ -161,7 +166,7 @@ describe("ScriptEditor", () => {
           scriptDuration: 10,
           sectionName: "Section 2",
           selectedScriptIndex: 0,
-          scriptTexts: [],
+          scriptTexts: [""],
         },
         // Add more sections as needed
       ],
@@ -183,14 +188,19 @@ describe("ScriptEditor", () => {
     act(() => {
       script1.click();
     });
-    const selectedSection = screen.getAllByRole("list")[0].querySelector(".border-sky-500.border-2");
+    const selectedSection = screen
+      .getAllByRole("list")[0]
+      .querySelector(".border-sky-500.border-2");
     expect(selectedSection).toBeInTheDocument();
 
     act(() => {
       script2.click();
     });
 
-    const selectedSection2 = screen.getAllByRole("list")[0].querySelector(".border-sky-500.border-2");
-  
-    expect(selectedSection2).toBeInTheDocument();});
+    const selectedSection2 = screen
+      .getAllByRole("list")[0]
+      .querySelector(".border-sky-500.border-2");
+
+    expect(selectedSection2).toBeInTheDocument();
+  });
 });
