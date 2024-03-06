@@ -102,7 +102,7 @@ export const ScriptEditor: React.FC = () => {
 
   const handleDeleteCurrent = async (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    var newIndex = items.findIndex((item) => item.id == selectedScript.id) 
+    let newIndex = items.findIndex((item) => item.id == selectedScript.id) 
     const newItems = items.filter((item) => item.id !== selectedScript.id)
     if (newIndex >= newItems.length) {
       newIndex -= 1
@@ -300,6 +300,8 @@ export const ScriptEditor: React.FC = () => {
                           </div>
 
                           <div
+                              data-testid="delete-script"
+                              onClick={handleDeleteCurrent}
                             className={cn(
                               " text-xs",
                               selectedScript.id === item.id
@@ -313,7 +315,6 @@ export const ScriptEditor: React.FC = () => {
                                 ? "destructive"
                                   : "secondary"
                                 }
-                                onClick={handleDeleteCurrent}
                                 >
                               <Cross2Icon />
                             </Badge>
@@ -350,6 +351,7 @@ export const ScriptEditor: React.FC = () => {
                           
                             {item.selectedScriptIndex !== item.scriptTexts.length - 1 ? 
                             <button 
+                            data-testid="add-draft"
                             onClick={() => updateScriptSelection(item, item.selectedScriptIndex + 1)}
                             className="border rounded-r-lg p-2 font-bold flex items-center justify-center"><ArrowRightIcon /></button> : 
                             
@@ -360,7 +362,7 @@ export const ScriptEditor: React.FC = () => {
                               >
                                 <HoverCard openDelay={200}>
                                 <HoverCardTrigger>
-                                    <div className="h-full w-full font-bold p-2 text-lg">
+                                    <div className="h-full w-full font-bold p-2 text-lg" >
                                       {buttonLoading === item.id ? "..." : <PlusIcon />}
                                     </div>
                                     </HoverCardTrigger>

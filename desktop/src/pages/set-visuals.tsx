@@ -31,6 +31,9 @@ import { useNavigate } from "react-router-dom";
 const formSchema = z.object({
   avatar: z.boolean().default(false).optional(),
   subtitles: z.boolean().default(false).optional(),
+  subtitleStyle: z.string().default("80px sans-serif").optional(),
+  subtitleSize: z.string().default("80px").optional(),
+  fontType: z.string().default("sans-serif").optional(),
   backgroundAudio: z.boolean().default(false).optional(),
   soundEffects: z.boolean().default(false).optional(),
   audience: z
@@ -49,12 +52,13 @@ type FormValues = z.infer<typeof formSchema>;
 
 const defaultValues: () => Promise<Partial<FormValues>> = async () => {
   return {
-    avatar: await window.api.getProjectHasAvatar().catch(()=>false)!,
-    subtitles:  await window.api.getProjectHasSubtitles().catch(()=>false)!,
+    avatar: await window.api.getProjectHasAvatar().catch(() => false)!,
+    subtitles: await window.api.getProjectHasSubtitles().catch(() => false)!,
+    subtitleStyle: await window.api.getProjectSubtitleStyle().catch(() => "80px sans-serif")!,
+    audience: (await window.api.getProjectAudience().catch(() => ({ name: "" }))).name!,
+    voiceover: (await window.api.getProjectVoiceover().catch(() => ({ id: "" }))).id!,
     backgroundAudio:  await window.api.getProjectHasBackgroundAudio().catch(()=>false)!,
     soundEffects:  await window.api.getProjectHasSoundEffect().catch(()=>false)!,
-    audience: ( await window.api.getProjectAudience().catch(()=>({name:""}))).name!,
-    voiceover: (await window.api.getProjectVoiceover().catch(()=>({id:""}))).id!,
     videoLength: await window.api.getProjectLength(),
     avatarSelection: (await window.api.getProjectAvatar().catch(()=>({id:""}))).id!,
   }
@@ -158,6 +162,11 @@ export function SetVisuals() {
     console.log(data);
     window.api.setProjectHasAvatar(data.avatar || false);
     window.api.setProjectHasSubtitles(data.subtitles || false);
+    if (data.subtitles) {
+      window.api.setProjectSubtitleStyle((data.subtitleSize + " " + data.fontType) || "80px sans-serif");
+    } else {
+      window.api.setProjectSubtitleStyle("80px sans-serif");
+    }
     window.api.setProjectHasBackgroundAudio(data.backgroundAudio || false);
     window.api.setProjectHasSoundEffects(data.soundEffects || false);
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
@@ -171,8 +180,8 @@ export function SetVisuals() {
     // TypeScript users 
     const subscription = watch(() => handleSubmit(onSubmit)())
     return () => subscription.unsubscribe();
-}, [watch, handleSubmit,  onSubmit]);
-  const { avatar, subtitles, avatarSelection } = form.watch();
+  }, [watch, handleSubmit, onSubmit]);
+  const { avatar, subtitles, subtitleSize, fontType, avatarSelection } = form.watch();
   return (
     <>
       <h1 className="text-4xl font-bold pb-8">
@@ -320,6 +329,77 @@ export function SetVisuals() {
                       />
                     </FormControl>
                   </FormItem>
+                )}
+              />
+              {subtitles && ( // Render subtitle size selector only if subtitles are enabled
+                <FormField
+                  control={form.control}
+                  name="subtitleSize"
+                  render={({ field }) => (
+                    <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <FormLabel className="text-base">Subtitle Size</FormLabel>
+                      <div className="flex items-center space-x-4">
+                        <button
+                          className="subtitle-size-button"
+                          style={{
+                            border: field.value === "60px" ? "2px solid #4299e1" : "2px solid transparent",
+                            boxShadow: field.value === "60px" ? "0 0 5px rgba(66, 153, 225, 0.5)" : "none",
+                          }}
+                          onClick={() => field.onChange("60px")}
+                        >
+                          <div className="subtitle-size-icon small-icon" style={{ fontSize: "12px" }}>T</div>
+                        </button>
+                        <button
+                          className="subtitle-size-button"
+                          style={{
+                            border: field.value === "80px" ? "2px solid #4299e1" : "2px solid transparent",
+                            boxShadow: field.value === "80px" ? "0 0 5px rgba(66, 153, 225, 0.5)" : "none",
+                          }}
+                          onClick={() => field.onChange("80px")}
+                        >
+                          <div className="subtitle-size-icon medium-icon" style={{ fontSize: "16px" }}>T</div>
+                        </button>
+                        <button
+                          className="subtitle-size-button"
+                          style={{
+                            border: field.value === "100px" ? "2px solid #4299e1" : "2px solid transparent",
+                            boxShadow: field.value === "100px" ? "0 0 5px rgba(66, 153, 225, 0.5)" : "none",
+                          }}
+                          onClick={() => field.onChange("100px")}
+                        >
+                          <div className="subtitle-size-icon large-icon" style={{ fontSize: "20px" }}>T</div>
+                        </button>
+                      </div>
+                      {/* Add description or any other relevant information */}
+                    </div>
+                  )}
+                />
+              )}
+              <FormField
+                control={form.control}
+                name="fontType"
+                render={({ field }) => (
+                  <div className="flex items-center space-x-4">
+                    <button
+                      className="font-type-button"
+                      style={{
+                        fontWeight: field.value === "sans-serif" ? "bold" : "normal",
+                      }}
+                      onClick={() => field.onChange("sans-serif")}
+                    >
+                      Sans-serif
+                    </button>
+                    <button
+                      className="font-type-button"
+                      style={{
+                        fontWeight: field.value === "serif" ? "bold" : "normal",
+                      }}
+                      onClick={() => field.onChange("serif")}
+                    >
+                      Serif
+                    </button>
+                    {/* Add more font type buttons as needed */}
+                  </div>
                 )}
               />
               <FormField

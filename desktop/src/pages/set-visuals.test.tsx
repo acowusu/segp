@@ -44,9 +44,11 @@ describe("ScriptEditor", () => {
       getProjectTopic: async () => mockTopics[0],
       getProjectAvatar: async () => mockAvatars[0],
       getProjectHasSubtitles: async () => false,
+      getProjectSubtitleStyle: async() => "80px sans-serif",
       getProjectLength: async () => 0,
       setProjectHasAvatar: async () => {},
       setProjectHasSubtitles: async () => {},
+      setProjectSubtitleStyle: async () => {},
     });
     await act(async () =>
       render(
