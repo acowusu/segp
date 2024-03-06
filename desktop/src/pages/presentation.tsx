@@ -395,22 +395,22 @@ export const PresentationSection: React.FC = () => {
         const [effOpts, layer] = addImageLayer(movie, opts);
         finalOpts.mediaOpts = effOpts;
         finalLayers.media = layer;
+        console.log("passed media");
       });
-      console.log("passed media");
 
       const waitAudio = p_audioOpts?.then((opts) => {
         const [effOpts, layer] = addAudioLayer(movie, opts);
         finalOpts.audioOpts = effOpts;
         finalLayers.audio = layer;
+        console.log("passed audio");
       });
-      console.log("passed audio");
 
       const waitAvatar = p_avatarOpts?.then((opts) => {
         const [effOpts, layer] = addAvatarLayer(movie, opts);
         finalOpts.avatarOpts = effOpts;
         finalLayers.avatar = layer;
+        console.log("passed avatar");
       });
-      console.log("passed avatar");
 
       const waitSubtitle = p_subtitleOpts?.then((opts) => {
         // subtitles must be displayed above avatar
@@ -419,22 +419,22 @@ export const PresentationSection: React.FC = () => {
           finalOpts.subtitleOpts = effOpts;
           finalLayers.subtitle = layer;
         });
+        console.log("passed subtitle");
       });
-      console.log("passed subtitle");
 
       const waitBacking = p_backingOpts?.then((opts) => {
         const [effOpts, layer] = addAudioLayer(movie, opts);
         finalOpts.backingOpts = effOpts;
         finalLayers.backing = layer;
+        console.log("passed backing");
       });
 
-      console.log("passed backing");
       const waitSoundFx = p_soundfxOpts?.then((opts) => {
         const [effOpts, layer] = addAudioLayer(movie, opts);
         finalOpts.soundfxOpts = effOpts;
         finalLayers.soundfx = layer;
+        console.log("passed soundfx");
       });
-      console.log("passed soundfx");
 
       await Promise.all([
         waitMedia,
