@@ -52,9 +52,7 @@ const defaultValues: () => Promise<Partial<FormValues>> = async () => {
   return {
     avatar: await window.api.getProjectHasAvatar().catch(() => false)!,
     subtitles: await window.api.getProjectHasSubtitles().catch(() => false)!,
-    subtitleStyle: await window.api.getProjectsubtitleStyle().catch(() => "80px sans-serif")!,
-    subtitleSize: await window.api.getProjectsubtitleStyle().catch(() => "80px")!,
-    fontType: await window.api.getProjectsubtitleStyle().catch(() => "sans-serif")!,
+    subtitleStyle: await window.api.getProjectSubtitleStyle().catch(() => "80px sans-serif")!,
     audience: (await window.api.getProjectAudience().catch(() => ({ name: "" }))).name!,
     voiceover: (await window.api.getProjectVoiceover().catch(() => ({ id: "" }))).id!,
     videoLength: await window.api.getProjectLength(),
@@ -161,9 +159,9 @@ export function SetVisuals() {
     window.api.setProjectHasAvatar(data.avatar || false);
     window.api.setProjectHasSubtitles(data.subtitles || false);
     if (data.subtitles) {
-      window.api.setProjectsubtitleStyle((data.subtitleSize + " " + data.fontType) || "80px sans-serif");
+      window.api.setProjectSubtitleStyle((data.subtitleSize + " " + data.fontType) || "80px sans-serif");
     } else {
-      window.api.setProjectsubtitleStyle("80px sans-serif");
+      window.api.setProjectSubtitleStyle("80px sans-serif");
     }
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
@@ -177,7 +175,7 @@ export function SetVisuals() {
     const subscription = watch(() => handleSubmit(onSubmit)())
     return () => subscription.unsubscribe();
   }, [watch, handleSubmit, onSubmit]);
-  const { avatar, subtitles, subtitleStyle, subtitleSize, fontType, avatarSelection } = form.watch();
+  const { avatar, subtitles, subtitleSize, fontType, avatarSelection } = form.watch();
   return (
     <>
       <h1 className="text-4xl font-bold pb-8">
