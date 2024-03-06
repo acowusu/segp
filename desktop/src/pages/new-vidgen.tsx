@@ -109,7 +109,13 @@ export const NewVideoGenerator: React.FC = () => {
 
         console.log("Existing layerOptions", layerOptions);
         // Media:
-        addImageLayer(movie, mediaOpts, { startTime: start } as ImageOptions);
+        if (mediaOpts) {
+          addImageLayer(movie, mediaOpts, { startTime: start } as ImageOptions);
+        }
+
+        if (audioOpts) {
+          addAudioLayer(movie, audioOpts, { startTime: start } as AudioOptions);
+        }
 
         // Avatar
         // addAvatarLayer(movie, avatarOpts, { startTime: start } as VideoOptions); DOES NOT WORK
