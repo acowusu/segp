@@ -20,6 +20,7 @@ import {
   addImageLayer,
   addSubtitleLayer,
   dispatchSectionGeneration,
+  generateAudio,
   parseLayerOptions,
   updateMetadataWithOpts,
 } from "../lib/etro-utils";
@@ -46,60 +47,64 @@ export const PresentationLayout: React.FC = () => {
   const moviesState = useState<Map<string, etro.Movie>>(new Map());
 
   useEffect(() => {
-    window.api
-      .getScript()
-      .then((data: ScriptData[]) => {
-        const map = new Map();
+    window.api.getScript().then((data: ScriptData[]) => {
+      console.log("setting script to", data);
+      const temp: NavHeader[] = [];
 
-        console.log("setting script to", data);
-        const temp: NavHeader[] = [];
-
-        let start = 0;
-        data.forEach((entry: ScriptData) => {
-          // no need to dispatch if these already exist just load layers
-          const { id, sectionName } = entry;
-
-          if (!entry.scriptDuration) {
-            throw new Error(
-              "The duration of the script Section is not defined"
-            );
-          }
-          // TODO: default to reading from script data if not present make defaults
-          // can delegate this to the dispatch function?
-          // if (entry.assetLayerOptions) {
-          //   parseLayerOptions(start, entry).then((opts) => {
-          //     map.set(id, {
-          //       start: start,
-          //       script: entry,
-          //       //layers: CHECK DO THE LAYERS NEED TO BE SET HERE?
-          //       layerOptions: opts,
-          //     });
-          //   });
-          // } else {
-          map.set(id, {
-            start: start, // real start time this is cached for later to videogen can quickly convert the layers
-            script: entry,
-            promisedLayerOptions: dispatchSectionGeneration(
-              entry,
-              0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
-            ),
-          });
-          // }
-
-          start += entry.scriptDuration; // should exist get sections will fail (do check!)
-
-          temp.push({
-            title: sectionName,
-            href: `/presentation/${id}`, // same as the one in App.tsx
-          });
-
-          setSections(temp);
-          setDataMap(map);
+      data.forEach((entry: ScriptData) => {
+        const { id, sectionName } = entry;
+        temp.push({
+          title: sectionName,
+          href: `/presentation/${id}`, // same as the one in App.tsx
         });
-      })
-      .finally(() => {
+        setSections(temp);
+      });
+
+      const map = new Map();
+      let start = 0;
+      const waitDispatch = data.map(async (entry: ScriptData) => {
+        // no need to dispatch if these already exist just load layers
+        const { id } = entry;
+
+        // TODO: default to reading from script data if not present make defaults
+        // can delegate this to the dispatch function?
+        // if (entry.assetLayerOptions) {
+        //   parseLayerOptions(start, entry).then((opts) => {
+        //     map.set(id, {
+        //       start: start,
+        //       script: entry,
+        //       layerOptions: opts,
+        //     });
+        //   });
+        // } else {
+        const { promisedOpts, modifiedSection: newEntry } =
+          await dispatchSectionGeneration(
+            // this await is for the initial audiogen, dration depends on it
+            entry,
+            0 // this is a fake start so that added layers start from the start MUST be changed fro videogen
+          );
+        map.set(id, {
+          start: start, // real start time this is cached for later to videogen can quickly convert the layers
+          script: newEntry, //has duration
+          promisedLayerOptions: promisedOpts,
+        });
+
+        if (!newEntry.scriptDuration) {
+          throw new Error(
+            "The duration of the script Section is not defined, audioGen should have done this"
+          );
+        }
+
+        start += newEntry.scriptDuration; // should exist get sections will fail (do check!)
+        // }
+
+        setDataMap(map);
+        return;
+      });
+      Promise.all(waitDispatch).then(() => {
         setIsScriptReady(true);
       });
+    });
   }, []);
 
   function stopMovies() {
@@ -146,7 +151,7 @@ export const PresentationLayout: React.FC = () => {
           ) : (
             <div>
               {" "}
-              <p className="text-muted-foreground">Loading Script ... </p>
+              <p className="text-muted-foreground">Preparing Sections ... </p>
             </div>
           )}
           <div className="flex justify-between">

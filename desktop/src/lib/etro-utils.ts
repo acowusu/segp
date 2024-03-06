@@ -211,30 +211,25 @@ export async function addSectionAvatar(
 }
 
 // Layer Promises //
-export function dispatchSectionGeneration(
+export async function dispatchSectionGeneration(
   section: ScriptData,
   start: number
-): PromisedLayerOpts {
+): Promise<{ promisedOpts: PromisedLayerOpts; modifiedSection: ScriptData }> {
   console.log("Section in dispatch", section);
-  const audioGen = generateAudio(section);
 
-  //dependence on audio gen being done first
-  const audioOpts = audioGen.then(() => {
-    // return getAudioOpts(section, start);
-    return;
-  });
-
-  const avatarOpts = audioGen.then(() => {
-    return getAvatarOpts(section, start);
-  });
+  // needs to run before everyting as this sets the script duration
+  const modifiedScript = await generateAudio(section);
 
   return {
-    p_mediaOpts: getMediaOpts(section, start),
-    // p_audioOpts: audioOpts,
-    p_avatarOpts: avatarOpts,
-    //   p_subtitleOpts: ,
-    //   p_backingOpts: ,
-    //   p_soundfxOpts: ,
+    promisedOpts: {
+      p_mediaOpts: getMediaOpts(section, start),
+      p_audioOpts: getAudioOpts(section, start),
+      p_avatarOpts: getAvatarOpts(section, start),
+      //   p_subtitleOpts: ,
+      //   p_backingOpts: ,
+      //   p_soundfxOpts: ,
+    },
+    modifiedSection: modifiedScript,
   };
 }
 
@@ -320,23 +315,25 @@ export async function getAvatarOpts(
   });
 }
 
-export async function generateAudio(section: ScriptData) {
+export async function generateAudio(section: ScriptData): Promise<ScriptData> {
   try {
     // what if the text is changed in the editor, does that clear the URL? (yes)
     if (section.scriptAudio) {
       console.log(
         `Audio for section (${section.sectionName}) already generated`
       );
-      return;
+      return section;
     }
 
     const modifiedScript = await window.api.textToAudio(section);
     window.api.updateProjectScriptSection(modifiedScript);
+    return modifiedScript;
   } catch (error) {
     console.error(
       `Error generating audio for section ${section.sectionName}:`,
       error
     );
+    return section;
   }
 }
 
