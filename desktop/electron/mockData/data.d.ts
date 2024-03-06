@@ -6,6 +6,7 @@ export interface ScriptData {
   id: string; // GUID 
   selectedScriptIndex: number; // index of the selected script
   scriptTexts: string[];  // array of script texts
+  imagePrompts?: ImageData[]; // array of prompts and URLS for images
   sectionName: string; // Name of section
   scriptAudio?: string; // path to audio file
   scriptDuration?: number; // duration of audio file
@@ -13,7 +14,14 @@ export interface ScriptData {
   scriptPrompt?: string; // path to prompt file
   sadTalkerPath?: string; // path to tmp file on server
   avatarVideoUrl?: string; // avatar video URL
-  soundEffectPath?: string; // path to sound effect file
+  aiImages?: string[]; // list of ai generated images
+  soundEffectPrompt?: string; // sound effect prompt
+  soundEffect?: string; // path to generated sound effect
+}
+
+export interface ImageData {
+  prompt: string;
+  imageURLS: string[];
 }
 
 export interface ScriptSelections {

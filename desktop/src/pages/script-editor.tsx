@@ -14,8 +14,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { ScriptData } from "../../electron/mockData/data";
-import { UpdateIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { ScriptData, Topic } from "../../electron/mockData/data";
+import { UpdateIcon, Cross2Icon, PlusIcon, ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import { Skeleton } from "../components/ui/skeleton";
 import { toast } from "sonner";
 import {
@@ -23,28 +23,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../components/ui/popover";
-
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../components/ui/hover-card"
+import loadingMessages from "../../electron/mockData/loadingScripts/scriptLoading.json"
 import { Progress } from "../components/ui/progress";
+import { MediaChoices } from "../components/custom/mediaChoices";
 
-const LoadingScripts = ({
-  generationProgress,
-}: {
-  generationProgress: number;
-}) => {
-  quantum.register();
 
-  return (
-    <div className="flex flex-col gap-8 items-center justify-center">
-      <h1 className="text-2xl font-bold p-4">
-        Please wait while we generate your scripts
-      </h1>
-      <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-        <l-quantum size="100" speed="3" color="red"></l-quantum>
-        <Progress value={generationProgress} className="w-5/6 mt-4" />
-      </Skeleton>
-    </div>
-  );
-};
 
 export const ScriptEditor: React.FC = () => {
   const navigate = useNavigate();
@@ -52,11 +40,49 @@ export const ScriptEditor: React.FC = () => {
   const [selectedScript, setSelectedScript] = useState<ScriptData>(
     {} as ScriptData
   );
-  const [showOtherDrafts, setShowOtherDrafts] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
   const [scriptLoadingProgress, setScriptLoadingProgress] = useState(0);
+  const [topic, setTopic] = useState<Topic>()
+  const [buttonLoading, setButtonLoading] = useState("");
+  const [mediaSelected, setMediaSelected] = useState("")
+
+  const loadingImages = ["./analysingpdf.png", "./inspiration.png", "./dict.png" ,"./writing.png"]
+
+  const LoadingScripts = ({
+    generationProgress,
+  }: {
+    generationProgress: number;
+  }) => {
+    quantum.register();
+  
+    return (
+      <div className="flex flex-col gap-8 items-center justify-center">
+        <h1 className="text-2xl font-bold p-4">
+          Please wait while we generate your scripts for {topic?.topic}
+        </h1>
+        <h1 className="text-xl font-semibold p-4">
+          About video:  {topic?.summary}
+        </h1>
+        {generationProgress <= 100 ? <><div className="w-full mb-4 flex align-center items-center	justify-center flex-col gap-4">
+          <img src={loadingImages[(Math.floor(generationProgress / 25)) % 4]} width={500} height={500}/>
+          <div className="font-bold text-xl">{loadingMessages[(Math.floor(generationProgress / 5)) % 20]}</div>
+        </div>
+        <Progress value={generationProgress} className="w-5/6 mt-4" /></> 
+        : 
+        <Skeleton className="w-4/5 h-3/5 mb-4 flex align-center items-center	justify-center flex-col	">
+          <l-quantum size="100" speed="3" color="red"></l-quantum>
+          <div className="text-xl font-bold">
+            Finalising...
+          </div>
+        </Skeleton>}
+      </div>
+    );
+  };
+
   useEffect(() => {
+    window.api.getProjectTopic().then(setTopic)
+    const TICK = 2000
     const task = window.api
       .getScript()
       .then(setItems)
@@ -70,19 +96,22 @@ export const ScriptEditor: React.FC = () => {
     });
     const interval = setInterval(() => {
       setScriptLoadingProgress((prev) => prev + 1);
-    }, 1000);
+    }, TICK);
     return () => clearInterval(interval);
   }, []);
-  const handleShowDrafts = (e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    console.log;
-    setShowOtherDrafts(!showOtherDrafts);
-  };
 
   const handleDeleteCurrent = async (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    setItems(items.filter((item) => item.id !== selectedScript.id));
-    await window.api.setScript(items);
+    var newIndex = items.findIndex((item) => item.id == selectedScript.id) 
+    const newItems = items.filter((item) => item.id !== selectedScript.id)
+    if (newIndex >= newItems.length) {
+      newIndex -= 1
+    }
+    if (newIndex >= 0) {
+      setSelectedScript(newItems[newIndex])
+    }
+    setItems(newItems);
+    await window.api.setScript(newItems);
   };
   const genAiImage = async (
     script: ScriptData,
@@ -110,26 +139,36 @@ export const ScriptEditor: React.FC = () => {
       const resolvedPrompt = await imgPrompt;
       const imgPath = await img;
       console.log(imgPath);
+      const updatedItems = items.map((item) => {
+        if (item.id === script.id) {
+          item.scriptMedia = imgPath;
+          item.scriptPrompt = resolvedPrompt;
+          item.aiImages = item.aiImages ? [...item.aiImages, imgPath] : [imgPath]
+        }
+        return item;
+      }) 
       setItems(
-        items.map((item) => {
-          if (item.id === script.id) {
-            item.scriptMedia = imgPath;
-            item.scriptPrompt = resolvedPrompt;
-          }
-          return item;
-        })
+        updatedItems
       );
-      await window.api.setScript(items);
+      await window.api.setScript(updatedItems);
     } else {
       console.log("Media already exists");
     }
   };
+  const setMedia = async (script: ScriptData, url: string) => {
+    const newItems = items.map((item) => {
+      if (script.id === item.id) {
+        item.scriptMedia = url;
+      }
+      return item;
+    })
+    setItems(newItems)
+    await window.api.setScript(newItems)
+  }
   const updateScriptSelection = (
-    e: React.MouseEvent,
     item: ScriptData,
     index: number
   ) => {
-    e.stopPropagation();
     setItems(
       items.map((script) => {
         if (script.id === item.id) {
@@ -145,22 +184,43 @@ export const ScriptEditor: React.FC = () => {
   const handleSetSelectedScript = async (script: ScriptData) => {
     if (disabled) return;
     setDisabled(true);
-    if (selectedScript.id !== script.id) setShowOtherDrafts(false);
 
     if (script !== undefined) {
       setSelectedScript(script);
+      if (script.imagePrompts) {
+        setMediaSelected(script.imagePrompts[0].prompt)
+      }
     }
     setDisabled(false);
   };
   const setScript = async () => {
+    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
     navigate("/get-video");
-    await window.api.setScript(items);
-    // START PIPELINE
-
-    // put ur stuff here
   };
   const selectTopic = async () => {
     navigate("/set-topic");
+  };
+  const updateScriptDraftSelection = async (
+    item: ScriptData,
+    index: number
+  ) => {
+    //set loading, disable button
+    setButtonLoading(item.id)
+    window.api.generateNewScript(item.scriptTexts[item.scriptTexts.length - 1])
+    .then(async (newScript) => {
+      console.log(newScript);
+      const newItems = items.map((script) => {
+        if (script.id === item.id) {
+          script.scriptTexts.push(newScript)
+          script.selectedScriptIndex = index;
+        }
+        return script;
+      })
+      setItems(newItems)
+      await window.api.setScript(newItems);
+    })
+    .catch((err) => console.log(err))
+    .finally(() => setButtonLoading(""))
   };
   const updateScriptText = async (
     e: React.FormEvent,
@@ -168,36 +228,36 @@ export const ScriptEditor: React.FC = () => {
     id: string
   ) => {
     const target = e.target as HTMLInputElement;
-    setItems(
-      items.map((script) => {
-        if (script.id === id) {
-          script.scriptTexts[index] = target.value;
-        }
-        return script;
-      })
-    );
-    await window.api.setScript(items);
+    const newItems = items.map((script) => {
+      if (script.id === id) {
+        script.scriptTexts[index] = target.value;
+      }
+      return script;
+    })
+    setItems(newItems);
+    await window.api.setScript(newItems);
   };
   const updatePromptText = async (e: React.FormEvent, id: string) => {
     const target = e.target as HTMLInputElement;
+    const newItems = items.map((script) => {
+      if (script.id === id) {
+        script.scriptPrompt = target.value;
+      }
+      return script;
+    })
     setItems(
-      items.map((script) => {
-        if (script.id === id) {
-          script.scriptPrompt = target.value;
-        }
-        return script;
-      })
+      newItems
     );
     await window.api.setScript(items);
   };
   return (
-    <div className="flex items-center justify-center mt-4">
+    <div className="items-center justify-center">
       {loadingScripts ? (
         <LoadingScripts generationProgress={scriptLoadingProgress} />
       ) : (
         <FramelessCard>
           <CardHeader>
-            <CardTitle>Script Editor</CardTitle>
+            <CardTitle className="text-4xl">Script Editor</CardTitle>
             <div>
               <Badge
                 aria-label="Refresh Scripts"
@@ -214,8 +274,9 @@ export const ScriptEditor: React.FC = () => {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="h-4/6">
-            <div className="flex flex-col gap-2 p-4 pt-0">
+          <div className="flex my-4">
+          <CardContent className="h-4/6 basis-1/2">
+            <div className="flex flex-col gap-2 pt-0  ">
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
                   <Reorder.Item key={item.id} value={item} className="mb-4"  data-testid="script-section">
@@ -224,119 +285,131 @@ export const ScriptEditor: React.FC = () => {
                         key={item.id}
                         data-testid="script-section-clickable"
                         className={cn(
-                          "script-section-clickable flex grow flex-col items-start gap-2 rounded-lg p-3 text-left text-sm transition-all border-2",
+                          "script-section-clickable flex w-full flex-col items-start gap-2 rounded-lg p-4 text-left text-sm transition-all border-2",
                           selectedScript.id === item.id &&
-                            " border-2 border-sky-500",
+                          " border-2 border-sky-500",
                           selectedScript.id !== item.id &&
-                            "hover:border-sky-500 hover: hover:border-dashed"
-                        )}
-                        onClick={() => handleSetSelectedScript(item)}
-                      >
-                        <div
-                          className={cn(
-                            " text-xs flex justify-between w-full items-center",
-                            selectedScript.id === item.id
-                              ? "text-foreground"
-                              : "text-muted-foreground"
+                          "hover:border-sky-500 hover: hover:border-dashed"
                           )}
-                        >
-                          <Badge
-                            aria-label="Delete Script"
-                            data-testid="delete-script"
-                            variant={
-                              selectedScript.id === item.id
-                                ? "destructive"
-                                : "secondary"
-                            }
-                            onClick={handleDeleteCurrent}
+                          onClick={() => handleSetSelectedScript(item)}
                           >
-                            <Cross2Icon></Cross2Icon>
-                          </Badge>
-                          {/* View Other Drafts */}
-                          <Badge
-                            aria-label="Show Drafts"
-                            variant={
-                              showOtherDrafts && selectedScript.id === item.id
-                                ? "cloud"
-                                : "secondary"
-                            }
-                            onClick={handleShowDrafts}
-                          >
-                            View Other Drafts
-                          </Badge>
-                        </div>
-                        {selectedScript.id === item.id && showOtherDrafts && (
-                          <div className="grid md:grid-cols-3 gap-4 w-full">
-                            {item.scriptTexts.map((script, index) => (
-                              <div
-                                onClick={(e) =>
-                                  updateScriptSelection(e, item, index)
-                                }
-                                className="p-2 overflow-hidden border h-20 rounded-lg  hover:border-dashed hover:border-sky-500"
-                              >
-                                <div>
-                                  <Badge
-                                  aria-label="Draft Selection"
-                                    variant={
-                                      index == item.selectedScriptIndex
-                                        ? "cloud"
-                                        : "secondary"
-                                    }
-                                  >
-                                    Draft {index + 1}
-                                  </Badge>
-                                </div>
-                                {script}
-                              </div>
-                            ))}
+                        <div className="flex flex-row justify-between w-full">
+                          
+                          <div className="font-semibold">
+                            {item.sectionName}
+                          </div>
 
-                            {/* <div className="p-2 overflow-hidden border h-20 rounded-lg  hover:border-dashed hover:border-sky-500">
-                            <PlusIcon className="w-8 h-8 text-secondary hover:text-sky-500 m-auto" />
-                           <p className="text-center">Add new draft</p>
-                          </div> */}
+                          <div
+                            className={cn(
+                              " text-xs",
+                              selectedScript.id === item.id
+                              ? "text-foreground"
+                                : "text-muted-foreground"
+                                )}
+                                >
+                            <Badge
+                              variant={
+                                selectedScript.id === item.id
+                                ? "destructive"
+                                  : "secondary"
+                                }
+                                onClick={handleDeleteCurrent}
+                                >
+                              <Cross2Icon />
+                            </Badge>
                           </div>
-                        )}
-                        <div className="flex w-full flex-col gap-1">
-                          <div className="flex items-center">
-                            <div className="flex items-center gap-2">
-                              <div className="font-semibold">
-                                {item.sectionName}
-                              </div>
-                            </div>
-                          </div>
+                            
                         </div>
-                        <div className="line-clamp-2 text-xs text-muted-foreground">
+                        <div className="line-clamp-2 text-xs text-muted-foreground flex flex-row">
+                          <button 
+                          onClick={() => updateScriptSelection(item, item.selectedScriptIndex - 1)}
+                          disabled = {item.selectedScriptIndex === 0}
+                          className="border rounded-l-lg p-2 font-bold flex items-center justify-center">
+                            <ArrowLeftIcon />
+                          </button>
                           {selectedScript.id === item.id ? (
-                            <ContentEditable
-                              html={item.scriptTexts[item.selectedScriptIndex]}
-                              disabled={false}
-                              onChange={(e) => {
-                                updateScriptText(
-                                  e,
-                                  item.selectedScriptIndex,
-                                  item.id
-                                );
-                              }}
-                              className="w-full focus:min-h-20 focus:border rounded-lg focus:p-2 overflow-y-auto	 focus:outline-none"
-                            />
+                            <div className="mx-4 p-2">
+                              <ContentEditable
+                                html={item.scriptTexts[item.selectedScriptIndex]}
+                                disabled={false}
+                                onChange={(e) => {
+                                  updateScriptText(
+                                    e,
+                                    item.selectedScriptIndex,
+                                    item.id
+                                    );
+                                  }}
+                                  className="w-full focus:min-h-20 focus:border rounded-lg focus:p-2 overflow-y-auto	 focus:outline-none"
+                                  />
+                              </div>
                           ) : (
-                            item.scriptTexts[item.selectedScriptIndex]
+                            <div className="mx-4 p-2">
+                              {item.scriptTexts[item.selectedScriptIndex]}
+                            </div>
                           )}
-                          {}
+                          
+                            {item.selectedScriptIndex !== item.scriptTexts.length - 1 ? 
+                            <button 
+                            onClick={() => updateScriptSelection(item, item.selectedScriptIndex + 1)}
+                            className="border rounded-r-lg p-2 font-bold flex items-center justify-center"><ArrowRightIcon /></button> : 
+                            
+                              <button 
+                              disabled = {buttonLoading !== ""}
+                              className="border rounded-r-lg flex items-center justify-center"
+                              onClick={async () => updateScriptDraftSelection(item, item.selectedScriptIndex + 1)}
+                              >
+                                <HoverCard openDelay={200}>
+                                <HoverCardTrigger>
+                                    <div className="h-full w-full font-bold p-2 text-lg">
+                                      {buttonLoading === item.id ? "..." : <PlusIcon />}
+                                    </div>
+                                    </HoverCardTrigger>
+                                <HoverCardContent>
+                                  Generate another version of this section of the script
+                                </HoverCardContent>
+                              </HoverCard>
+                              </button>
+                            }
                         </div>
                       </div>
-                      <div></div>
-                      <div className="flex-col grow-0 max-w-48  min-w-48  w-48 ">
+                      <div className="w-[25rem] flex grow-0">
+                        {item.scriptMedia ? <img src={`${item.scriptMedia}`} className="w-full aspect-video object-cover rounded-lg"/> : 
+                        <div className="border p-4 w-full aspect-video object-cover rounded-lg">No image</div>}
+                      </div>
+                    </div>
+                  </Reorder.Item>
+                ))}
+              </Reorder.Group>
+            </div>
+          </CardContent>
+          <div className="basis-1/2 h-screen fixed w-1/2 right-0">
+          {selectedScript.id !== undefined && 
+            <div className="border p-6 flex flex-col gap-4 items-center rounded-xl mr-8">
+                <h1 className="text-2xl font-bold">
+                  Customise your media 
+                </h1>
+                <h3>
+                  Selected: {selectedScript.sectionName}
+                </h3>
+                <div className="w-full h-full">
+                  <div className="flex flex-row gap-4">
+                    <Button onClick={() => setMediaSelected("GenAI")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
+                    <MediaChoices prompts={selectedScript.imagePrompts??[]} callback={setMediaSelected}/>
+                  </div>
+                  <div className="w-full h-full flex justify-start items-start mt-4 gap-4">
+                  {mediaSelected === "GenAI" ? <div className="flex-col grow-0 w-full">
                         {
-                          <>
-                            {item.scriptMedia !== undefined ? (
-                              <Popover>
+                          <div className="grid grid-cols-3 gap-4 w-full">
+                              {selectedScript.aiImages && selectedScript.aiImages.map((image, index) => (
+                                <Popover key={index}>
                                 <PopoverTrigger asChild>
                                   <img
-                                    src={`local:///${item.scriptMedia}`}
+                                    src={image}
                                     alt="script media"
-                                    className="w-48 aspect-video object-cover rounded-lg"
-                                  />
+                                    className={`aspect-video border rounded-lg overflow-hidden 
+                          ${selectedScript.scriptMedia === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
+                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index])}}
+                                    />
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
                                   <div className="grid gap-4">
@@ -348,47 +421,58 @@ export const ScriptEditor: React.FC = () => {
                                         Customize the prompt for this image
                                       </p>
                                     </div>
-                                    {item.scriptPrompt && (
+                                    {selectedScript.scriptPrompt && (
                                       <ContentEditable
-                                        html={item.scriptPrompt}
-                                        disabled={false}
-                                        onChange={(e) => {
-                                          updatePromptText(e, item.id);
-                                        }}
-                                        className="w-full min-h-20 border rounded-lg p-2 overflow-y-auto	 focus:outline-none"
+                                      html={selectedScript.scriptPrompt}
+                                      disabled={false}
+                                      onChange={(e) => {
+                                        updatePromptText(e, selectedScript.id);
+                                      }}
+                                      className="w-full min-h-20 border rounded-lg p-2 overflow-y-auto	 focus:outline-none"
                                       />
-                                    )}
+                                      )}
                                     <Button
-                                      onClick={() => genAiImage(item, true)}
-                                    >
+                                      onClick={() => genAiImage(selectedScript, true)}
+                                      >
                                       <UpdateIcon />
                                     </Button>
                                   </div>
                                 </PopoverContent>
                               </Popover>
-                            ) : (
-                              <Skeleton className="aspect-video	   flex align-center items-center	justify-center flex-col relative inset-y-0 right-0 w-48	">
-                                <Button onClick={() => genAiImage(item, true)}>
-                                  <UpdateIcon />
+                              ))}
+                              <Skeleton className="aspect-video w-full border flex items-center justify-center	">
+                                <Button className="text-2xl font-bold" onClick={() => {genAiImage(selectedScript, true)}}>
+                                  +
                                 </Button>
                               </Skeleton>
-                            )}
-                          </>
+                            
+                          </div>
                         }
-                      </div>
-                    </div>
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
+                      </div> : 
+                      <div className="grid grid-cols-3 gap-4">
+                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.imageURLS.map((url, index) => {
+                          return (<div key={index} className={`aspect-video border rounded-lg overflow-hidden 
+                          ${selectedScript.scriptMedia === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}
+                    
+                          
+                          `} onClick={async () => setMedia(selectedScript, url)}>
+                            <img src={`${url}`}/>
+                          </div>)
+                      })}
+                      </div>}
+                  </div>
+                  
+                </div>
             </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button onClick={selectTopic} variant="outline">
-              Back
-            </Button>
-            <Button onClick={setScript}>Next</Button>
-          </CardFooter>
-        </FramelessCard>
+            }
+          </div>
+            
+        </div>
+        <CardFooter className="flex w-1/2 justify-between">
+          <Button onClick={selectTopic} variant="outline">Back</Button>
+          <Button onClick={setScript}>Next</Button>
+        </CardFooter>
+      </FramelessCard> 
       )}
     </div>
   );

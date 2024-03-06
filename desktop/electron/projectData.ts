@@ -32,7 +32,20 @@ export function getProjectSubtitleStyle(): string {
   if (!getProjectStore().has("subtitleStyle")) {
     throw new Error("subtitle style not set");
   }
-  return getProjectStore().get("subtitleStyle") as string;
+  return getProjectStore().get("subtitle style") as string;
+}
+
+export function getProjectHasSoundEffect(): boolean {
+  if (!getProjectStore().has("soundEffect")) {
+    throw new Error("soundEffect not set");
+  }
+  return getProjectStore().get("soundEffect") as boolean;
+}
+export function getProjectHasBackgroundAudio(): boolean {
+  if (!getProjectStore().has("backgroundAudio")) {
+    throw new Error("backgroundAudio not set");
+  }
+  return getProjectStore().get("backgroundAudio") as boolean;
 }
 
 export function getProjectVoiceover(): Voiceover {
@@ -58,7 +71,6 @@ export function getProjectScript(): ScriptData[] {
       }
     }
     return []
-    
 }
 
 
@@ -97,6 +109,12 @@ export function setProjectHasSubtitles(hasSubtitles: boolean): void {
 }
 export function setProjectSubtitleStyle(hasSubtitles: string): void {
   getProjectStore().set("subtitles", hasSubtitles);
+}
+export function setProjectHasBackgroundAudio(hasAudio: boolean): void {
+  getProjectStore().set("backgroundAudio", hasAudio);
+}
+export function setProjectHasSoundEffects(hasAudio: boolean): void {
+  getProjectStore().set("soundEffect", hasAudio);
 }
 export function setProjectVoiceover(voiceover: Voiceover): void {
   getProjectStore().set("voiceover", voiceover);
