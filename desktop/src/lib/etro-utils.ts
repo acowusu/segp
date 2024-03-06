@@ -219,16 +219,23 @@ export async function dispatchSectionGeneration(
 
   // needs to run before everyting as this sets the script duration
   const modifiedScript = await generateAudio(section);
+  const promisedOpts: PromisedLayerOpts = {};
+
+  promisedOpts.p_mediaOpts = getMediaOpts(modifiedScript, start);
+  promisedOpts.p_audioOpts = getAudioOpts(modifiedScript, start);
+
+  if (await window.api.getProjectHasAvatar()) {
+    promisedOpts.p_avatarOpts = getAvatarOpts(modifiedScript, start); // undefined if the avatar is not selected for the project, return what is given
+  } else {
+    console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
+  }
+
+  // promisedOpts.p_subtitleOpts = getTextOpts(modifiedScript, start)
+  //   promisedOpts.p_backingOpts = getAudioOpts(modifiedScript, start)
+  //   promisedOpts.p_soundfxOpts = getAudioOpts(modifiedScript, start)
 
   return {
-    promisedOpts: {
-      p_mediaOpts: getMediaOpts(modifiedScript, start),
-      p_audioOpts: getAudioOpts(modifiedScript, start),
-      p_avatarOpts: getAvatarOpts(modifiedScript, start),
-      //   p_subtitleOpts: ,
-      //   p_backingOpts: ,
-      //   p_soundfxOpts: ,
-    },
+    promisedOpts: promisedOpts,
     modifiedSection: modifiedScript,
   };
 }
@@ -339,10 +346,7 @@ export async function generateAudio(section: ScriptData): Promise<ScriptData> {
 }
 
 async function generateAvatar(section: ScriptData): Promise<ScriptData> {
-  if (!window.api.getProjectHasAvatar()) {
-    console.log("No Avatar Option Selected. Skipping Avatar Generation... ");
-    return section; // undefined if the avatar is not selected for the project, return what is given
-  }
+  // avatar option is know to be selected at this point
   try {
     // similar issue with changing avatar is URL changed??
     if (section.avatarVideoUrl) {
