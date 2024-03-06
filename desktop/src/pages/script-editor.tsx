@@ -194,7 +194,8 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
+    // this cannot reset audio everytime, should only be done when audio is actually changed, it should also change the options already stored
+    // await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
     navigate("/presentation");
   };
   const selectTopic = async () => {
