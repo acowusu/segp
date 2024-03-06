@@ -90,6 +90,10 @@ export const PresentationLayout: React.FC = () => {
 
   function stopMovies() {
     Array.from(moviesState[0].values()).forEach((movie) => {
+      // movie.layers.forEach((layer) => {
+      //   layer.detach();
+      // });
+
       movie.stop();
     });
   }
@@ -209,6 +213,11 @@ export const PresentationSection: React.FC = () => {
       console.log("canvas is null");
       return;
     }
+
+    if (movieRef.current) {
+      movieRef.current.stop();
+    }
+
     const movie = movies.get(id);
 
     // if a movie already exists don;t make a new one
@@ -273,6 +282,7 @@ export const PresentationSection: React.FC = () => {
         ...currentLayerOptions.avatarOpts,
         ...overrideAudioOpts,
       });
+
     //TODO: must also be written back to script here
     console.log("Section looks like:", sectionData);
     setDataMap((map) => map.set(id, sectionData));

@@ -411,7 +411,8 @@ export function addAvatarLayer(
   console.log("adding chroma to avatar");
   layer.effects.push(chromaKey);
   console.log("added chroma to avatar");
-  movie.layers.push(layer);
+  // movie.layers.push(layer);
+  movie.addLayer(layer);
   console.log("Added avatar layer");
   return [effectiveOpts, layer];
 }

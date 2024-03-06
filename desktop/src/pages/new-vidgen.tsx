@@ -80,12 +80,15 @@ export const NewVideoGenerator: React.FC = () => {
     const movie = movieRef.current;
 
     sections.forEach(async (section) => {
-      const { start, script, promisedLayerOptions, layerOptions } = section;
+      const { start, script, promisedLayerOptions, layerOptions, layers } =
+        section;
       const { p_mediaOpts, p_audioOpts, p_avatarOpts } = promisedLayerOptions;
 
       // !!Need to correc the fake start times!
 
-      if (layerOptions) {
+      if (layerOptions && layers) {
+        // these should always exist together, maybe group them in a type?
+
         // if these exist then all the generation is completed, so just load these options
         const {
           mediaOpts,
@@ -95,9 +98,19 @@ export const NewVideoGenerator: React.FC = () => {
           backingOpts,
           soundfxOpts,
         } = layerOptions;
+        const { avatar } = layers;
+
         console.log("Existing layerOptions", layerOptions);
+        // Media:
         addImageLayer(movie, mediaOpts, { startTime: start } as ImageOptions);
-        addAvatarLayer(movie, avatarOpts, { startTime: start } as VideoOptions);
+
+        // Avatar
+        // addAvatarLayer(movie, avatarOpts, { startTime: start } as VideoOptions); DOES NOT WORK
+        if (avatar) {
+          avatar.startTime = start;
+          movie.addLayer(avatar);
+        }
+        console.log("Done adding layers");
       } else {
         // TODO: add toasts here?
         // Primary Media
