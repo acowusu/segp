@@ -57,15 +57,16 @@ export const SetTopic: React.FC = () => {
           <CardTitle>Select Topic</CardTitle>
           <CardDescription>
             These topics were identified in the report provided.
-            <br className="mb-4" />
+
+          </CardDescription>
+            <div>
             <Badge variant={"secondary"}  className="mt-2 cursor-pointer"
             onClick={()=>toast.promise(window.api.getTopics(true).then(setItems), {
               loading: `Regenerating topics...`,
               success: `Done`,
               error: (e)=>`Error Regenerating: ${e}` 
             })}>Refresh</Badge>
-
-          </CardDescription>
+            </div>
         </CardHeader>
         <CardContent className="h-4/6">
           <ScrollArea className="h-4/6">
