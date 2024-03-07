@@ -160,7 +160,7 @@ export function SetVisuals() {
     defaultValues,
   });
 
-  const onSubmit = useCallback((data: FormValues) =>  {
+  const onSubmit = (data: FormValues) =>  {
     console.log(data);
     window.api.setProjectHasAvatar(data.avatar || false);
     window.api.setProjectHasSubtitles(data.subtitles || false);
@@ -174,23 +174,18 @@ export function SetVisuals() {
     setVoiceover(voiceoverItems.find(item => item.id === data.voiceover)!)
     setAudience(audienceItems.find(item => item.name === data.audience)!)
     setAvatar(avatarItems.find(item => item.id === data.avatarSelection)!)
+    navigate("/set-topic")
+  }
 
-  }, [audienceItems, setAudience, setVoiceover, voiceoverItems, avatarItems, setAvatar])
-
-  const {watch,handleSubmit }  = form
-  useEffect(() => {
-    // TypeScript users 
-    const subscription = watch(() => handleSubmit(onSubmit)())
-    return () => subscription.unsubscribe();
-  }, [watch, handleSubmit, onSubmit]);
   const { avatar, subtitles, subtitleSize, fontType, avatarSelection } = form.watch();
   return (
     <>
       <h1 className="text-4xl font-bold pb-8">
         Project Settings
       </h1>
+      
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex flex-col xl:flex-row gap-8">
+        <form className="space-y-8 flex flex-col xl:flex-row gap-8">
           <div className="max-w-[40rem] w-full">
             <h3 className="mb-4 text-lg font-medium">Configuration</h3>
             <FormField
@@ -458,7 +453,7 @@ export function SetVisuals() {
               subtitleStyle={subtitleSize + " " + fontType}
               />
 
-              <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
+              <Button onClick={() => onSubmit(form.getValues())}>Generate Topics</Button>
           </div>
         </form>
       </Form>
