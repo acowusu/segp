@@ -102,7 +102,7 @@ export const ScriptEditor: React.FC = () => {
 
   const handleDeleteCurrent = async (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    var newIndex = items.findIndex((item) => item.id == selectedScript.id) 
+    let newIndex = items.findIndex((item) => item.id == selectedScript.id) 
     const newItems = items.filter((item) => item.id !== selectedScript.id)
     if (newIndex >= newItems.length) {
       newIndex -= 1
@@ -171,7 +171,7 @@ export const ScriptEditor: React.FC = () => {
   ) => {
     setItems(
       items.map((script) => {
-        if (script.id === item.id) {
+        if (script.id === item.id && script.selectedScriptIndex !== index) {
           script.selectedScriptIndex = index;
           script.avatarVideoUrl = undefined;
           script.scriptAudio = undefined;
@@ -194,7 +194,7 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
+    await window.api.setScript(items.map((item) => {return {...item}}));
     navigate("/get-video");
   };
   const selectTopic = async () => {
