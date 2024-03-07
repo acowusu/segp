@@ -23,7 +23,7 @@ export function lerp(a: number, b: number, t: number, p: number) {
  * @param sections - An array of script data representing different sections.
  * @param movie - The movie object to which the image layers will be added.
  * @throws {Error} - If no media or duration is found in a section.
- *
+ */
 export function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
   let start = 0;
   for (const section of sections) {

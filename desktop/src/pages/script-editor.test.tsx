@@ -63,7 +63,7 @@ describe("ScriptEditor", () => {
           selectedScriptIndex: 0,
           scriptTexts: ["This is a test script", "This is a test script 2"],
           sectionName: "Section 1",
-          scriptMedia: {url: "image1.jpg", author: "matthew", width: 100, height: 100},
+          scriptMedia: {url: "image1.jpg", author: "matthew"},
           scriptDuration: 5,
         },
         // Add more sections as needed
@@ -98,13 +98,13 @@ describe("ScriptEditor", () => {
             selectedScriptIndex: 0,
             scriptTexts: [""],
             sectionName: "Section 1",
-            scriptMedia: {url: "image1.jpg", author: "matthew", width: 100, height: 100},
+            scriptMedia: {url: "image1.jpg", author: "matthew"},
             imagePrompts: [{ prompt: "A prompt", unsplashedImages: [{url: "example.com" ,author: "matthew"}] }],
             scriptDuration: 5,
           },
           {
             id: "2",
-            scriptMedia: {url: "image2.jpg", author: "matthew", width: 100, height: 100},
+            scriptMedia: {url: "image2.jpg", author: "matthew"},
             scriptDuration: 10,
             sectionName: "Section 2",
             selectedScriptIndex: 0,
@@ -116,7 +116,7 @@ describe("ScriptEditor", () => {
         .mockResolvedValueOnce([
           {
             id: "2",
-            scriptMedia: {url: "image2.jpg", author: "matthew", width: 100, height: 100},
+            scriptMedia: {url: "image2.jpg", author: "matthew"},
             scriptDuration: 10,
             sectionName: "Section 2",
             selectedScriptIndex: 0,
@@ -157,12 +157,12 @@ describe("ScriptEditor", () => {
           selectedScriptIndex: 0,
           scriptTexts: [""],
           sectionName: "Section 1",
-          scriptMedia: {url: "image1.jpg", author: "matthew", width: 100, height: 100},
+          scriptMedia: {url: "image1.jpg", author: "matthew"},
           scriptDuration: 5,
         },
         {
           id: "2",
-          scriptMedia: {url: "image2.jpg", author: "matthew", width: 100, height: 100},
+          scriptMedia: {url: "image2.jpg", author: "matthew"},
           scriptDuration: 10,
           sectionName: "Section 2",
           selectedScriptIndex: 0,

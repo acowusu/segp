@@ -141,7 +141,7 @@ export const ScriptEditor: React.FC = () => {
       console.log(imgPath);
       const updatedItems = items.map((item) => {
         if (item.id === script.id) {
-          item.scriptMedia = {url: imgPath, author: "AI", width: 1920, height: 1080};
+          item.scriptMedia = {url: imgPath, author: "AI"};
           item.scriptPrompt = resolvedPrompt;
           item.aiImages = item.aiImages ? [...item.aiImages, imgPath] : [imgPath]
         }
@@ -155,10 +155,10 @@ export const ScriptEditor: React.FC = () => {
       console.log("Media already exists");
     }
   };
-  const setMedia = async (script: ScriptData, url: string, author: string, width: number, height: number) => {
+  const setMedia = async (script: ScriptData, url: string, author: string) => {
     const newItems = items.map((item) => {
       if (script.id === item.id) {
-        item.scriptMedia = {url: url, author: author, width: width, height: height};
+        item.scriptMedia = {url: url, author: author};
       }
       return item;
     })
@@ -410,7 +410,7 @@ export const ScriptEditor: React.FC = () => {
                                     alt="script media"
                                     className={`aspect-video border rounded-lg overflow-hidden 
                           ${selectedScript.scriptMedia?.url === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
-                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], "AI", 1920, 1080)}}
+                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], "AI")}}
                                     />
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
@@ -451,11 +451,11 @@ export const ScriptEditor: React.FC = () => {
                         }
                       </div> : 
                       <div className="grid grid-cols-3 gap-4">
-                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.unsplashedImages.map(({url, author, width, height}, index) => {
+                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.unsplashedImages.map(({url, author}, index) => {
                           return (
                             <div key={index} className={`aspect-video border rounded-lg overflow-hidden relative group
                               ${selectedScript.scriptMedia?.url === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover:border-dashed border-2"}
-                            `} onClick={async () => setMedia(selectedScript, url, author, width, height)}>
+                            `} onClick={async () => setMedia(selectedScript, url, author)}>
                               <img src={`${url}`} alt="Unsplash"/>
                               <div className="p-2 bg-black bg-opacity-70 w-full absolute bottom-0 invisible group-hover:visible text-primary font-bold">
                                 credit: {author}

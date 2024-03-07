@@ -28,8 +28,6 @@ export interface ImageData {
 export interface unsplashedImages {
   url: string;
   author: string;
-  width: number;
-  height: number;
 }
 
 
