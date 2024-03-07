@@ -348,7 +348,7 @@ export const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie)
     });
     const effect = new etro.effect.ChromaKey({
       target: new etro.Color(0, 0, 0, 0), // default: new etro.Color(1, 0, 0, 1)
-      threshold: 10, .5
+      threshold: 10, 
       interpolate: false, // default: false
     })
     layer.effects.push(
