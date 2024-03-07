@@ -304,7 +304,7 @@ export function addImageLayer(
 ): [ImageOptions, etro.layer.Image] {
   console.log("Adding image layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
-  console.log("!!!! MEDIA OPTS:", effectiveOpts); // first load https://images.unsplash.com/38/QoR8Bv1S2SEqH6UcSJC…x8fDE3MDk3NTIwNDR8MA&ixlib=rb-4.0.3&w=1920&h=1080
+  console.log("!!!! MEDIA OPTS:", effectiveOpts);
   const layer = new etro.layer.Image(effectiveOpts);
   movie.addLayer(layer);
   console.log("Added image layer");
@@ -318,6 +318,7 @@ export function addAudioLayer(
 ): [AudioOptions, etro.layer.Audio] {
   console.log("Adding audio layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
+  console.log("!!!! AUDIO OPTS:", effectiveOpts);
   const layer = new etro.layer.Audio(effectiveOpts);
   movie.addLayer(layer);
   console.log("Added audio layer");
@@ -338,6 +339,7 @@ export function addAvatarLayer(
 ): [VideoOptions, etro.layer.Video] {
   console.log("Adding avatar layer");
   const effectiveOpts = { ...opts, ...(overrideOpts ?? {}) };
+  console.log("!!!! AVATAR OPTS:", effectiveOpts);
   const layer = new etro.layer.Video(effectiveOpts);
   const chromaKey = new etro.effect.ChromaKey({
     target: new etro.Color(0, 0, 0, 0), // default: new etro.Color(1, 0, 0, 1)
