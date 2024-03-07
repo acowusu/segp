@@ -84,7 +84,7 @@ export async function fetchImages(prompts: Array<string>): Promise<Array<Array<u
     const unsplashResponse = await fetch(unsplashEndpoint);
     const unsplashData = await unsplashResponse.json();
 
-    const unsplashPhotos = unsplashData.results.map((photo: { width: number, height: number, urls: { raw: string }, user: {name: string} }) => {return {url: photo.urls.raw + "&w=1920&h=1080", author: photo.user.name, width: photo.width, height: photo.height}});
+    const unsplashPhotos = unsplashData.results.map((photo: { urls: { raw: string }, user: {name: string} }) => {return {url: photo.urls.raw + "&w=1920&h=1080", author: photo.user.name}});
 
     imageFilePaths.push(unsplashPhotos);
     
