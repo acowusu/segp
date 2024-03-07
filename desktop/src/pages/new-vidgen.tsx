@@ -23,6 +23,7 @@ import {
   addSubtitleLayer,
   fixLerpForMediaLayer,
   getMediaLayer,
+  loadAssets,
   updateMetadataWithOpts,
 } from "../lib/etro-utils";
 import {
@@ -93,133 +94,28 @@ export const NewVideoGenerator: React.FC = () => {
 
       // !!! Need to correct the fake start times!
 
-      if (layerOptions && layers) {
-        // these should always exist together, maybe group them in a type?
-
-        // if these exist then all the generation is completed, so just load these options
-        const {
-          mediaOpts,
-          audioOpts,
-          avatarOpts,
-          subtitleOpts,
-          backingOpts,
-          soundfxOpts,
-        } = layerOptions;
-        const { avatar } = layers;
-
-        console.log("Existing layerOptions", layerOptions);
-        // Media:
-        if (mediaOpts) {
-          addImageLayer(movie, mediaOpts, { startTime: start } as ImageOptions);
+      const [finalOpts, finalLayers] = await loadAssets(
+        movie,
+        promisedLayerOptions,
+        layerOptions,
+        {
+          mediaOpts: { startTime: start } as ImageOptions,
+          audioOpts: { startTime: start } as AudioOptions,
+          avatarOpts: { startTime: start } as VideoOptions,
+          subtitleOpts: { startTime: start } as TextOptions,
+          backingOpts: { startTime: start } as AudioOptions,
+          soundfxOpts: { startTime: start } as AudioOptions,
         }
+      );
+      // }
 
-        if (audioOpts) {
-          addAudioLayer(movie, audioOpts, { startTime: start } as AudioOptions);
-        }
+      console.log("Vidgen: all asset layers are loaded into movie", movie);
+      console.log("Vidgen: final asset options", finalOpts);
+      // sectionData.layerOptions = finalOpts;
+      // sectionData.layers = finalLayers;
 
-        // Avatar
-        // addAvatarLayer(movie, avatarOpts, { startTime: start } as VideoOptions); DOES NOT WORK
-        if (avatar) {
-          avatar.startTime = start;
-          movie.addLayer(avatar);
-        }
-        console.log("Done adding layers");
-      } else {
-        // TODO: add toasts here?
-        // Primary Media
-        if (!promisedLayerOptions) {
-          throw new Error(
-            "new-vidgen/generateMovie: the promises must now exist as the layer/options dont"
-          );
-        }
-        const {
-          p_mediaOpts,
-          p_avatarOpts,
-          p_audioOpts,
-          p_subtitleOpts,
-          p_backingOpts,
-          p_soundfxOpts,
-        } = promisedLayerOptions!; // if no layers or opts exist promises must exist
-
-        const finalOpts: LayerOpts = {};
-        const finalLayers: Layers = {};
-
-        // Change the Optionalness of some of these layers
-        const waitMedia = p_mediaOpts?.then((opts) => {
-          const [effOpts, layer] = addImageLayer(movie, opts, {
-            startTime: start,
-          } as ImageOptions);
-          finalOpts.mediaOpts = effOpts;
-          finalLayers.media = layer;
-          console.log("passed media");
-        });
-
-        const waitAudio = p_audioOpts?.then((opts) => {
-          const [effOpts, layer] = addAudioLayer(movie, opts, {
-            startTime: start,
-          } as AudioOptions);
-          finalOpts.audioOpts = effOpts;
-          finalLayers.audio = layer;
-          console.log("passed audio");
-        });
-
-        const waitAvatar = p_avatarOpts?.then((opts) => {
-          const [effOpts, layer] = addAvatarLayer(movie, opts, {
-            startTime: start,
-          } as VideoOptions);
-          finalOpts.avatarOpts = effOpts;
-          finalLayers.avatar = layer;
-          console.log("passed avatar");
-        });
-
-        const waitSubtitle = p_subtitleOpts?.then((opts) => {
-          // subtitles must be displayed above avatar
-          waitAvatar?.then(() => {
-            const [effOpts, layer] = addSubtitleLayer(movie, opts, {
-              startTime: start,
-            } as TextOptions);
-            finalOpts.subtitleOpts = effOpts;
-            finalLayers.subtitle = layer;
-          });
-          console.log("passed subtitle");
-        });
-
-        const waitBacking = p_backingOpts?.then((opts) => {
-          const [effOpts, layer] = addAudioLayer(movie, opts, {
-            startTime: start,
-          } as AudioOptions);
-          finalOpts.backingOpts = effOpts;
-          finalLayers.backing = layer;
-          console.log("passed backing");
-        });
-
-        const waitSoundFx = p_soundfxOpts?.then((opts) => {
-          const [effOpts, layer] = addAudioLayer(movie, opts, {
-            startTime: start,
-          } as AudioOptions);
-          finalOpts.soundfxOpts = effOpts;
-          finalLayers.soundfx = layer;
-          console.log("passed soundfx");
-        });
-
-        await Promise.all([
-          waitMedia,
-          waitAudio,
-          waitAvatar,
-          waitSubtitle,
-          waitBacking,
-          waitSoundFx,
-        ]);
-        // }
-
-        console.log("Vidgen: all asset layers are loaded into movie", movie);
-        console.log("Vidgen: final asset options", finalOpts);
-        // sectionData.layerOptions = finalOpts;
-        // sectionData.layers = finalLayers;
-
-        console.log("starting update opts");
-        await updateMetadataWithOpts(script, finalOpts);
-      }
+      console.log("starting update opts");
+      await updateMetadataWithOpts(script, finalOpts);
 
       setCurrentProcess(`${script.sectionName} assets added`);
     });
