@@ -166,7 +166,11 @@ export async function setAudience(audience: Audience): Promise<void> {
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
   console.log("setVoiceover", voiceover);
-  
+  const currentVoiceover = projectData.getProjectVoiceover();
+  if (currentVoiceover.id == voiceover.id) {
+    console.log("Voiceover already set")
+    return
+  }
  projectData.setProjectScript(
   projectData.getProjectScript().map((script) => {
     script.scriptAudio = undefined;
