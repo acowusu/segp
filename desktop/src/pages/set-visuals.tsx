@@ -55,6 +55,8 @@ const defaultValues: () => Promise<Partial<FormValues>> = async () => {
     avatar: await window.api.getProjectHasAvatar().catch(() => false)!,
     subtitles: await window.api.getProjectHasSubtitles().catch(() => false)!,
     subtitleStyle: await window.api.getProjectSubtitleStyle().catch(() => "80px sans-serif")!,
+    subtitleSize: await window.api.getProjectSubtitleStyle().catch(() => "80px")!,
+    fontType: await window.api.getProjectSubtitleStyle().catch(() => "sans-serif")!,
     audience: (await window.api.getProjectAudience().catch(() => ({ name: "" }))).name!,
     voiceover: (await window.api.getProjectVoiceover().catch(() => ({ id: "" }))).id!,
     backgroundAudio:  await window.api.getProjectHasBackgroundAudio().catch(()=>false)!,
@@ -453,6 +455,7 @@ export function SetVisuals() {
               avatarUrl={selectedAvatar.imagePath ?? "big-person.png"}
               showAvatar={avatar}
               showSubtitle={subtitles}
+              subtitleStyle={subtitleSize + " " + fontType}
               />
 
               <Button onClick={() => navigate("/set-topic")}>Generate Topics</Button>
