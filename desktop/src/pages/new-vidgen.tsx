@@ -255,9 +255,7 @@ export const NewVideoGenerator: React.FC = () => {
             <Button
               className="ml-4"
               onClick={() => {
-                movieRef.current?.play({
-                  duration: 1.0,
-                });
+                movieRef.current?.play();
                 setCurrentState("playing");
                 console.log("playing");
                 console.log(movieRef.current);

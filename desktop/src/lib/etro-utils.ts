@@ -523,7 +523,6 @@ export async function loadAssets(
   // go through all assets and create the given layers
 
   if (mediaOpts) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [opts, mediaLayer] = addImageLayer(
       movie,
       mediaOpts,
@@ -545,7 +544,6 @@ export async function loadAssets(
   }
 
   if (audioOpts) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [opts, audioLayer] = addAudioLayer(
       movie,
       audioOpts,
@@ -567,8 +565,7 @@ export async function loadAssets(
     });
   }
 
-  if (avatarOpts) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  if ((await window.api.getProjectHasAvatar()) && avatarOpts) {
     const [opts, avatarLayer] = addAvatarLayer(
       movie,
       avatarOpts,
@@ -587,7 +584,6 @@ export async function loadAssets(
   }
 
   if (subtitleOpts) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [opts, subtitleLayer] = addSubtitleLayer(
       movie,
       subtitleOpts,
@@ -614,7 +610,6 @@ export async function loadAssets(
   }
 
   if (backingOpts) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [opts, backingLayer] = addAudioLayer(
       movie,
       backingOpts,
@@ -633,7 +628,6 @@ export async function loadAssets(
   }
 
   if (soundfxOpts) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [opts, soundfxLayer] = addAudioLayer(
       movie,
       soundfxOpts,
