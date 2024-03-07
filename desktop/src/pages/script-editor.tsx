@@ -47,7 +47,10 @@ export const ScriptEditor: React.FC = () => {
   const [buttonLoading, setButtonLoading] = useState("");
   const [mediaSelected, setMediaSelected] = useState("")
 
-  const loadingImages = ["./analysingpdf.png", "./inspiration.png", "./dict.png" ,"./writing.png"]
+  const loadingImages = ["./reading_loading.png", "./extracting_loading.png", "./understanding_loading.png", 
+                        "./consulting_loading.png", "./creating_loading.png", "./generating_loading.png", "./fetching_loading.png", 
+                        "./drinks_loading.png", "./checking_loading.png", "./suggesting_loading.png", "./friend_loading.png", "./final_loading.png", 
+                        "./complete_loading.png"]
 
   const LoadingScripts = ({
     generationProgress,
@@ -65,8 +68,8 @@ export const ScriptEditor: React.FC = () => {
           About video:  {topic?.summary}
         </h1>
         {generationProgress <= 100 ? <><div className="w-full mb-4 flex align-center items-center	justify-center flex-col gap-4">
-          <img src={loadingImages[(Math.floor(generationProgress / 25)) % 4]} width={500} height={500}/>
-          <div className="font-bold text-xl">{loadingMessages[(Math.floor(generationProgress / 5)) % 20]}</div>
+          <img src={loadingImages[(Math.floor(generationProgress / 9)) % 13]} width={500} height={500}/>
+          <div className="font-bold text-xl">{loadingMessages[(Math.floor(generationProgress / 9)) % 13]}</div>
         </div>
         <Progress value={generationProgress} className="w-5/6 mt-4" /></> 
         : 
