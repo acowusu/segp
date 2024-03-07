@@ -54,17 +54,6 @@ export const VideoGenerator: React.FC = () => {
     console.log("setting up player", movie);
     const script = await window.api.getScript();
     await addAudioLayers(script, movie);
-    // const backing = await window.api.getProjectBackingTrack();
-    // const backingLayer = new etro.layer.Audio({
-      //   startTime: 0,
-      //   duration: backing.audioDuration,
-      //   source: await window.api.toDataURL(backing.audioSrc),
-      //   sourceStartTime: 0, // default: 0
-      //   muted: false, // default: false
-      //   volume: 0.5, // default: 1
-      //   playbackRate: 1, //default: 1
-      // });
-      // movie.layers.push(backingLayer);
       addImageLayers(script, movie);
       await toast.promise(addAvatarLayers(script, movie).then(()=>addSubtitleLayers(script, movie)
       ), {
@@ -72,7 +61,6 @@ export const VideoGenerator: React.FC = () => {
         success: `Avatar Layers have been added.  `,
         error: (error)=> `Error adding Avatar Layers ${error}` ,
       })
-    // await addSadTalkerLayers(script, movie);
 
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);
