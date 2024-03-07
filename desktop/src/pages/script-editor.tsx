@@ -275,12 +275,12 @@ export const ScriptEditor: React.FC = () => {
             </div>
           </CardHeader>
           <div className="flex my-4">
-          <CardContent className="h-4/6 basis-1/2">
+          <CardContent className="h-4/6 w-1/2">
             <div className="flex flex-col gap-2 pt-0  ">
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
                   <Reorder.Item key={item.id} value={item} className="mb-4"  data-testid="script-section">
-                    <div className="flex flex-row gap-2  ">
+                    <div className="flex flex-row gap-2 max-h-[10rem] ">
                       <div
                         key={item.id}
                         data-testid="script-section-clickable"
@@ -329,7 +329,7 @@ export const ScriptEditor: React.FC = () => {
                             <ArrowLeftIcon />
                           </button>
                           {selectedScript.id === item.id ? (
-                            <div className="mx-4 p-2">
+                            <div className="mx-4 p-2 overflow-auto no-scrollbar">
                               <ContentEditable
                                 html={item.scriptTexts[item.selectedScriptIndex]}
                                 disabled={false}
@@ -384,7 +384,7 @@ export const ScriptEditor: React.FC = () => {
               </Reorder.Group>
             </div>
           </CardContent>
-          <div className="basis-1/2 h-screen fixed w-1/2 right-0">
+          <div className="h-full fixed w-1/2 right-0">
           {selectedScript.id !== undefined && 
             <div className="border p-6 flex flex-col gap-4 items-center rounded-xl mr-8">
                 <h1 className="text-2xl font-bold">
