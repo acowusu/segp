@@ -119,7 +119,8 @@ export const ScriptEditor: React.FC = () => {
   ) => {
     if (userInitiated && !script.scriptMediaIsVideo) {
       console.log(script.scriptMedia)
-      const video = window.api.imageToVideo(script.scriptMedia!, 7, 3);
+      const imgPath = script.scriptMedia!.replace("local:///", "")
+      const video = window.api.imageToVideo(imgPath, 7, 10);
       toast.promise(video, {
         loading: `Generating Video from ${script.scriptMedia} for ${script.sectionName}`,
         success: (video) => `Video Generated: ${video}`,
@@ -407,7 +408,7 @@ export const ScriptEditor: React.FC = () => {
                       </div>
                       <div className="w-[25rem] flex grow-0">
                         {(item.scriptMedia && !item.scriptMediaIsVideo) ? <img src={`${item.scriptMedia}`} className="w-full aspect-video object-cover rounded-lg"/> : 
-                        item.scriptMedia ? <video src={`${item.scriptMedia}`} controls/> :
+                        item.scriptMedia ? <video muted autoPlay loop className="w-full aspect-video object-cover rounded-lg"> <source src={`${item.scriptMedia}`} type="video/mp4"/> </video> :
                         <div className="border p-4 w-full aspect-video object-cover rounded-lg">No image</div>}
                       </div>
                     </div>
@@ -441,7 +442,7 @@ export const ScriptEditor: React.FC = () => {
                                   <img
                                     src={image}
                                     alt="script media"
-                                    className={`aspect-video border rounded-lg overflow-hidden 
+                                    className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
                           ${selectedScript.scriptMedia === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
                                     onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], false)}}
                                     />
@@ -487,13 +488,15 @@ export const ScriptEditor: React.FC = () => {
                         {
                           <div className="grid grid-cols-3 gap-4 w-full">
                               {selectedScript.aiVideos && selectedScript.aiVideos.map((video, index) => (
+                                <div key={index}>
                                   <video
                                     src={video}
-                                    className={`aspect-video border rounded-lg overflow-hidden 
+                                    className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
                                     ${selectedScript.scriptMedia === selectedScript.aiVideos![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
                                     onClick={() => {setMedia(selectedScript, selectedScript.aiVideos![index], true)}}
                                     controls
                                   />
+                                </div>
                               ))}
                               <Skeleton className="aspect-video w-full border flex items-center justify-center	">
                                 <Button className="text-2xl font-bold" onClick={() => {genAIVideo(selectedScript, true)}}>
@@ -506,7 +509,7 @@ export const ScriptEditor: React.FC = () => {
                       </div> :
                       <div className="grid grid-cols-3 gap-4">
                         {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.imageURLS.map((url, index) => {
-                          return (<div key={index} className={`aspect-video border rounded-lg overflow-hidden 
+                          return (<div key={index} className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
                           ${selectedScript.scriptMedia === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}          
                           `} onClick={async () => setMedia(selectedScript, url, false)}>
                             <img src={`${url}`}/>

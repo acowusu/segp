@@ -29,6 +29,6 @@ export async function imageToVideo(imagePath: string, fps: number=7, videoLength
         body: form,
     });
 
-    console.log("Destination: ", destination);
-    return destination;
+    console.log("Destination: ", "local:///" + destination);
+    return "local:///" + destination;
 }
