@@ -47,7 +47,7 @@ export const VideoGenerator: React.FC = () => {
     const movie = new etro.Movie({
       canvas: canvas,
       repeat: false,
-      background: etro.parseColor("#ccc"),
+      background: etro.parseColor("#e74c3c"),
     });
     canvas.width = 1920;
     canvas.height = 1080;
@@ -117,8 +117,8 @@ export const VideoGenerator: React.FC = () => {
     const blob: Blob = (await movieRef.current?.record({
       frameRate: 24,
       type: 'video/webm;codecs=h264',
-      // audio: default true,
-      // video: default true,
+      audio: true,
+      video: true,
       // duration: default end of video
       // onStart: optional callback
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
