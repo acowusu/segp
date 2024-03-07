@@ -156,7 +156,7 @@ export const generateScript = async (report: string, topic:Topic): Promise<Scrip
                 selectedScriptIndex: 0,
                 sectionName: section.title + " Part " + (i+1).toString(),
                 scriptTexts: [sentence.text],
-                scriptMedia: imgPrompts[0].imageURLS[0]
+                scriptMedia: imgPrompts[0].unsplashedImages[0]
                 }
         })
         return await Promise.all(sentences);
@@ -230,7 +230,7 @@ export const genImagePrompts = async (script: string): Promise<ImageData[]> => {
             const imageURL = (await fetchImages([prompt]))[0].splice(0, 10); 
             return {
             prompt: prompt,
-            imageURLS: imageURL
+            unsplashedImages: imageURL
         } as ImageData});
 
         return await Promise.all(images);

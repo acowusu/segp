@@ -82,25 +82,25 @@ export const MockVideo: React.FC<MockVideoProps> = ({
       startTime: 0,
       duration: 9,
       text:  (_element: etro.EtroObject, time: number) => {
-        return Math.round(time) % 2 ==0 ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation" : "llamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+        return Math.round(time) % 2 ==0 ? "Lorem ipsum dolor sit amet" : "consectetur adipiscing elit";
       },
-      x: WIDTH/2-WIDTH/4, // default: 0
-      y: HEIGHT-200, // default: 0
-      width: WIDTH/2, // default: null (full width)
-      height: parseInt(subtitleStyle) + 20, // default: null (full height)
+      x: 0, // default: 0
+      y: 0, // default: 0
       opacity: 1, // default: 1
       color: etro.parseColor('white'), // default: new etro.Color(0, 0, 0, 1)
       font: subtitleStyle, // default: '10px sans-serif'
-      textX: WIDTH/4, // default: 0
-      textY: parseInt(subtitleStyle), // default: 0
+      textX: (3 * WIDTH / 4) / 2, // default: 0
+      textY: HEIGHT, // default: 0
       textAlign: 'center', // default: 'left'
       textBaseline: 'alphabetic', // default: 'alphabetic'
       textDirection: 'ltr', // default: 'ltr'
-      background: new etro.Color(0, 0, 0, 0.51), // default: null (transparent)
+      background: new etro.Color(0, 0, 0, 0.0), // default: null (transparent)
       // textStroke: { // default: null (no stroke)
       //   color: etro.parseColor('black'),
       //   thickness: 5, // default: 1
       // },
+      //text: section.scriptTexts[section.selectedScriptIndex],
+      maxWidth: 3 * WIDTH / 4, // default: null (no maximum width)
     });
     
 
