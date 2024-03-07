@@ -72,7 +72,7 @@ const createZoomOutLayer = (section: ScriptData, start: number) => {
     },
     x: 0,
     y: 0,
-    opacity: 1, // default: 1
+    opacity: 1, 
   });
 }
 
@@ -95,7 +95,7 @@ const createSlideLayer = (section: ScriptData, start: number) => {
     destHeight: HEIGHT * 1.2,
     x: 0,
     y: 0,
-    opacity: 1, // default: 1
+    opacity: 1, 
   });
 }
 
@@ -160,7 +160,6 @@ export function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
       maxWidth: 3 * WIDTH / 4, // default: null (no maximum width)
     });
     movie.layers.push(layer);
-    console.log("adding layer", layer);
 
     start += section.scriptDuration;
   });
@@ -186,10 +185,9 @@ export async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) 
       sourceStartTime: 0,
       muted: false, // default: false
       volume: 1, // default: 1
-      playbackRate: 1, //default: 1
+      playbackRate: 1, 
     });
     movie.layers.push(layer);
-    console.log("adding layer", layer);
 
     if (section.soundEffect) {
       const effectLayer = new etro.layer.Audio({
@@ -199,11 +197,11 @@ export async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) 
         sourceStartTime: 0,
         muted: false, // default: false
         volume: 0.6, // default: 1
-        playbackRate: 1, //default: 1
+        playbackRate: 1, 
       });
       movie.layers.push(effectLayer);
       console.log("adding sound effect layer", effectLayer);
-    };
+    }
     start += section.scriptDuration;
 
 
@@ -216,8 +214,8 @@ export async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) 
       source: bgAudio[0].path,
       sourceStartTime: 0,
       muted: false, // default: false
-      volume: 0.3, // default: 1
-      playbackRate: 1, //default: 1
+      volume: 0.3, 
+      playbackRate: 1, 
     });
     movie.layers.push(effectLayer);
     console.log("adding bg music layer", effectLayer);
@@ -343,20 +341,18 @@ export const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie)
       destHeight: avatar.height / 3, // default: null (full height)
       x: WIDTH - avatar.width / 3,
       y: HEIGHT - avatar.height / 3,
-      opacity: 1, // default: 1
-      volume: 0, // default: 1
+      opacity: 1, 
+      volume: 0, 
     });
     const effect = new etro.effect.ChromaKey({
       target: new etro.Color(0, 0, 0, 0), // default: new etro.Color(1, 0, 0, 1)
-      threshold: 10, 
+      threshold: 10,
       interpolate: false, // default: false
     })
     layer.effects.push(
       effect
     );
     movie.layers.push(layer);
-    console.log("adding layer", layer);
-
     start += section.scriptDuration;
   }
 }
