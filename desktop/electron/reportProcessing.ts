@@ -9,6 +9,7 @@ import type {
   Topic,
   Visual,
   Voiceover,
+  unsplashedImages,
 } from "./mockData/data";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
@@ -72,9 +73,9 @@ export async function downloadFile(url: URL | RequestInfo, fileDirectory: string
 
 
 // Takes in an array of prompts for images and returns an array of array of filepaths to the images
-export async function fetchImages(prompts: Array<string>): Promise<Array<Array<string>>> {
+export async function fetchImages(prompts: Array<string>): Promise<Array<Array<unsplashedImages>>> {
 
-  const imageFilePaths: Array<Array<string>> = [];
+  const imageFilePaths: Array<Array<unsplashedImages>> = [];
   const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI'];
   
   for (const prompt of prompts) {
@@ -83,7 +84,7 @@ export async function fetchImages(prompts: Array<string>): Promise<Array<Array<s
     const unsplashResponse = await fetch(unsplashEndpoint);
     const unsplashData = await unsplashResponse.json();
 
-    const unsplashPhotos = unsplashData.results.map((photo: { urls: { raw: string } }) => photo.urls.raw + "&w=1920&h=1080");
+    const unsplashPhotos = unsplashData.results.map((photo: { urls: { raw: string }, user: {name: string} }) => {return {url: photo.urls.raw + "&w=1920&h=1080", author: photo.user.name}});
 
     imageFilePaths.push(unsplashPhotos);
     
