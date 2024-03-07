@@ -10,10 +10,19 @@ export const mockApi:IAPI = {
     getProjectAudience: function (): Promise<Audience> {
         throw new Error("Function not implemented.");
     },
+    getProjectHasBackgroundAudio: function (): Promise<boolean> {
+        throw new Error("Function not implemented.");
+    },
+    getProjectHasSoundEffect: function (): Promise<boolean> {
+        throw new Error("Function not implemented.");
+    },
     getProjectHasAvatar: function (): Promise<boolean> {
         throw new Error("Function not implemented.");
     },
     getProjectHasSubtitles: function (): Promise<boolean> {
+        throw new Error("Function not implemented.");
+    },
+    getProjectSubtitleStyle: function (): Promise<string> {
         throw new Error("Function not implemented.");
     },
     getProjectVoiceover: function (): Promise<Voiceover> {
@@ -49,6 +58,9 @@ export const mockApi:IAPI = {
     setProjectHasSubtitles: function (): Promise<void> {
         throw new Error("Function not implemented.");
     },
+    setProjectSubtitleStyle: function (): Promise<void> {
+        throw new Error("Function not implemented.");
+    },
     setProjectVoiceover: function (): Promise<void> {
         throw new Error("Function not implemented.");
     },
@@ -68,6 +80,12 @@ export const mockApi:IAPI = {
         throw new Error("Function not implemented.");
     },
     setProjectBackingTrack: function (): Promise<void> {
+        throw new Error("Function not implemented.");
+    },
+    setProjectHasBackgroundAudio: function (): Promise<void> {
+        throw new Error("Function not implemented.");
+    },
+    setProjectHasSoundEffects: function (): Promise<void> {
         throw new Error("Function not implemented.");
     },
     getProjectPath: function (): Promise<string> {
@@ -179,6 +197,12 @@ export const mockApi:IAPI = {
         throw new Error("Function not implemented.");
     },
     generateAvatar:  async () => {
+        throw new Error("Function not implemented.");
+    },
+    generateNewScript:  async () => {
+        throw new Error("Function not implemented.");
+    },
+    generateSoundEffect:  async () => {
         throw new Error("Function not implemented.");
     },
 }

@@ -12,7 +12,6 @@ export const multiply =  ({ a, b }: { a: number, b: number }) => {
     return a * b
 }
 
-// import { worker_convertWebmToMp4 } from "./worker";
 
 export interface ImageData {
   data: Uint8ClampedArray;
@@ -50,8 +49,8 @@ export const extractTextFromPDF = async ({
     const pdf = await getDocumentProxy(new Uint8Array(buffer));
 
     const { totalPages, text } = await extractText(pdf, { mergePages: true });
-    const images = [];
-    // console.log("# Extracting images 1");
+    const images: ImageData[] = [];
+    console.log("# Extracting images 1");
     for (let i = 1; i < totalPages; i++) {
         images.push(...(await extractImagesFromPDF({ filePath, pageNumber:i, projectPath })));
     }

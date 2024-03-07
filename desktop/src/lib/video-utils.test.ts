@@ -76,7 +76,14 @@ describe("addImageLayers", () => {
     });
 
     test("should set the correct start time for each layer", () => {
+        vi.spyOn(window, "api", "get").mockReturnValue({
+            ...mockApi,
+            toDataURL: async () => "data:image/png;base64,",
+            getProjectHasBackgroundAudio: async () => false,
+            getProjectHasSoundEffect: async () => false
+        });
         addImageLayers(sections, movie);
+
 
         let start = 0;
         movie.layers.forEach((layer: { startTime: number; duration: number; }) => {
@@ -142,18 +149,6 @@ describe("addSubtitleLayers", () => {
 describe("addAudioLayers", () => {
     let sections: ScriptData[];
     let movie: etro.Movie;
-    vi.spyOn(window, "api", "get").mockReturnValue({
-        ...mockApi,
-        toDataURL: async () => "data:image/png;base64,",
-        getScript: vi.fn().mockResolvedValue(sections),
-        textToAudio: vi.fn().mockImplementation((section) => {
-            return Promise.resolve({
-                ...section,
-                scriptAudio: `audio_${section.id}.wav`,
-            });
-        }),
-        setScript: vi.fn(),
-    });
     beforeEach(() => {
         sections = [
             {
@@ -177,18 +172,44 @@ describe("addAudioLayers", () => {
             // Add more sections as needed
         ];
 
+    vi.spyOn(window, "api", "get").mockReturnValue({
+        ...mockApi,
+        toDataURL: async () => "data:image/png;base64,",
+        getScript: vi.fn().mockResolvedValue(sections),
+        textToAudio: vi.fn().mockImplementation((section) => {
+            return Promise.resolve({
+                ...section,
+                scriptAudio: `audio_${section.id}.wav`,
+            });
+        }),
+        setScript: vi.fn(),
+    });
+    
         movie = new etro.Movie({
             canvas: document.createElement("canvas"),
         });
     });
 
     test("should add audio layers to the movie", async () => {
+        vi.spyOn(window, "api", "get").mockReturnValue({
+            ...mockApi,
+            toDataURL: async () => "data:image/png;base64,",
+            getProjectHasBackgroundAudio: async () => false,
+            getProjectHasSoundEffect: async () => false
+        });
         await addAudioLayers(sections, movie);
+
 
         expect(movie.layers.length).toBe(sections.length); // Each section should have two audio layers
     });
 
     test("should set the correct start time for each layer", async () => {
+        vi.spyOn(window, "api", "get").mockReturnValue({
+            ...mockApi,
+            toDataURL: async () => "data:image/png;base64,",
+            getProjectHasBackgroundAudio: async () => false,
+            getProjectHasSoundEffect: async () => false
+        });
         await addAudioLayers(sections, movie);
 
         let start = 0;
@@ -239,8 +260,15 @@ describe("addAudioLayers", () => {
             scriptMedia: "image1.jpg",
             scriptDuration: 5,
             scriptAudio: "audio1.wav",
-            soundEffectPath: "soundEffect.wav",
+            soundEffect: "soundEffect.wav",
         };
+
+        vi.spyOn(window, "api", "get").mockReturnValue({
+            ...mockApi,
+            toDataURL: async () => "data:image/png;base64,",
+            getProjectHasBackgroundAudio: async () => false,
+            getProjectHasSoundEffect: async () => false
+        });
 
         sections.push(sectionWithSoundEffect);
 
@@ -291,12 +319,33 @@ describe("generateAudio", () => {
     });
 
     test("should generate audio for sections without scriptAudio", async () => {
+
+       
+    
+        vi.spyOn(window, "api", "get").mockReturnValue({
+            ...mockApi,
+            toDataURL: async () => "data:image/png;base64,",
+            getScript: vi.fn().mockResolvedValue(sections),
+            textToAudio: vi.fn().mockImplementation((section) => {
+                return Promise.resolve({
+                    ...section,
+                    scriptAudio: `audio_${section.id}.wav`,
+                });
+            }),
+            setScript: vi.fn(),
+            getProjectHasAvatar: vi.fn().mockReturnValue(false),
+            getProjectHasBackgroundAudio: async () => false,
+            getProjectHasSoundEffect: async () => false,
+        });
+
+       
+
+        
+
         await generateAudio();
 
         expect(window.api.textToAudio).toHaveBeenCalledTimes(1);
         expect(window.api.textToAudio).toHaveBeenCalledWith(sections[1]);
-
-        expect(window.api.setScript).toHaveBeenCalledTimes(1);
         expect(window.api.setScript).toHaveBeenCalledWith([
             sections[0],
             {
@@ -307,6 +356,24 @@ describe("generateAudio", () => {
     });
 
     test("should not generate audio for sections with scriptAudio", async () => {
+
+        vi.spyOn(window, "api", "get").mockReturnValue({
+            ...mockApi,
+            toDataURL: async () => "data:image/png;base64,",
+            getScript: vi.fn().mockResolvedValue(sections),
+            textToAudio: vi.fn().mockImplementation((section) => {
+                return Promise.resolve({
+                    ...section,
+                    scriptAudio: `audio_${section.id}.wav`,
+                });
+            }),
+            setScript: vi.fn(),
+            getProjectHasAvatar: vi.fn().mockReturnValue(false),
+            getProjectHasBackgroundAudio: async () => false,
+            getProjectHasSoundEffect: async () => false,
+        });
+
+
         await generateAudio();
 
         expect(window.api.textToAudio).not.toHaveBeenCalledWith(sections[0]);

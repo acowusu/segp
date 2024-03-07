@@ -26,7 +26,11 @@ describe("ScriptEditor", () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
       getVisuals: async () => mockVisuals,
+      getProjectHasBackgroundAudio: async () => false,
+      getProjectHasSoundEffect: async () => false,
       getProjectVisual: async () => mockVisuals[0],
+      setProjectHasBackgroundAudio: async () => {},
+      setProjectHasSoundEffects: async () => {},
       setVisual: async () => {},
       setAudience: async () => {},
       setVoiceover: async () => {},
@@ -40,9 +44,11 @@ describe("ScriptEditor", () => {
       getProjectTopic: async () => mockTopics[0],
       getProjectAvatar: async () => mockAvatars[0],
       getProjectHasSubtitles: async () => false,
+      getProjectSubtitleStyle: async() => "80px sans-serif",
       getProjectLength: async () => 0,
       setProjectHasAvatar: async () => {},
       setProjectHasSubtitles: async () => {},
+      setProjectSubtitleStyle: async () => {},
     });
     await act(async () =>
       render(

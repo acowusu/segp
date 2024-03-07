@@ -2,7 +2,7 @@
 import { getProjectPath, getTextReportPath } from "./metadata";
 import audiences from "./mockData/audiences.json";
 import { pool } from "./pool";
-import { generateTopics, generateScript } from "./server"
+import { generateTopics, generateScript, generateExtraScript } from "./server"
 import type {
   Audience,
   ScriptData,
@@ -79,20 +79,14 @@ export async function fetchImages(prompts: Array<string>): Promise<Array<Array<s
   
   for (const prompt of prompts) {
     const unsplashAccessKey = unsplashAccessKeys.shift()
-    const unsplashEndpoint = `https://api.unsplash.com/search/photos?per_page=5&query=${prompt}&client_id=${unsplashAccessKey}`;
+    const unsplashEndpoint = `https://api.unsplash.com/search/photos?per_page=9&query=${prompt}&client_id=${unsplashAccessKey}&content_filter=high&orientation=landscape`;
     const unsplashResponse = await fetch(unsplashEndpoint);
     const unsplashData = await unsplashResponse.json();
 
-    const unsplashPhotos = unsplashData.results.map((photo: { urls: { regular: string } }) => photo.urls.regular);
-    const promptFilePaths: Array<string> = [];
+    const unsplashPhotos = unsplashData.results.map((photo: { urls: { raw: string } }) => photo.urls.raw + "&w=1920&h=1080");
 
-    for (let i = 0; i < unsplashPhotos.length; i++) {
-      const imageUrl = unsplashPhotos[i];
-      const filename = `${prompt}${i}.jpg`;
-      const response = await downloadFile(imageUrl, getProjectPath(), { method: 'GET' }, filename);
-      promptFilePaths.push(response.destination);
-    }
-    imageFilePaths.push(promptFilePaths);
+    imageFilePaths.push(unsplashPhotos);
+    
     if (unsplashAccessKey !== undefined) {
       unsplashAccessKeys.push(unsplashAccessKey);
     }
@@ -131,10 +125,11 @@ export async function getScript(force?:boolean): Promise<ScriptData[]> {
   script = await generateScript(report, projectData.getProjectTopic())
   await setScript(script)
   return script
-
-
 }
 
+export async function generateNewScript(script: string): Promise<string> {
+  return await generateExtraScript(script)
+}
 export async function setScript(script: ScriptData[]): Promise<void> {
   projectData.setProjectScript(script);
 }
