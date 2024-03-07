@@ -3,9 +3,12 @@ from dataclasses import Field
 
 import torch
 import uvicorn
-from fastapi import FastAPI, Form, HTTPException
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig)
+from fastapi import FastAPI
+from fastapi import Form
+from fastapi import HTTPException
+from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer
+from transformers import BitsAndBytesConfig
 from typing_extensions import Annotated
 
 model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
