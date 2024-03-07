@@ -91,7 +91,7 @@ export const NewVideoGenerator: React.FC = () => {
       const { start, script, promisedLayerOptions, layerOptions, layers } =
         section;
 
-      // !!Need to correc the fake start times!
+      // !!! Need to correct the fake start times!
 
       if (layerOptions && layers) {
         // these should always exist together, maybe group them in a type?

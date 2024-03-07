@@ -115,9 +115,9 @@ export interface Layers {
 type SectionData = {
   start: number; //might not be needed
   script: ScriptData;
-  promisedLayerOptions?: PromisedLayerOpts;
+  promisedLayerOptions: PromisedLayerOpts;
   layers?: Layers;
-  layerOptions?: LayerOpts;
+  layerOptions: LayerOpts;
 };
 
 interface Status {

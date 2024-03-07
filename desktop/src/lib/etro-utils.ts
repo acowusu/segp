@@ -3,7 +3,12 @@
  */
 
 import etro from "etro";
-import { PromisedLayerOpts, ScriptData } from "../../electron/mockData/data";
+import {
+  Layers,
+  PromisedLayerOpts,
+  ScriptData,
+  SectionData,
+} from "../../electron/mockData/data";
 import { LayerOpts } from "../../electron/mockData/data";
 import { toast } from "sonner";
 import { LucideGalleryVerticalEnd } from "lucide-react";
@@ -142,7 +147,32 @@ export function makeVideoOpts(
   };
 }
 
-// TODO make TextOpts?
+export function makeTextOpts(
+  start: number,
+  duration: number,
+  src: string,
+  sourceWidth: number,
+  sourceHeight: number,
+  canvasWidth: number,
+  canvasHeight: number,
+  overrideOpts?: VideoOptions
+): VideoOptions {
+  return {
+    startTime: start,
+    duration: duration,
+    source: src,
+    destX: overrideOpts?.destX ?? 0, // default: 0
+    destY: overrideOpts?.destY ?? 0, // default: 0
+    destWidth: sourceWidth, // default: null (full width)
+    destHeight: sourceHeight, // default: null (full height)
+    // following places bottom right
+    x: overrideOpts?.x ?? canvasWidth - sourceWidth, // default: 0
+    y: overrideOpts?.y ?? canvasHeight - sourceHeight, // default: 0
+    opacity: overrideOpts?.opacity ?? 1, // default: 1
+    volume: overrideOpts?.volume ?? 0, // default: 1 //0  for avatar layer can change
+    // muted: false, //default: false
+  };
+}
 
 // Layer Promises //
 export async function dispatchSectionGeneration(
@@ -165,8 +195,8 @@ export async function dispatchSectionGeneration(
   }
 
   // promisedOpts.p_subtitleOpts = getTextOpts(modifiedScript, start)
-  //   promisedOpts.p_backingOpts = getAudioOpts(modifiedScript, start)
-  //   promisedOpts.p_soundfxOpts = getAudioOpts(modifiedScript, start)
+  //   promisedOpts.p_backingOpts = getBackingOpts(modifiedScript, start)
+  //   promisedOpts.p_soundfxOpts = getSoundfxOpts(modifiedScript, start)
 
   return {
     promisedOpts: promisedOpts,
@@ -402,39 +432,308 @@ export async function parseLayerOptions(
   // fix media
   const duration = section.scriptDuration!; // must exist
 
-  mediaOpts &&
-    (layerOpts.mediaOpts = makeImageOpts(
+  if (mediaOpts) {
+    layerOpts.mediaOpts = makeImageOpts(
       start,
       duration,
       section.scriptMedia!,
       mediaOpts.sourceWidth!,
       mediaOpts.sourceHeight!,
       mediaOpts
-    ));
+    );
+  }
 
-  audioOpts &&
-    (layerOpts.audioOpts = makeAudioOpts(
+  if (audioOpts) {
+    layerOpts.audioOpts = makeAudioOpts(
       start,
       duration,
       await window.api.toDataURL(section.scriptAudio!, "audio/wav"),
       audioOpts
-    ));
+    );
+  }
 
-  // avatarOpts &&
-  //   (layerOpts.avatarOpts = makeVideoOpts(
-  //     start,
-  //     duration,
-  //     await window.api.toDataURL(section.avatarVideoUrl!, "video/mp4"),
-  //     avatarOpts.sourceWidth,
-  //     avatarOpts.sourceHeight,
-  //     avatarOpts.canvasWidth,
-  //     avatarOpts.canvasHeight,
-  //     avatarOpts
-  //   ));
+  if ((await window.api.getProjectHasAvatar()) && avatarOpts) {
+    layerOpts.avatarOpts = makeVideoOpts(
+      start,
+      duration,
+      await window.api.toDataURL(section.avatarVideoUrl!, "video/mp4"),
+      avatarOpts.sourceWidth,
+      avatarOpts.sourceHeight,
+      avatarOpts.canvasWidth,
+      avatarOpts.canvasHeight,
+      avatarOpts
+    );
+  }
 
   // TODO do the rest of the layers
 
   console.log("parsed options: ", parsedOpts);
   console.log("fixed options: ", layerOpts);
   return layerOpts;
+}
+
+export async function loadAssets(
+  movie: etro.Movie,
+  promisedOpts: PromisedLayerOpts,
+  savedOpts: LayerOpts,
+  overrideOpts?: LayerOpts
+): Promise<[LayerOpts, Layers]> {
+  const {
+    mediaOpts,
+    audioOpts,
+    avatarOpts,
+    subtitleOpts,
+    backingOpts,
+    soundfxOpts,
+  } = savedOpts;
+
+  const {
+    p_mediaOpts,
+    p_audioOpts,
+    p_avatarOpts,
+    p_subtitleOpts,
+    p_backingOpts,
+    p_soundfxOpts,
+  } = promisedOpts;
+  console.log("saved opts: ", savedOpts);
+  console.log("promised opts: ", promisedOpts);
+
+  // possible overrides to the layer we want to introduce
+  const {
+    mediaOpts: overrideMediaOpts,
+    audioOpts: overrideAudioOpts,
+    avatarOpts: overrideAvatarOpts,
+    subtitleOpts: overrideSubtitleOpts,
+    backingOpts: overrideBackingOpts,
+    soundfxOpts: overrideSoundfxOpts,
+  }: LayerOpts = overrideOpts ?? {};
+
+  // returning values
+  const finalOpts: LayerOpts = {};
+  const finalLayers: Layers = {};
+
+  // waiters for the promised layers
+  let waitMedia: Promise<void> | undefined,
+    waitAudio: Promise<void> | undefined,
+    waitAvatar: Promise<void> | undefined,
+    waitSubtitle: Promise<void> | undefined,
+    waitBacking: Promise<void> | undefined,
+    waitSoundfx: Promise<void> | undefined;
+
+  // go through all assets and create the given layers
+
+  if (mediaOpts) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [opts, mediaLayer] = addImageLayer(
+      movie,
+      mediaOpts,
+      overrideMediaOpts
+    );
+    finalOpts.mediaOpts = opts;
+    finalLayers.media = mediaLayer;
+    console.log("added media from saved opts");
+  } else {
+    if (!p_mediaOpts) {
+      throw new Error("utils/loadAssets: Promise of the media should exist!");
+    }
+    waitMedia = p_mediaOpts?.then((opts) => {
+      const [effOpts, layer] = addImageLayer(movie, opts, overrideMediaOpts);
+      finalOpts.mediaOpts = effOpts;
+      finalLayers.media = layer;
+      console.log("got promised media");
+    });
+  }
+
+  if (audioOpts) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [opts, audioLayer] = addAudioLayer(
+      movie,
+      audioOpts,
+      overrideAudioOpts
+    );
+    finalOpts.audioOpts = opts;
+    finalLayers.audio = audioLayer;
+    console.log("added audio from saved opts");
+  } else {
+    if (!p_audioOpts) {
+      throw new Error("utils/loadAssets: Promise of the audio should exist!");
+    }
+
+    waitAudio = p_audioOpts?.then((opts) => {
+      const [effOpts, layer] = addAudioLayer(movie, opts, overrideAudioOpts);
+      finalOpts.audioOpts = effOpts;
+      finalLayers.audio = layer;
+      console.log("got promised audio");
+    });
+  }
+
+  if (avatarOpts) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [opts, avatarLayer] = addAvatarLayer(
+      movie,
+      avatarOpts,
+      overrideAvatarOpts
+    );
+    finalOpts.avatarOpts = opts;
+    finalLayers.avatar = avatarLayer;
+    console.log("added avatar from saved opts");
+  } else if (p_avatarOpts) {
+    waitAvatar = p_avatarOpts?.then((opts) => {
+      const [effOpts, layer] = addAvatarLayer(movie, opts, overrideAvatarOpts);
+      finalOpts.avatarOpts = effOpts;
+      finalLayers.avatar = layer;
+      console.log("got promsied avatar");
+    });
+  }
+
+  if (subtitleOpts) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [opts, subtitleLayer] = addSubtitleLayer(
+      movie,
+      subtitleOpts,
+      overrideSubtitleOpts
+    );
+    finalOpts.subtitleOpts = opts;
+    finalLayers.subtitle = subtitleLayer;
+    console.log("added subtitle from saved opts");
+  } else if (p_subtitleOpts) {
+    waitSubtitle = p_subtitleOpts?.then((opts) => {
+      // subtitles must be displayed above avatar if avatar exists
+      // TODO check if this works in teh 4 diferent scenarios
+      waitAvatar?.then(() => {
+        const [effOpts, layer] = addSubtitleLayer(
+          movie,
+          opts,
+          overrideSubtitleOpts
+        );
+        finalOpts.subtitleOpts = effOpts;
+        finalLayers.subtitle = layer;
+      });
+      console.log("got promised subtitle");
+    });
+  }
+
+  if (backingOpts) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [opts, backingLayer] = addAudioLayer(
+      movie,
+      backingOpts,
+      overrideBackingOpts
+    );
+    finalOpts.backingOpts = opts;
+    finalLayers.backing = backingLayer;
+    console.log("added backing from saved opts");
+  } else if (p_backingOpts) {
+    waitBacking = p_backingOpts?.then((opts) => {
+      const [effOpts, layer] = addAudioLayer(movie, opts, overrideBackingOpts);
+      finalOpts.backingOpts = effOpts;
+      finalLayers.backing = layer;
+      console.log("got promised backing");
+    });
+  }
+
+  if (soundfxOpts) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [opts, soundfxLayer] = addAudioLayer(
+      movie,
+      soundfxOpts,
+      overrideSoundfxOpts
+    );
+    finalOpts.soundfxOpts = opts;
+    finalLayers.soundfx = soundfxLayer;
+    console.log("added soundfx from saved opts");
+  } else if (p_soundfxOpts) {
+    waitSoundfx = p_soundfxOpts?.then((opts) => {
+      const [effOpts, layer] = addAudioLayer(movie, opts, overrideSoundfxOpts);
+      finalOpts.soundfxOpts = effOpts;
+      finalLayers.soundfx = layer;
+      console.log("passed soundfx");
+    });
+  }
+  // TODO: add toast notifs to the waiters!
+  await Promise.all([
+    waitMedia,
+    waitAudio,
+    waitAvatar,
+    waitSubtitle,
+    waitBacking,
+    waitSoundfx,
+  ]);
+
+  return [finalOpts, finalLayers];
+}
+
+/** Selectively set the layer options and fill the missing ones with promsied opts */
+export async function setSectionOpts(
+  fakeStart: number, // the start value we want to give the asset for now
+  actualStart: number, // one to document to know where the asset really starts for final videogen
+  script: ScriptData
+): Promise<SectionData> {
+  const data: SectionData = {
+    start: actualStart,
+    script: script,
+    promisedLayerOptions: {},
+    layerOptions: {},
+  };
+
+  if (script.assetLayerOptions) {
+    const parsedSavedOpts = await parseLayerOptions(fakeStart, script);
+    if (!script.scriptDuration) {
+      // would probably also mean the audio is not yet generated
+      script = await generateAudio(script);
+      data.script = script; // make sure to update
+    }
+    const {
+      mediaOpts,
+      audioOpts,
+      avatarOpts,
+      subtitleOpts,
+      backingOpts,
+      soundfxOpts,
+    } = parsedSavedOpts;
+
+    if (mediaOpts) {
+      data.layerOptions.mediaOpts = mediaOpts;
+    } else {
+      data.promisedLayerOptions.p_mediaOpts = getMediaOpts(script, fakeStart);
+    }
+
+    if (audioOpts) {
+      data.layerOptions.audioOpts = audioOpts;
+    } else {
+      data.promisedLayerOptions.p_audioOpts = getAudioOpts(script, fakeStart);
+    }
+
+    if ((await window.api.getProjectHasAvatar()) && avatarOpts) {
+      data.layerOptions.avatarOpts = avatarOpts;
+    } else {
+      data.promisedLayerOptions.p_avatarOpts = getMediaOpts(script, fakeStart);
+    }
+
+    // if (subtitleOpts) {
+    //   data.layerOptions.subtitleOpts = subtitleOpts;
+    // } else {
+    //   data.promisedLayerOptions.p_subtitleOpts = getTextOpts(script, fakeStart);
+    // }
+
+    // if (backingOpts) {
+    //   data.layerOptions.backingOpts = backingOpts;
+    // } else {
+    //   data.promisedLayerOptions.p_backingOpts = getBackingOpts(script, fakeStart);
+    // }
+
+    // if (mediaOpts) {
+    //   data.layerOptions.mediaOpts = mediaOpts;
+    // } else {
+    //   data.promisedLayerOptions.p_mediaOpts = getSoundfxOpts(script, fakeStart);
+    // }
+  } else {
+    // dispatch all as none exist
+    const { promisedOpts, modifiedSection: newScript } =
+      await dispatchSectionGeneration(script, fakeStart);
+    data.script = newScript;
+    data.promisedLayerOptions = promisedOpts;
+  }
+
+  return data;
 }

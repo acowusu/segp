@@ -126,11 +126,13 @@ export function updateSectionWithLayerOptions(section: ScriptData, opts: string 
     }
   }
   if (found) {
-    console.log("setProjectScriptSection: found the section, replacing it")
+    console.log("updateSectionWithLayerOptions: found the section, replacing it")
     setProjectScript(currentScript);
+  } else {
+    console.log("updateSectionWithLayerOptions: did not find the section, no replacement")
+
   }
 
-  console.log("updateSectionWithLayerOptions: did not find the section, no replacement")
 }
 
 
