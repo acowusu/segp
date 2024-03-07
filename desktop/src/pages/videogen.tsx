@@ -47,32 +47,21 @@ export const VideoGenerator: React.FC = () => {
     const movie = new etro.Movie({
       canvas: canvas,
       repeat: false,
-      background: etro.parseColor("#ccc"),
+      background: etro.parseColor("#e74c3c"),
     });
     canvas.width = 1920;
     canvas.height = 1080;
     console.log("setting up player", movie);
     const script = await window.api.getScript();
     await addAudioLayers(script, movie);
-    // const backing = await window.api.getProjectBackingTrack();
-    // const backingLayer = new etro.layer.Audio({
-      //   startTime: 0,
-      //   duration: backing.audioDuration,
-      //   source: await window.api.toDataURL(backing.audioSrc),
-      //   sourceStartTime: 0, // default: 0
-      //   muted: false, // default: false
-      //   volume: 0.5, // default: 1
-      //   playbackRate: 1, //default: 1
-      // });
-      // movie.layers.push(backingLayer);
-      await addImageLayers(script, movie);
 
-      await toast.promise(addAvatarLayers(script, movie).then(async () => await addSubtitleLayers(script, movie)), {
-        loading: `Adding Avatar Layers...`,
-        success: `Avatar Layers have been added.  `,
-        error: (error)=> `Error adding Avatar Layers ${error}` ,
-      })
-    // await addSadTalkerLayers(script, movie);
+    await addImageLayers(script, movie);
+
+    await toast.promise(addAvatarLayers(script, movie).then(async () => await addSubtitleLayers(script, movie)), {
+      loading: `Adding Avatar Layers...`,
+      success: `Avatar Layers have been added.  `,
+      error: (error)=> `Error adding Avatar Layers ${error}` ,
+    })
 
 
 
@@ -119,8 +108,8 @@ export const VideoGenerator: React.FC = () => {
     const blob: Blob = (await movieRef.current?.record({
       frameRate: 24,
       type: 'video/webm;codecs=h264',
-      // audio: default true,
-      // video: default true,
+      audio: true,
+      video: true,
       // duration: default end of video
       // onStart: optional callback
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
