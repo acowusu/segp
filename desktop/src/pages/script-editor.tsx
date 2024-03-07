@@ -171,7 +171,7 @@ export const ScriptEditor: React.FC = () => {
   ) => {
     setItems(
       items.map((script) => {
-        if (script.id === item.id) {
+        if (script.id === item.id && script.selectedScriptIndex !== index) {
           script.selectedScriptIndex = index;
           script.avatarVideoUrl = undefined;
           script.scriptAudio = undefined;
@@ -194,7 +194,7 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
+    await window.api.setScript(items.map((item) => {return {...item}}));
     navigate("/get-video");
   };
   const selectTopic = async () => {
