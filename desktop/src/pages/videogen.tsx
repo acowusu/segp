@@ -65,7 +65,7 @@ export const VideoGenerator: React.FC = () => {
       //   playbackRate: 1, //default: 1
       // });
       // movie.layers.push(backingLayer);
-      addImageLayers(script, movie);
+      await addImageLayers(script, movie);
       await toast.promise(addAvatarLayers(script, movie).then(()=>addSubtitleLayers(script, movie)
       ), {
         loading: `Adding Avatar Layers...`,

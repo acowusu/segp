@@ -447,7 +447,6 @@ export const ScriptEditor: React.FC = () => {
                                   +
                                 </Button>
                               </Skeleton>
-                            
                           </div>
                         }
                       </div> : 
@@ -464,7 +463,6 @@ export const ScriptEditor: React.FC = () => {
                             </div>
                           );
                         })}
-
                       </div>}
                   </div>
                   

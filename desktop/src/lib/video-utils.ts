@@ -24,21 +24,19 @@ export function lerp(a: number, b: number, t: number, p: number) {
  * @param movie - The movie object to which the image layers will be added.
  * @throws {Error} - If no media or duration is found in a section.
  */
-export function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
+export async function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
   let start = 0;
-  sections.forEach((section: ScriptData) => {
+  for (const section of sections) {
     if (!section.scriptMedia) throw new Error("No media found");
     if (!section.scriptDuration) throw new Error("No duration found");
     var layer = null;
-    const WIDTH = section.scriptMedia.width
-    const HEIGHT = section.scriptMedia.height
     const randNum = Math.floor(Math.random() * 3); // random number 0 - 2
     switch (randNum) {
       case (0): {
         layer = new etro.layer.Image({
           startTime: start,
           duration: section.scriptDuration,
-          source: section.scriptMedia.url,
+          source: await resizeImage(section.scriptMedia.url, WIDTH, HEIGHT),
           destX: (_element: etro.EtroObject, time: number) => {
             return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
           }, // default: 0
@@ -63,7 +61,7 @@ export function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
         layer = new etro.layer.Image({
           startTime: start,
           duration: section.scriptDuration,
-          source: section.scriptMedia.url,
+          source: await resizeImage(section.scriptMedia.url, WIDTH, HEIGHT),
           destX: (_element: etro.EtroObject, time: number) => {
             return lerp(-WIDTH / 10, 0, time, section.scriptDuration!);
           }, // default: 0
@@ -88,7 +86,7 @@ export function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
         layer = new etro.layer.Image({
           startTime: start,
           duration: section.scriptDuration,
-          source: section.scriptMedia.url,
+          source: await resizeImage(section.scriptMedia.url, WIDTH, HEIGHT),
           destX: (_element: etro.EtroObject, time: number) => {
             return lerp(0, -WIDTH / 5, time, section.scriptDuration!);
           }, // default: 0
@@ -106,7 +104,8 @@ export function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
     console.log("adding layer", layer);
     start += section.scriptDuration;
     movie.layers.push(layer!);
-    });
+  }
+  
   }
 
 
@@ -143,6 +142,7 @@ export function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
 
         start += section.scriptDuration;
     });
+    
 }
 
 /**
@@ -353,4 +353,28 @@ export const generateAvatarSections = async () => {
     } catch (error) {
         console.error("Error generating avatar:", error);
     }
+}
+
+async function resizeImage(url: string, targetWidth: number, targetHeight: number): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous"; // To allow fetching images from other origins
+      img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+              reject(new Error('Unable to get canvas context'));
+              return;
+          }
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          const dataURL = canvas.toDataURL(); // Convert canvas to data URL
+          resolve(dataURL);
+      };
+      img.onerror = (error) => {
+          reject(new Error(`Failed to load image: ${error}`));
+      };
+      img.src = url;
+  });
 }
