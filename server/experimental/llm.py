@@ -1,10 +1,12 @@
-from dataclasses import Field
-from fastapi import FastAPI, Form, HTTPException
-from typing_extensions import Annotated
-import uvicorn
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import sys
+from dataclasses import Field
+
+import torch
+import uvicorn
+from fastapi import FastAPI, Form, HTTPException
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig)
+from typing_extensions import Annotated
 
 model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
