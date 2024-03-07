@@ -115,33 +115,37 @@ export async function addImageLayers(sections: ScriptData[], movie: etro.Movie) 
  * @param movie - The movie object to which the subtitle layers will be added.
  * @throws {Error} - If no media or duration is found in a section.
  */
-export function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
-    let start = 0;
-    sections.forEach((section: ScriptData) => {
-        if (!section.scriptMedia) throw new Error("No media found");
-        if (!section.scriptDuration) throw new Error("No duration found");
-        const layer = new SubtitleText({
-            startTime: start,
-            duration: section.scriptDuration,
-            text: section.scriptTexts[section.selectedScriptIndex],
-            x: 0, // default: 0
-            y: 0, // default: 0
-            opacity: 1, // default: 1
-            color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
-            font: "50px sans-serif", // default: '10px sans-serif'
-            textX: (3 * WIDTH / 4) / 2, // default: 0
-            textY: HEIGHT, // default: 0
-            textAlign: "center", // default: 'left'
-            textBaseline: "alphabetic", // default: 'alphabetic'
-            textDirection: "ltr", // default: 'ltr'
-            background: new etro.Color(0, 0, 0, 0.0), // default: null (transparent)
-            maxWidth: 3 * WIDTH / 4, // default: null (no maximum width)
-        });
-        movie.layers.push(layer);
-        console.log("adding layer", layer);
+export async function addSubtitleLayers(sections: ScriptData[], movie: etro.Movie) {
+  if (!(await window.api.getProjectHasSubtitles())) {
+    console.log("asjkdhk jahsd")
+    return
+  }
+  let start = 0;
+  sections.forEach((section: ScriptData) => {
+      if (!section.scriptMedia) throw new Error("No media found");
+      if (!section.scriptDuration) throw new Error("No duration found");
+      const layer = new SubtitleText({
+          startTime: start,
+          duration: section.scriptDuration,
+          text: section.scriptTexts[section.selectedScriptIndex],
+          x: 0, // default: 0
+          y: 0, // default: 0
+          opacity: 1, // default: 1
+          color: etro.parseColor("white"), // default: new etro.Color(0, 0, 0, 1)
+          font: "50px sans-serif", // default: '10px sans-serif'
+          textX: (3 * WIDTH / 4) / 2, // default: 0
+          textY: HEIGHT, // default: 0
+          textAlign: "center", // default: 'left'
+          textBaseline: "alphabetic", // default: 'alphabetic'
+          textDirection: "ltr", // default: 'ltr'
+          background: new etro.Color(0, 0, 0, 0.0), // default: null (transparent)
+          maxWidth: 3 * WIDTH / 4, // default: null (no maximum width)
+      });
+      movie.layers.push(layer);
+      console.log("adding layer", layer);
 
-        start += section.scriptDuration;
-    });
+      start += section.scriptDuration;
+  });
     
 }
 
@@ -269,7 +273,7 @@ export const generateAudio = async () => {
  */
 export const addAvatarLayers = async (sections: ScriptData[], movie: etro.Movie) => {
     sections = await window.api.getScript()
-    if (!window.api.getProjectHasAvatar()) {
+    if (!(await window.api.getProjectHasAvatar())) {
         console.log("No Avatar Option Selected. Skipping Avatar Layering... ");
         return;
     }

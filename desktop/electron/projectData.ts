@@ -108,7 +108,7 @@ export function setProjectHasSubtitles(hasSubtitles: boolean): void {
   getProjectStore().set("subtitles", hasSubtitles);
 }
 export function setProjectSubtitleStyle(hasSubtitles: string): void {
-  getProjectStore().set("subtitles", hasSubtitles);
+  getProjectStore().set("subtitlesStyle", hasSubtitles);
 }
 export function setProjectHasBackgroundAudio(hasAudio: boolean): void {
   getProjectStore().set("backgroundAudio", hasAudio);

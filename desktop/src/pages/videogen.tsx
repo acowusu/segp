@@ -66,13 +66,15 @@ export const VideoGenerator: React.FC = () => {
       // });
       // movie.layers.push(backingLayer);
       await addImageLayers(script, movie);
-      await toast.promise(addAvatarLayers(script, movie).then(()=>addSubtitleLayers(script, movie)
-      ), {
+      
+      await toast.promise(addAvatarLayers(script, movie).then(async () => await addSubtitleLayers(script, movie)), {
         loading: `Adding Avatar Layers...`,
         success: `Avatar Layers have been added.  `,
         error: (error)=> `Error adding Avatar Layers ${error}` ,
       })
     // await addSadTalkerLayers(script, movie);
+
+    
 
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);
