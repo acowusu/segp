@@ -105,6 +105,7 @@ export const VideoGenerator: React.FC = () => {
         return prev;
       });
     }, 50);
+    movieRef.current?.seek(0);
     const blob: Blob = (await movieRef.current?.record({
       frameRate: 24,
       type: 'video/webm;codecs=h264',
