@@ -1,7 +1,8 @@
 import re
 import subprocess
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
+from fastapi import Request
 
 app = FastAPI(root_path="/v8")
 
