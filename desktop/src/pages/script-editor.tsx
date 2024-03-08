@@ -31,7 +31,8 @@ import {
 import loadingMessages from "../../electron/mockData/loadingScripts/scriptLoading.json"
 import { Progress } from "../components/ui/progress";
 import { MediaChoices } from "../components/custom/mediaChoices";
-
+import { Input } from "../components/ui/input";
+import { Switch } from "../components/ui/switch";
 
 
 export const ScriptEditor: React.FC = () => {
@@ -42,10 +43,12 @@ export const ScriptEditor: React.FC = () => {
   );
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
+  const [loadingSound, setLoadingSound] = useState(false);
   const [scriptLoadingProgress, setScriptLoadingProgress] = useState(0);
   const [topic, setTopic] = useState<Topic>()
   const [buttonLoading, setButtonLoading] = useState("");
   const [mediaSelected, setMediaSelected] = useState("")
+  const [hasSoundEffects, setHasSoundEffects] = useState(false)
 
   const loadingImages = ["./reading_loading.png", "./extracting_loading.png", "./understanding_loading.png", 
                         "./consulting_loading.png", "./creating_loading.png", "./generating_loading.png", "./fetching_loading.png", 
@@ -85,6 +88,7 @@ export const ScriptEditor: React.FC = () => {
 
   useEffect(() => {
     window.api.getProjectTopic().then(setTopic)
+    window.api.getProjectHasSoundEffect().then(setHasSoundEffects)
     const TICK = 2000
     const task = window.api
       .getScript()
@@ -203,6 +207,55 @@ export const ScriptEditor: React.FC = () => {
   const selectTopic = async () => {
     navigate("/set-topic");
   };
+  const toggleSoundEffect = async (section: ScriptData) => {
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script.soundEffectPrompt = section.soundEffectPrompt === "No effect" ? "Autogeneffect" : "No effect";
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(items.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+  }
+  const toggleAutoSoundEffect = async (section: ScriptData) => {
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script.soundEffectPrompt = section.soundEffectPrompt === "Autogeneffect" ? "" : "Autogeneffect";
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(newItems.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+  }
+
+  const setEffectPrompt = async (section: ScriptData, e: React.ChangeEvent<HTMLInputElement>) => {
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script.soundEffectPrompt = e.target.value;
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(newItems.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+  }
+  const loadSound = async (section: ScriptData) => {
+    setLoadingSound(true)
+    const modified = await window.api.generateSoundEffect(section);
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script = modified;
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(newItems.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+    setLoadingSound(false)
+  }
+
   const updateScriptDraftSelection = async (
     item: ScriptData,
     index: number
@@ -216,6 +269,8 @@ export const ScriptEditor: React.FC = () => {
         if (script.id === item.id) {
           script.scriptTexts.push(newScript)
           script.selectedScriptIndex = index;
+          script.avatarVideoUrl = undefined;
+          script.scriptAudio = undefined;
         }
         return script;
       })
@@ -234,6 +289,8 @@ export const ScriptEditor: React.FC = () => {
     const newItems = items.map((script) => {
       if (script.id === id) {
         script.scriptTexts[index] = target.value;
+        script.avatarVideoUrl = undefined;
+        script.scriptAudio = undefined;
       }
       return script;
     })
@@ -399,6 +456,7 @@ export const ScriptEditor: React.FC = () => {
                 <div className="w-full h-full">
                   <div className="flex flex-row gap-4">
                     <Button onClick={() => setMediaSelected("GenAI")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
+                    {hasSoundEffects && <Button onClick={() => setMediaSelected("soundEffect")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Sound Effect</Button>}
                     <MediaChoices prompts={selectedScript.imagePrompts??[]} callback={setMediaSelected}/>
                   </div>
                   <div className="w-full h-full flex justify-start items-start mt-4 gap-4">
@@ -452,12 +510,50 @@ export const ScriptEditor: React.FC = () => {
                               </Skeleton>
                           </div>
                         }
-                      </div> : 
-                      <div className="grid grid-cols-3 gap-4">
+                      </div> : mediaSelected === "soundEffect" ? 
+                        <div className="py-8 flex flex-col gap-8 w-full">
+                        
+                        <div className="w-full border border-gray-500 border-opacity-40 flex flex-row justify-between p-4 rounded-lg">
+                          <div>
+                            Have sound effect for this section
+                          </div>
+                          <Switch
+                            checked={selectedScript.soundEffectPrompt !== "No effect"}
+                            onCheckedChange={async () => {await toggleSoundEffect(selectedScript)}}
+                            />
+                        </div>
+                        {selectedScript.soundEffectPrompt !== "No effect" && <div className="w-full border border-gray-500 border-opacity-40 flex flex-row justify-between p-4 rounded-lg">
+                          <div>
+                            Automatically generate effects
+                          </div>
+                          <Switch
+                            checked={selectedScript.soundEffectPrompt === "Autogeneffect"}
+                            onCheckedChange={async () => {await toggleAutoSoundEffect(selectedScript)}}
+                            />
+                        </div>
+                        }
+
+
+                          {selectedScript.soundEffectPrompt !== "No effect" && selectedScript.soundEffectPrompt !== "Autogeneffect" && 
+                          <div className="flex flex-col gap-8 items-center justify-center">
+                            <div className="w-full flex flex-row gap-4">
+                              <Input className="w-3/5" placeholder="Describe sound effect" value={selectedScript.soundEffectPrompt} onChange={(e) => setEffectPrompt(selectedScript, e)}/>
+                              <Button onClick={() => loadSound(selectedScript)}>{loadingSound ? "Generating..." : "Generate Effect"}</Button>
+                            </div>
+                            {loadingSound ? <div>loading sound...</div> : <audio src={selectedScript.soundEffect ? selectedScript.soundEffect : ""} controls/>}
+                          </div>
+                          
+                          
+                          
+                          }
+
+
+                        </div> :
+                        <div className="grid grid-cols-3 gap-4">
                         {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.unsplashedImages.map(({url, author}, index) => {
                           return (
                             <div key={index} className={`aspect-video border rounded-lg overflow-hidden relative group
-                              ${selectedScript.scriptMedia?.url === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover:border-dashed border-2"}
+                            ${selectedScript.scriptMedia?.url === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover:border-dashed border-2"}
                             `} onClick={async () => setMedia(selectedScript, url, author)}>
                               <img src={`${url}`} alt="Unsplash"/>
                               <div className="p-2 bg-black bg-opacity-70 w-full absolute bottom-0 invisible group-hover:visible text-primary font-bold">
@@ -466,14 +562,14 @@ export const ScriptEditor: React.FC = () => {
                             </div>
                           );
                         })}
-                      </div>}
+                        </div>}
+                      
                   </div>
                   
                 </div>
             </div>
             }
           </div>
-            
         </div>
         <CardFooter className="flex w-1/2 justify-between">
           <Button onClick={selectTopic} variant="outline">Back</Button>
