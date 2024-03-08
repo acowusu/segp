@@ -31,7 +31,8 @@ import {
 import loadingMessages from "../../electron/mockData/loadingScripts/scriptLoading.json"
 import { Progress } from "../components/ui/progress";
 import { MediaChoices } from "../components/custom/mediaChoices";
-
+import { Input } from "../components/ui/input";
+import { Switch } from "../components/ui/switch";
 
 export const ScriptEditor: React.FC = () => {
   const navigate = useNavigate();
@@ -41,12 +42,17 @@ export const ScriptEditor: React.FC = () => {
   );
   const [disabled, setDisabled] = useState(false);
   const [loadingScripts, setLoadingScripts] = useState(true);
+  const [loadingSound, setLoadingSound] = useState(false);
   const [scriptLoadingProgress, setScriptLoadingProgress] = useState(0);
   const [topic, setTopic] = useState<Topic>()
   const [buttonLoading, setButtonLoading] = useState("");
   const [mediaSelected, setMediaSelected] = useState("")
+  const [hasSoundEffects, setHasSoundEffects] = useState(false)
 
-  const loadingImages = ["./analysingpdf.png", "./inspiration.png", "./dict.png" ,"./writing.png"]
+  const loadingImages = ["./reading_loading.png", "./extracting_loading.png", "./understanding_loading.png", 
+                        "./consulting_loading.png", "./creating_loading.png", "./generating_loading.png", "./fetching_loading.png", 
+                        "./drinks_loading.png", "./checking_loading.png", "./suggesting_loading.png", "./friend_loading.png", "./final_loading.png", 
+                        "./complete_loading.png"]
 
   const LoadingScripts = ({
     generationProgress,
@@ -64,8 +70,8 @@ export const ScriptEditor: React.FC = () => {
           About video:  {topic?.summary}
         </h1>
         {generationProgress <= 100 ? <><div className="w-full mb-4 flex align-center items-center	justify-center flex-col gap-4">
-          <img src={loadingImages[(Math.floor(generationProgress / 25)) % 4]} width={500} height={500}/>
-          <div className="font-bold text-xl">{loadingMessages[(Math.floor(generationProgress / 5)) % 20]}</div>
+          <img src={loadingImages[(Math.floor(generationProgress / 9)) % 13]} width={500} height={500}/>
+          <div className="font-bold text-xl">{loadingMessages[(Math.floor(generationProgress / 9)) % 13]}</div>
         </div>
         <Progress value={generationProgress} className="w-5/6 mt-4" /></> 
         : 
@@ -81,6 +87,7 @@ export const ScriptEditor: React.FC = () => {
 
   useEffect(() => {
     window.api.getProjectTopic().then(setTopic)
+    window.api.getProjectHasSoundEffect().then(setHasSoundEffects)
     const TICK = 2000
     const task = window.api
       .getScript()
@@ -101,7 +108,7 @@ export const ScriptEditor: React.FC = () => {
 
   const handleDeleteCurrent = async (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    var newIndex = items.findIndex((item) => item.id == selectedScript.id) 
+    let newIndex = items.findIndex((item) => item.id == selectedScript.id) 
     const newItems = items.filter((item) => item.id !== selectedScript.id)
     if (newIndex >= newItems.length) {
       newIndex -= 1
@@ -174,7 +181,7 @@ export const ScriptEditor: React.FC = () => {
       console.log(imgPath);
       const updatedItems = items.map((item) => {
         if (item.id === script.id) {
-          item.scriptMedia = imgPath;
+          item.scriptMedia = {url: imgPath, author: "AI"};
           item.scriptPrompt = resolvedPrompt;
           item.aiImages = item.aiImages ? [...item.aiImages, imgPath] : [imgPath]
         }
@@ -188,10 +195,10 @@ export const ScriptEditor: React.FC = () => {
       console.log("Media already exists");
     }
   };
-  const setMedia = async (script: ScriptData, url: string, isVideo: boolean) => {
+  const setMedia = async (script: ScriptData, url: string, isVideo: boolean, author: string) => {
     const newItems = items.map((item) => {
       if (script.id === item.id) {
-        item.scriptMedia = url;
+        item.scriptMedia = {url: url, author: author};
         item.scriptMediaIsVideo = isVideo;
       }
       return item;
@@ -205,7 +212,7 @@ export const ScriptEditor: React.FC = () => {
   ) => {
     setItems(
       items.map((script) => {
-        if (script.id === item.id) {
+        if (script.id === item.id && script.selectedScriptIndex !== index) {
           script.selectedScriptIndex = index;
           script.avatarVideoUrl = undefined;
           script.scriptAudio = undefined;
@@ -228,12 +235,61 @@ export const ScriptEditor: React.FC = () => {
     setDisabled(false);
   };
   const setScript = async () => {
-    await window.api.setScript(items.map((item) => {return {...item, scriptAudio: undefined, soundEffectPrompt: undefined, soundEffect: undefined}}));
+    await window.api.setScript(items.map((item) => {return {...item}}));
     navigate("/get-video");
   };
   const selectTopic = async () => {
     navigate("/set-topic");
   };
+  const toggleSoundEffect = async (section: ScriptData) => {
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script.soundEffectPrompt = section.soundEffectPrompt === "No effect" ? "Autogeneffect" : "No effect";
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(items.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+  }
+  const toggleAutoSoundEffect = async (section: ScriptData) => {
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script.soundEffectPrompt = section.soundEffectPrompt === "Autogeneffect" ? "" : "Autogeneffect";
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(newItems.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+  }
+
+  const setEffectPrompt = async (section: ScriptData, e: React.ChangeEvent<HTMLInputElement>) => {
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script.soundEffectPrompt = e.target.value;
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(newItems.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+  }
+  const loadSound = async (section: ScriptData) => {
+    setLoadingSound(true)
+    const modified = await window.api.generateSoundEffect(section);
+    const newItems = items.map((script) => {
+      if (script.id === section.id) {
+        script = modified;
+      }
+      return script;
+    })
+    setItems(newItems);
+    setSelectedScript(newItems.find((script) => script.id === selectedScript.id)!)
+    await window.api.setScript(newItems);
+    setLoadingSound(false)
+  }
+
   const updateScriptDraftSelection = async (
     item: ScriptData,
     index: number
@@ -247,6 +303,8 @@ export const ScriptEditor: React.FC = () => {
         if (script.id === item.id) {
           script.scriptTexts.push(newScript)
           script.selectedScriptIndex = index;
+          script.avatarVideoUrl = undefined;
+          script.scriptAudio = undefined;
         }
         return script;
       })
@@ -265,6 +323,8 @@ export const ScriptEditor: React.FC = () => {
     const newItems = items.map((script) => {
       if (script.id === id) {
         script.scriptTexts[index] = target.value;
+        script.avatarVideoUrl = undefined;
+        script.scriptAudio = undefined;
       }
       return script;
     })
@@ -309,12 +369,12 @@ export const ScriptEditor: React.FC = () => {
             </div>
           </CardHeader>
           <div className="flex my-4">
-          <CardContent className="h-4/6 basis-1/2">
+          <CardContent className="h-4/6 w-1/2">
             <div className="flex flex-col gap-2 pt-0  ">
               <Reorder.Group axis="y" values={items} onReorder={setItems}>
                 {items.map((item) => (
                   <Reorder.Item key={item.id} value={item} className="mb-4"  data-testid="script-section">
-                    <div className="flex flex-row gap-2  ">
+                    <div className="flex flex-row gap-2 max-h-[10rem] ">
                       <div
                         key={item.id}
                         data-testid="script-section-clickable"
@@ -334,6 +394,8 @@ export const ScriptEditor: React.FC = () => {
                           </div>
 
                           <div
+                              data-testid="delete-script"
+                              onClick={handleDeleteCurrent}
                             className={cn(
                               " text-xs",
                               selectedScript.id === item.id
@@ -347,7 +409,6 @@ export const ScriptEditor: React.FC = () => {
                                 ? "destructive"
                                   : "secondary"
                                 }
-                                onClick={handleDeleteCurrent}
                                 >
                               <Cross2Icon />
                             </Badge>
@@ -362,7 +423,7 @@ export const ScriptEditor: React.FC = () => {
                             <ArrowLeftIcon />
                           </button>
                           {selectedScript.id === item.id ? (
-                            <div className="mx-4 p-2">
+                            <div className="mx-4 p-2 overflow-auto no-scrollbar">
                               <ContentEditable
                                 html={item.scriptTexts[item.selectedScriptIndex]}
                                 disabled={false}
@@ -384,6 +445,7 @@ export const ScriptEditor: React.FC = () => {
                           
                             {item.selectedScriptIndex !== item.scriptTexts.length - 1 ? 
                             <button 
+                            data-testid="add-draft"
                             onClick={() => updateScriptSelection(item, item.selectedScriptIndex + 1)}
                             className="border rounded-r-lg p-2 font-bold flex items-center justify-center"><ArrowRightIcon /></button> : 
                             
@@ -394,7 +456,7 @@ export const ScriptEditor: React.FC = () => {
                               >
                                 <HoverCard openDelay={200}>
                                 <HoverCardTrigger>
-                                    <div className="h-full w-full font-bold p-2 text-lg">
+                                    <div className="h-full w-full font-bold p-2 text-lg" >
                                       {buttonLoading === item.id ? "..." : <PlusIcon />}
                                     </div>
                                     </HoverCardTrigger>
@@ -417,7 +479,7 @@ export const ScriptEditor: React.FC = () => {
               </Reorder.Group>
             </div>
           </CardContent>
-          <div className="basis-1/2 h-screen fixed w-1/2 right-0">
+          <div className="h-full fixed w-1/2 right-0">
           {selectedScript.id !== undefined && 
             <div className="border p-6 flex flex-col gap-4 items-center rounded-xl mr-8">
                 <h1 className="text-2xl font-bold">
@@ -430,6 +492,7 @@ export const ScriptEditor: React.FC = () => {
                   <div className="flex flex-row gap-4">
                     <Button onClick={() => setMediaSelected("GenAIImage")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
                     <Button onClick={() => setMediaSelected("GenAIVideo")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Convert image to AI video</Button>
+                    {hasSoundEffects && <Button onClick={() => setMediaSelected("soundEffect")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Sound Effect</Button>}
                     <MediaChoices prompts={selectedScript.imagePrompts??[]} callback={setMediaSelected}/>
                   </div>
                   <div className="w-full h-full flex justify-start items-start mt-4 gap-4">
@@ -444,7 +507,7 @@ export const ScriptEditor: React.FC = () => {
                                     alt="script media"
                                     className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
                           ${selectedScript.scriptMedia === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
-                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], false)}}
+                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], false, "AI")}}
                                     />
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
@@ -493,7 +556,7 @@ export const ScriptEditor: React.FC = () => {
                                     src={video}
                                     className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
                                     ${selectedScript.scriptMedia === selectedScript.aiVideos![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
-                                    onClick={() => {setMedia(selectedScript, selectedScript.aiVideos![index], true)}}
+                                    onClick={() => {setMedia(selectedScript, selectedScript.aiVideos![index], true, "AI")}}
                                     controls
                                   />
                                 </div>
@@ -503,26 +566,68 @@ export const ScriptEditor: React.FC = () => {
                                   +
                                 </Button>
                               </Skeleton>
-                            
                           </div>
                         }
-                      </div> :
-                      <div className="grid grid-cols-3 gap-4">
-                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.imageURLS.map((url, index) => {
-                          return (<div key={index} className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
-                          ${selectedScript.scriptMedia === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}          
-                          `} onClick={async () => setMedia(selectedScript, url, false)}>
-                            <img src={`${url}`}/>
-                          </div>)
-                      })}
-                      </div>}
+                      </div> : mediaSelected === "soundEffect" ? 
+                        <div className="py-8 flex flex-col gap-8 w-full">
+                        
+                        <div className="w-full border border-gray-500 border-opacity-40 flex flex-row justify-between p-4 rounded-lg">
+                          <div>
+                            Have sound effect for this section
+                          </div>
+                          <Switch
+                            checked={selectedScript.soundEffectPrompt !== "No effect"}
+                            onCheckedChange={async () => {await toggleSoundEffect(selectedScript)}}
+                            />
+                        </div>
+                        {selectedScript.soundEffectPrompt !== "No effect" && <div className="w-full border border-gray-500 border-opacity-40 flex flex-row justify-between p-4 rounded-lg">
+                          <div>
+                            Automatically generate effects
+                          </div>
+                          <Switch
+                            checked={selectedScript.soundEffectPrompt === "Autogeneffect"}
+                            onCheckedChange={async () => {await toggleAutoSoundEffect(selectedScript)}}
+                            />
+                        </div>
+                        }
+
+
+                          {selectedScript.soundEffectPrompt !== "No effect" && selectedScript.soundEffectPrompt !== "Autogeneffect" && 
+                          <div className="flex flex-col gap-8 items-center justify-center">
+                            <div className="w-full flex flex-row gap-4">
+                              <Input className="w-3/5" placeholder="Describe sound effect" value={selectedScript.soundEffectPrompt} onChange={(e) => setEffectPrompt(selectedScript, e)}/>
+                              <Button onClick={() => loadSound(selectedScript)}>{loadingSound ? "Generating..." : "Generate Effect"}</Button>
+                            </div>
+                            {loadingSound ? <div>loading sound...</div> : <audio src={selectedScript.soundEffect ? selectedScript.soundEffect : ""} controls/>}
+                          </div>
+                          
+                          
+                          
+                          }
+
+
+                        </div> :
+                        <div className="grid grid-cols-3 gap-4">
+                        {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.unsplashedImages.map(({url, author}, index) => {
+                          return (
+                            <div key={index} className={`aspect-video border rounded-lg overflow-hidden relative group
+                            ${selectedScript.scriptMedia?.url === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover:border-dashed border-2"}
+                            `} onClick={async () => setMedia(selectedScript, url, false, author)}>
+                              <img src={`${url}`} alt="Unsplash"/>
+                              <div className="p-2 bg-black bg-opacity-70 w-full absolute bottom-0 invisible group-hover:visible text-primary font-bold">
+                                credit: {author}
+                              </div>
+                            </div>
+                          );
+                        })}
+                        </div>}
+                      
                   </div>
                   
                 </div>
             </div>
             }
           </div>
-            
         </div>
         <CardFooter className="flex w-1/2 justify-between">
           <Button onClick={selectTopic} variant="outline">Back</Button>

@@ -22,6 +22,9 @@ export const mockApi:IAPI = {
     getProjectHasSubtitles: function (): Promise<boolean> {
         throw new Error("Function not implemented.");
     },
+    getProjectSubtitleStyle: function (): Promise<string> {
+        throw new Error("Function not implemented.");
+    },
     getProjectVoiceover: function (): Promise<Voiceover> {
         throw new Error("Function not implemented.");
     },
@@ -53,6 +56,9 @@ export const mockApi:IAPI = {
         throw new Error("Function not implemented.");
     },
     setProjectHasSubtitles: function (): Promise<void> {
+        throw new Error("Function not implemented.");
+    },
+    setProjectSubtitleStyle: function (): Promise<void> {
         throw new Error("Function not implemented.");
     },
     setProjectVoiceover: function (): Promise<void> {

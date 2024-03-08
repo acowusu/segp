@@ -9,6 +9,7 @@ import type {
   Topic,
   Visual,
   Voiceover,
+  unsplashedImages,
 } from "./mockData/data";
 // import topics from "./mockData/topics.json";
 import visuals from "./mockData/visuals.json";
@@ -72,10 +73,10 @@ export async function downloadFile(url: URL | RequestInfo, fileDirectory: string
 
 
 // Takes in an array of prompts for images and returns an array of array of filepaths to the images
-export async function fetchImages(prompts: Array<string>): Promise<Array<Array<string>>> {
+export async function fetchImages(prompts: Array<string>): Promise<Array<Array<unsplashedImages>>> {
 
-  const imageFilePaths: Array<Array<string>> = [];
-  const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI'];
+  const imageFilePaths: Array<Array<unsplashedImages>> = [];
+  const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI', 'ogmohep6A6sUkg4XalVaOjD4NMOUTM5SZxT_SyYGGio', 'Oel1y6GyfBinxf9eRXksMunRFX8bk-VaSJk2t7ItTQQ'];
   
   for (const prompt of prompts) {
     const unsplashAccessKey = unsplashAccessKeys.shift()
@@ -83,7 +84,7 @@ export async function fetchImages(prompts: Array<string>): Promise<Array<Array<s
     const unsplashResponse = await fetch(unsplashEndpoint);
     const unsplashData = await unsplashResponse.json();
 
-    const unsplashPhotos = unsplashData.results.map((photo: { urls: { raw: string } }) => photo.urls.raw + "&w=1920&h=1080");
+    const unsplashPhotos = unsplashData.results.map((photo: { urls: { raw: string }, user: {name: string} }) => {return {url: photo.urls.raw + "&w=1920&h=1080", author: photo.user.name}});
 
     imageFilePaths.push(unsplashPhotos);
     
@@ -166,7 +167,11 @@ export async function setAudience(audience: Audience): Promise<void> {
 }
 export async function setVoiceover(voiceover: Voiceover): Promise<void> {
   console.log("setVoiceover", voiceover);
-  
+  const currentVoiceover = projectData.getProjectVoiceover();
+  if (currentVoiceover.id == voiceover.id) {
+    console.log("Voiceover already set")
+    return
+  }
  projectData.setProjectScript(
   projectData.getProjectScript().map((script) => {
     script.scriptAudio = undefined;

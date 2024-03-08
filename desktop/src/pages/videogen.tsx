@@ -47,32 +47,21 @@ export const VideoGenerator: React.FC = () => {
     const movie = new etro.Movie({
       canvas: canvas,
       repeat: false,
-      background: etro.parseColor("#ccc"),
+      background: etro.parseColor("#e74c3c"),
     });
     canvas.width = 1920;
     canvas.height = 1080;
     console.log("setting up player", movie);
     const script = await window.api.getScript();
     await addAudioLayers(script, movie);
-    // const backing = await window.api.getProjectBackingTrack();
-    // const backingLayer = new etro.layer.Audio({
-      //   startTime: 0,
-      //   duration: backing.audioDuration,
-      //   source: await window.api.toDataURL(backing.audioSrc),
-      //   sourceStartTime: 0, // default: 0
-      //   muted: false, // default: false
-      //   volume: 0.5, // default: 1
-      //   playbackRate: 1, //default: 1
-      // });
-      // movie.layers.push(backingLayer);
-      await addMediaLayers(script, movie);
-      await toast.promise(addAvatarLayers(script, movie).then(()=>addSubtitleLayers(script, movie)
-      ), {
-        loading: `Adding Avatar Layers...`,
-        success: `Avatar Layers have been added.  `,
-        error: (error)=> `Error adding Avatar Layers ${error}` ,
-      })
-    // await addSadTalkerLayers(script, movie);
+
+    await addMediaLayers(script, movie);
+
+    await toast.promise(addAvatarLayers(script, movie).then(async () => await addSubtitleLayers(script, movie)), {
+      loading: `Adding Avatar Layers...`,
+      success: `Avatar Layers have been added.  `,
+      error: (error)=> `Error adding Avatar Layers ${error}` ,
+    })
 
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);
@@ -117,8 +106,8 @@ export const VideoGenerator: React.FC = () => {
     const blob: Blob = (await movieRef.current?.record({
       frameRate: 24,
       type: 'video/webm;codecs=h264',
-      // audio: default true,
-      // video: default true,
+      audio: true,
+      video: true,
       // duration: default end of video
       // onStart: optional callback
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -160,7 +149,7 @@ export const VideoGenerator: React.FC = () => {
 
   return (
     <div>
-      <FramelessCard >
+      <FramelessCard className="flex flex-col gap-4" >
         <CardHeader>
           <CardTitle>Generate Video</CardTitle>
           <CardDescription>
@@ -169,78 +158,85 @@ export const VideoGenerator: React.FC = () => {
 
           </CardDescription>
         </CardHeader>
-      {currentState === "initial" && (
-        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-          <Button
-            className="ml-4"
-            onClick={() => {
-              generateEtro();
-            }}
-          >
-            Generate Audio
-            <MagicWandIcon />
-          </Button>
-        </Skeleton>
-      )}
-      {currentState === "playback" && (
-        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-          <Button
-            className="ml-4"
-            onClick={() => {
-              movieRef.current?.play();
-              setCurrentState("playing");
-              console.log("playing");
-              console.log(movieRef.current);
-            }}
-          >
-            Play
-            <PlayIcon />
-          </Button>
-        </Skeleton>
-      )}
-      <canvas
-        className={`w-full mb-4 ${currentState === "playing" ? "" : "hidden"}`}
-        ref={canvasRef}
-      ></canvas>
 
-        <Button onClick={() => navigate("/script-editor")}>
-          Return to script editor
-        </Button>
+        <div className="flex flex-row gap-8">
+          {currentState === "initial" && (
+          <Skeleton className="aspect-video	 w-4/5 mb-4 flex align-center items-center justify-center flex-col	">
+            <Button
+              className="ml-4"
+              onClick={() => {
+                generateEtro();
+              }}
+            >
+              Generate Audio
+              <MagicWandIcon />
+            </Button>
+          </Skeleton>
+        )}
+        {currentState === "playback" && (
+          <Skeleton className="aspect-video	 w-4/5 mb-4 flex align-center items-center	justify-center flex-col	">
+            <Button
+              className="ml-4"
+              onClick={() => {
+                movieRef.current?.play();
+                setCurrentState("playing");
+                console.log("playing");
+                console.log(movieRef.current);
+              }}
+            >
+              Play
+              <PlayIcon />
+            </Button>
+          </Skeleton>
+        )}
+        <canvas
+          className={`w-4/5 mb-4 ${currentState === "playing" ? "" : "hidden"}`}
+          ref={canvasRef}
+        ></canvas>
+        {(currentState === "rendering" || currentState === "etro") && (
+          <Skeleton className="aspect-video	 w-4/5 mb-4 flex align-center items-center	justify-center flex-col	">
+            <Progress value={generationProgress} className="w-5/6 mt-4" />
+            <p>{currentProcess}</p>
+          </Skeleton>
+        )}
 
-      {currentState === "playing" && (
-        <>
-          <Button
-            className=""
-            onClick={() => {
-              movieRef.current?.pause();
-              setCurrentState("playback");
-            }}
-          >
-            Pause
+        <div className="flex flex-col gap-8 flex-grow">
+          <Button onClick={() => navigate("/script-editor")}>
+            Return to script editor
           </Button>
-        </>
-      )}
-      {currentState === "playback" && (
-        <>
-          <Button
-            className=""
-            onClick={async () => {
-              setCurrentState("rendering");
-              await generateVideo();
-              setCurrentState("playback");
-            }}
-          >
-            Save as Video file
-          </Button>
-        </>
-      )}
-      {(currentState === "rendering" || currentState === "etro") && (
-        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-          <Progress value={generationProgress} className="w-5/6 mt-4" />
-          <p>{currentProcess}</p>
-        </Skeleton>
-      )}
-      <div></div>
+
+          {currentState === "playing" && (
+            <>
+              <Button
+                className=""
+                onClick={() => {
+                  movieRef.current?.pause();
+                  setCurrentState("playback");
+                }}
+              >
+                Pause
+              </Button>
+            </>
+          )}
+          {currentState === "playback" && (
+            <>
+              <Button
+                className=""
+                onClick={async () => {
+                  setCurrentState("rendering");
+                  await generateVideo();
+                  setCurrentState("playback");
+                }}
+              >
+                Save as Video file
+              </Button>
+            </>
+          )}
+
+        </div>
+        </div>
+
+
       </FramelessCard>
     </div>
   );

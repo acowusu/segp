@@ -1,7 +1,7 @@
 {
   "name": "desktop",
   "private": true,
-  "version": "0.0.3",
+  "version": "1.0.1",
   "repository": "https://github.com/acowusu/segp.git",
   "postinstall": "electron-builder install-app-deps",
   "author": "Imperial College London Department of Computing",

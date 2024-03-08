@@ -41,6 +41,12 @@ This project aims to develop an application that seamlessly converts large PDF r
    10. [Contributing](#contributing)
    11. [License](#license)
 
+
+## Download
+
+You can get the latest release [here](https://github.com/acowusu/segp/releases/latest):
+
+
 ## Installation
 
 1. Clone the repository.
