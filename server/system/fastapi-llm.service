@@ -8,6 +8,8 @@ WorkingDirectory=/home/alexa/segp-1/server/experimental
 Environment=PATH=/home/alexa/.conda/envs/bark/bin:$PATH 
 Environment=CUDA_VISIBLE_DEVICES=1
 ExecStart=/home/alexa/.conda/envs/bark/bin/python llm.py
+Restart=on-failure
+RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
