@@ -126,8 +126,8 @@ export const ScriptEditor: React.FC = () => {
   ) => {
     if (userInitiated && !script.scriptMediaIsVideo) {
       console.log(script.scriptMedia)
-      const imgPath = script.scriptMedia!.replace("local:///", "")
-      const video = window.api.imageToVideo(imgPath, 7, 3);
+      const imgPath = script.scriptMedia!.url.replace("local:///", "")
+      const video = window.api.imageToVideo(imgPath, 7, 10);
       toast.promise(video, {
         loading: `Generating Video from ${script.scriptMedia} for ${script.sectionName}`,
         success: (video) => `Video Generated: ${video}`,
@@ -137,7 +137,7 @@ export const ScriptEditor: React.FC = () => {
       console.log(videoPath)
       const updatedItems = items.map((item) => {
         if (item.id === script.id) {
-          item.scriptMedia = videoPath;
+          item.scriptMedia = {url: videoPath, author: "AI"};
           item.aiVideos = item.aiVideos ? [...item.aiVideos, videoPath] : [videoPath]
           console.log(item.aiVideos)
           item.scriptMediaIsVideo = true;
@@ -469,8 +469,8 @@ export const ScriptEditor: React.FC = () => {
                         </div>
                       </div>
                       <div className="w-[25rem] flex grow-0">
-                        {(item.scriptMedia && !item.scriptMediaIsVideo) ? <img src={`${item.scriptMedia}`} className="w-full aspect-video object-cover rounded-lg"/> : 
-                        item.scriptMedia ? <video muted autoPlay loop className="w-full aspect-video object-cover rounded-lg"> <source src={`${item.scriptMedia}`} type="video/mp4"/> </video> :
+                        {(item.scriptMedia && !item.scriptMediaIsVideo) ? <img src={`${item.scriptMedia.url}`} className="w-full aspect-video object-cover rounded-lg"/> : 
+                        item.scriptMedia ? <video muted autoPlay loop className="w-full aspect-video object-cover rounded-lg"> <source src={`${item.scriptMedia.url}`} type="video/mp4"/> </video> :
                         <div className="border p-4 w-full aspect-video object-cover rounded-lg">No image</div>}
                       </div>
                     </div>
@@ -506,7 +506,7 @@ export const ScriptEditor: React.FC = () => {
                                     src={image}
                                     alt="script media"
                                     className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
-                          ${selectedScript.scriptMedia === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
+                          ${selectedScript.scriptMedia?.url === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
                                     onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], false, "AI")}}
                                     />
                                 </PopoverTrigger>
@@ -555,7 +555,7 @@ export const ScriptEditor: React.FC = () => {
                                   <video
                                     src={video}
                                     className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
-                                    ${selectedScript.scriptMedia === selectedScript.aiVideos![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
+                                    ${selectedScript.scriptMedia?.url === selectedScript.aiVideos![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
                                     onClick={() => {setMedia(selectedScript, selectedScript.aiVideos![index], true, "AI")}}
                                     controls
                                   />
@@ -568,7 +568,8 @@ export const ScriptEditor: React.FC = () => {
                               </Skeleton>
                           </div>
                         }
-                      </div> : mediaSelected === "soundEffect" ? 
+                      </div> : 
+                      mediaSelected === "soundEffect" ? 
                         <div className="py-8 flex flex-col gap-8 w-full">
                         
                         <div className="w-full border border-gray-500 border-opacity-40 flex flex-row justify-between p-4 rounded-lg">
@@ -590,22 +591,14 @@ export const ScriptEditor: React.FC = () => {
                             />
                         </div>
                         }
-
-
-                          {selectedScript.soundEffectPrompt !== "No effect" && selectedScript.soundEffectPrompt !== "Autogeneffect" && 
-                          <div className="flex flex-col gap-8 items-center justify-center">
-                            <div className="w-full flex flex-row gap-4">
-                              <Input className="w-3/5" placeholder="Describe sound effect" value={selectedScript.soundEffectPrompt} onChange={(e) => setEffectPrompt(selectedScript, e)}/>
-                              <Button onClick={() => loadSound(selectedScript)}>{loadingSound ? "Generating..." : "Generate Effect"}</Button>
-                            </div>
-                            {loadingSound ? <div>loading sound...</div> : <audio src={selectedScript.soundEffect ? selectedScript.soundEffect : ""} controls/>}
+                        {selectedScript.soundEffectPrompt !== "No effect" && selectedScript.soundEffectPrompt !== "Autogeneffect" && 
+                        <div className="flex flex-col gap-8 items-center justify-center">
+                          <div className="w-full flex flex-row gap-4">
+                            <Input className="w-3/5" placeholder="Describe sound effect" value={selectedScript.soundEffectPrompt} onChange={(e) => setEffectPrompt(selectedScript, e)}/>
+                            <Button onClick={() => loadSound(selectedScript)}>{loadingSound ? "Generating..." : "Generate Effect"}</Button>
                           </div>
-                          
-                          
-                          
-                          }
-
-
+                          {loadingSound ? <div>loading sound...</div> : <audio src={selectedScript.soundEffect ? selectedScript.soundEffect : ""} controls/>}
+                        </div>}
                         </div> :
                         <div className="grid grid-cols-3 gap-4">
                         {selectedScript.imagePrompts && selectedScript.imagePrompts.find((data) => data.prompt.toLowerCase() === mediaSelected.toLowerCase())?.unsplashedImages.map(({url, author}, index) => {
