@@ -12,6 +12,7 @@ describe("ScriptEditor", () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+      getProjectHasSoundEffect: async () => false
     });
     await act(async () =>
       render(
@@ -39,6 +40,7 @@ describe("ScriptEditor", () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+      getProjectHasSoundEffect: async () => false
     });
     await act(async () =>
       render(
@@ -57,6 +59,7 @@ describe("ScriptEditor", () => {
       ...mockApi,
       setScript: vi.fn().mockResolvedValue({}),
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+      getProjectHasSoundEffect: async () => false,
       getScript: async () => [
         {
           id: "1",
@@ -89,6 +92,7 @@ describe("ScriptEditor", () => {
     vi.spyOn(window, "api", "get").mockReturnValue({
       ...mockApi,
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+      getProjectHasSoundEffect: async () => false,
       setScript: vi.fn().mockResolvedValue({}),
       getScript: vi
         .fn()
@@ -151,6 +155,7 @@ describe("ScriptEditor", () => {
       ...mockApi,
       setScript: vi.fn().mockResolvedValue({}),
       getProjectTopic: vi.fn().mockResolvedValue(topics[0]),
+      getProjectHasSoundEffect: async () => false,
       getScript: async () => [
         {
           id: "1",
