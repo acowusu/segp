@@ -45,6 +45,7 @@ function createWindow() {
     y: y + 50,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      webSecurity: false
     },
   })
 
