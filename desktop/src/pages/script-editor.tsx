@@ -120,7 +120,7 @@ export const ScriptEditor: React.FC = () => {
     if (userInitiated && !script.scriptMediaIsVideo) {
       console.log(script.scriptMedia)
       const imgPath = script.scriptMedia!.replace("local:///", "")
-      const video = window.api.imageToVideo(imgPath, 7, 10);
+      const video = window.api.imageToVideo(imgPath, 7, 3);
       toast.promise(video, {
         loading: `Generating Video from ${script.scriptMedia} for ${script.sectionName}`,
         success: (video) => `Video Generated: ${video}`,

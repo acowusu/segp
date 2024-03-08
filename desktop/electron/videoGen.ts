@@ -34,5 +34,5 @@ export async function imageToVideo(imagePath: string, fps: number=7, videoLength
     const newDestination = await transcodeImgVidToMp4(destination)
 
     console.log("Destination: (of transcoded video)", "local:///" + newDestination);
-    return "local:///" + destination;
+    return "local:///" + newDestination;
 }
