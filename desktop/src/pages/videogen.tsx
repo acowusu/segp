@@ -12,6 +12,8 @@ import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../compon
 import { addAudioLayers, addAvatarLayers, addImageLayers, addSubtitleLayers, generateAudio, generateAvatarSections } from "../lib/video-utils";
 
 
+const images = ["./fetching_loading.png", "./final_loading.png"];
+
 /** TODOs:
  * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
  * -> support other layers, audio
@@ -26,6 +28,7 @@ export const VideoGenerator: React.FC = () => {
   const [currentProcess, setCurrentProcess] = useState<string>("");
   const [currentState, setCurrentState] = useState<string>("initial");
   const [script, setScript] = useState<ScriptData[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const updateScript = async () => {
     window.api.getScript().then( async (script) => {
       setScript(script);
@@ -72,7 +75,20 @@ export const VideoGenerator: React.FC = () => {
   const generateEtro = async () => {
     setCurrentProcess("Starting");
     setCurrentState("etro");
-    await generateAudio();
+
+    const updateProgress = (progress: number) => {
+      setGenerationProgress(progress);
+      if ((progress > 0) && (progress <= 50)) {
+        setCurrentProcess("Recording audio...");
+        setCurrentImageIndex(0)
+      }
+      if ((progress < 100) && (progress > 50)) {
+        setCurrentProcess("Listening to audio...");
+        setCurrentImageIndex(1)
+      }
+    };
+
+    await generateAudio(updateProgress);
     await generateAvatarSections();
     console.log("audio generated backing should exist");
 
@@ -226,10 +242,11 @@ export const VideoGenerator: React.FC = () => {
         </>
       )}
       {(currentState === "rendering" || currentState === "etro") && (
-        <Skeleton className="aspect-video	 w-full mb-4 flex align-center items-center	justify-center flex-col	">
-          <Progress value={generationProgress} className="w-5/6 mt-4" />
-          <p>{currentProcess}</p>
-        </Skeleton>
+        <Skeleton className="aspect-video w-full mb-4 flex align-center items-center justify-center flex-col ">
+        <img src={images[currentImageIndex]} alt="Loading" style={{ width: '300px', height: '300px' }}/>
+        <Progress value={generationProgress} className="w-5/6 mt-4" />
+        <p>{currentProcess}</p>
+    </Skeleton>
       )}
       <div></div>
       </FramelessCard>

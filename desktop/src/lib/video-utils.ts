@@ -264,9 +264,11 @@ export const updateSection = async (section: ScriptData, index?: number) => {
  * @returns {Promise<void>} A promise that resolves when the audio generation is complete.
  * @throws {Error} If there is an error generating the audio.
  */
-export const generateAudio = async () => {
+export const generateAudio = async (updateProgress) => {
   try {
     const initial = await window.api.getScript();
+    const totalSections = initial.length;
+    let sectionsProcessed = 0;
     for (let section of initial) {
       console.log("section", section.scriptAudio, section.soundEffect);
       if (!section.scriptAudio) {
@@ -274,6 +276,9 @@ export const generateAudio = async () => {
         toast.promise(modified, {
           loading: `Generating audio for ${section.sectionName}...`,
           success: (newSection) => {
+            sectionsProcessed++;
+            const progress = (sectionsProcessed / totalSections) * 100;
+            updateProgress(progress);
             return `Audio has been generated for ${section.sectionName}. ${newSection.scriptAudio} has been saved.`;
           },
           error: "Error generating audio for section: " + section.sectionName,
