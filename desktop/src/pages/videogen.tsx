@@ -9,7 +9,7 @@ import { MagicWandIcon, PlayIcon } from "@radix-ui/react-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../components/ui/card";
-import { addAudioLayers, addAvatarLayers, addImageLayers, addSubtitleLayers, generateAudio, generateAvatarSections } from "../lib/video-utils";
+import { addAudioLayers, addAvatarLayers, addMediaLayers, addSubtitleLayers, generateAudio, generateAvatarSections } from "../lib/video-utils";
 
 
 /** TODOs:
@@ -55,15 +55,13 @@ export const VideoGenerator: React.FC = () => {
     const script = await window.api.getScript();
     await addAudioLayers(script, movie);
 
-    await addImageLayers(script, movie);
+    await addMediaLayers(script, movie);
 
     await toast.promise(addAvatarLayers(script, movie).then(async () => await addSubtitleLayers(script, movie)), {
       loading: `Adding Avatar Layers...`,
       success: `Avatar Layers have been added.  `,
       error: (error)=> `Error adding Avatar Layers ${error}` ,
     })
-
-
 
     movieRef.current = movie;
     console.log("movieRef", movieRef.current);

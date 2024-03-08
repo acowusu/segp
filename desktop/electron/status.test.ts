@@ -125,7 +125,7 @@ test("shutdownService should throw an error if failed to shutdown the service", 
 });
 test("getServiceStatus should return an array of status objects", async () => {
     // Arrange
-    const statuses = ['Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive']
+    const statuses = ['Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive']
     const expectedStatuses: Status[] = endpoints.map((endpoint, i) => ({
         url: endpoint.url,
         name: endpoint.name,
@@ -150,7 +150,7 @@ test("getServiceStatus should return an array of status objects", async () => {
 
     // Assert
     expect(result).toEqual(expectedStatuses);
-    expect(mockFetch).toHaveBeenCalledTimes(6);
+    expect(mockFetch).toHaveBeenCalledTimes(7);
 });
 
 
@@ -172,7 +172,7 @@ test("getServiceStatus should handle request abort error", async () => {
 
     // Assert
     expect(result).toEqual(expectedStatuses);
-    expect(mockFetch).toHaveBeenCalledTimes(6);
+    expect(mockFetch).toHaveBeenCalledTimes(7);
 });
 
 test("getServiceStatus should handle other errors", async () => {
@@ -192,5 +192,5 @@ test("getServiceStatus should handle other errors", async () => {
 
     // Assert
     expect(result).toEqual(expectedStatuses);
-    expect(mockFetch).toHaveBeenCalledTimes(6);
+    expect(mockFetch).toHaveBeenCalledTimes(7);
 });

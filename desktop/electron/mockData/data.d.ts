@@ -10,11 +10,13 @@ export interface ScriptData {
   sectionName: string; // Name of section
   scriptAudio?: string; // path to audio file
   scriptDuration?: number; // duration of audio file
+  scriptMediaIsVideo?: boolean // false for images, true for videos
   scriptMedia?: unsplashedImages; // path to media file
   scriptPrompt?: string; // path to prompt file
   sadTalkerPath?: string; // path to tmp file on server
   avatarVideoUrl?: string; // avatar video URL
   aiImages?: string[]; // list of ai generated images
+  aiVideos?: string[]; // list of ai generated videos
   soundEffectPrompt?: string; // sound effect prompt
   soundEffect?: string; // path to generated sound effect
 }

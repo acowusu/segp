@@ -80,6 +80,16 @@ app && app.on('activate', () => {
   }
 })
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'local',
+    privileges: {
+        bypassCSP: true,
+        stream: true,
+    }
+  }
+])
+
 app && app.whenReady().then(() => {
   protocol.handle('local', (request) =>{
     console.log( request.url.slice('local:///'.length))

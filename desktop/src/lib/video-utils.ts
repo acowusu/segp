@@ -106,36 +106,55 @@ const createSlideLayer = async (section: ScriptData, start: number) => {
 }
 
 /**
- * Adds image layers to a movie based on the provided sections and script data.
+ * Adds Media layers to a movie based on the provided sections and script data.
  * @param sections - An array of script data representing different sections.
- * @param movie - The movie object to which the image layers will be added.
+ * @param movie - The movie object to which the media layers will be added.
  * @throws {Error} - If no media or duration is found in a section.
  */
-export async function addImageLayers(sections: ScriptData[], movie: etro.Movie) {
-  let start = 0;
-  for (const section of sections) {
-    if (!section.scriptMedia) throw new Error("No media found");
-    if (!section.scriptDuration) throw new Error("No duration found");
-    let layer = null;
-    const randNum = Math.floor(Math.random() * 3); // random number 0 - 2
-    switch (randNum) {
-      case (0): {
-        layer = await createZoomLayer(section, start);
-        break;
+export async function addMediaLayers(sections: ScriptData[], movie: etro.Movie) {
+    let start = 0;
+    for (const section of sections) {
+      if (!section.scriptMedia) throw new Error("No media found");
+      if (!section.scriptDuration) throw new Error("No duration found");
+      var layer = null;
+      if (section.scriptMediaIsVideo) {
+        const videoPath = section.scriptMedia.replace("local:///", "")
+        console.log(section)
+        console.log(videoPath)
+        layer = new etro.layer.Video({
+          startTime: start,
+          duration: section.scriptDuration,
+          source: await window.api.toDataURL(videoPath, "video/mp4"),
+          destX: 0, // default: 0
+          destY: 0, // default: 0
+          destWidth: undefined, // default: null (full width)
+          destHeight: undefined, // default: null (full height)
+          x: 0,  // default: 0
+          y: 0, // default: 0
+          opacity: 1, // default: 1
+          volume: 0, // default: 1
+        })
+      } else {
+        const randNum = Math.floor(Math.random() * 3); // random number 0 - 2
+        switch (randNum) {
+          case (0): {
+            layer = await createZoomLayer(section, start);
+            break;
+          }
+          case (1): {
+            layer = await createZoomOutLayer(section, start);
+            break;
+          }
+          default: {
+            layer = await createSlideLayer(section, start);
+          }
+        }
       }
-      case (1): {
-        layer = await createZoomOutLayer(section, start);
-        break;
-      }
-      default: {
-        layer = await createSlideLayer(section, start);
-      }
-    }
-    start += section.scriptDuration;
-    movie.layers.push(layer);
+      console.log("adding layer", layer);
+      start += section.scriptDuration;
+      movie.layers.push(layer);
   };
 }
-
 
 /**
  * Adds subtitle layers to a movie based on the provided sections and script data.

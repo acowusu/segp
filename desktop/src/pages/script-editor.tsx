@@ -34,7 +34,6 @@ import { MediaChoices } from "../components/custom/mediaChoices";
 import { Input } from "../components/ui/input";
 import { Switch } from "../components/ui/switch";
 
-
 export const ScriptEditor: React.FC = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<ScriptData[]>([]);
@@ -120,6 +119,40 @@ export const ScriptEditor: React.FC = () => {
     setItems(newItems);
     await window.api.setScript(newItems);
   };
+
+  const genAIVideo = async (
+    script: ScriptData,
+    userInitiated?: boolean,
+  ) => {
+    if (userInitiated && !script.scriptMediaIsVideo) {
+      console.log(script.scriptMedia)
+      const imgPath = script.scriptMedia!.replace("local:///", "")
+      const video = window.api.imageToVideo(imgPath, 7, 3);
+      toast.promise(video, {
+        loading: `Generating Video from ${script.scriptMedia} for ${script.sectionName}`,
+        success: (video) => `Video Generated: ${video}`,
+        error: "Error",
+      })
+      const videoPath = await video;
+      console.log(videoPath)
+      const updatedItems = items.map((item) => {
+        if (item.id === script.id) {
+          item.scriptMedia = videoPath;
+          item.aiVideos = item.aiVideos ? [...item.aiVideos, videoPath] : [videoPath]
+          console.log(item.aiVideos)
+          item.scriptMediaIsVideo = true;
+        }
+        return item;
+      }) 
+      setItems(
+        updatedItems
+      );
+      await window.api.setScript(updatedItems);
+    } else {
+      console.log("Media already exists");
+    }
+  }
+
   const genAiImage = async (
     script: ScriptData,
     userInitiated?: boolean,
@@ -162,10 +195,11 @@ export const ScriptEditor: React.FC = () => {
       console.log("Media already exists");
     }
   };
-  const setMedia = async (script: ScriptData, url: string, author: string) => {
+  const setMedia = async (script: ScriptData, url: string, isVideo: boolean, author: string) => {
     const newItems = items.map((item) => {
       if (script.id === item.id) {
         item.scriptMedia = {url: url, author: author};
+        item.scriptMediaIsVideo = isVideo;
       }
       return item;
     })
@@ -435,7 +469,8 @@ export const ScriptEditor: React.FC = () => {
                         </div>
                       </div>
                       <div className="w-[25rem] flex grow-0">
-                        {item.scriptMedia ? <img src={`${item.scriptMedia.url}`} className="w-full aspect-video object-cover rounded-lg"/> : 
+                        {(item.scriptMedia && !item.scriptMediaIsVideo) ? <img src={`${item.scriptMedia}`} className="w-full aspect-video object-cover rounded-lg"/> : 
+                        item.scriptMedia ? <video muted autoPlay loop className="w-full aspect-video object-cover rounded-lg"> <source src={`${item.scriptMedia}`} type="video/mp4"/> </video> :
                         <div className="border p-4 w-full aspect-video object-cover rounded-lg">No image</div>}
                       </div>
                     </div>
@@ -455,12 +490,13 @@ export const ScriptEditor: React.FC = () => {
                 </h3>
                 <div className="w-full h-full">
                   <div className="flex flex-row gap-4">
-                    <Button onClick={() => setMediaSelected("GenAI")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
+                    <Button onClick={() => setMediaSelected("GenAIImage")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Generate AI image</Button>
+                    <Button onClick={() => setMediaSelected("GenAIVideo")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Convert image to AI video</Button>
                     {hasSoundEffects && <Button onClick={() => setMediaSelected("soundEffect")} className="bg-inherit border border-gray-500 border-opacity-40 text-primary">Sound Effect</Button>}
                     <MediaChoices prompts={selectedScript.imagePrompts??[]} callback={setMediaSelected}/>
                   </div>
                   <div className="w-full h-full flex justify-start items-start mt-4 gap-4">
-                  {mediaSelected === "GenAI" ? <div className="flex-col grow-0 w-full">
+                  {mediaSelected === "GenAIImage" ? <div className="flex-col grow-0 w-full">
                         {
                           <div className="grid grid-cols-3 gap-4 w-full">
                               {selectedScript.aiImages && selectedScript.aiImages.map((image, index) => (
@@ -469,9 +505,9 @@ export const ScriptEditor: React.FC = () => {
                                   <img
                                     src={image}
                                     alt="script media"
-                                    className={`aspect-video border rounded-lg overflow-hidden 
-                          ${selectedScript.scriptMedia?.url === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
-                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], "AI")}}
+                                    className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
+                          ${selectedScript.scriptMedia === selectedScript.aiImages![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
+                                    onClick={() => {setMedia(selectedScript, selectedScript.aiImages![index], false, "AI")}}
                                     />
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
@@ -504,7 +540,29 @@ export const ScriptEditor: React.FC = () => {
                               </Popover>
                               ))}
                               <Skeleton className="aspect-video w-full border flex items-center justify-center	">
-                                <Button className="text-2xl font-bold" onClick={() => {genAiImage(selectedScript, true)}}>
+                                  <Button className="text-2xl font-bold" onClick={() => {genAiImage(selectedScript, true)}}>
+                                    +
+                                  </Button>
+                              </Skeleton>
+                            
+                          </div>
+                        }
+                      </div> : mediaSelected == "GenAIVideo" ? <div className="flex-col grow-0 w-full">
+                        {
+                          <div className="grid grid-cols-3 gap-4 w-full">
+                              {selectedScript.aiVideos && selectedScript.aiVideos.map((video, index) => (
+                                <div key={index}>
+                                  <video
+                                    src={video}
+                                    className={`aspect-video border rounded-lg overflow-hidden cursor-pointer
+                                    ${selectedScript.scriptMedia === selectedScript.aiVideos![index] ? "border-2 border-sky-500" : "hover:border-sky-500 hover: hover:border-dashed border-2"}`}
+                                    onClick={() => {setMedia(selectedScript, selectedScript.aiVideos![index], true, "AI")}}
+                                    controls
+                                  />
+                                </div>
+                              ))}
+                              <Skeleton className="aspect-video w-full border flex items-center justify-center	">
+                                <Button className="text-2xl font-bold" onClick={() => {genAIVideo(selectedScript, true)}}>
                                   +
                                 </Button>
                               </Skeleton>
@@ -554,7 +612,7 @@ export const ScriptEditor: React.FC = () => {
                           return (
                             <div key={index} className={`aspect-video border rounded-lg overflow-hidden relative group
                             ${selectedScript.scriptMedia?.url === url ? "border-2 border-sky-500" : "hover:border-sky-500 hover:border-dashed border-2"}
-                            `} onClick={async () => setMedia(selectedScript, url, author)}>
+                            `} onClick={async () => setMedia(selectedScript, url, false, author)}>
                               <img src={`${url}`} alt="Unsplash"/>
                               <div className="p-2 bg-black bg-opacity-70 w-full absolute bottom-0 invisible group-hover:visible text-primary font-bold">
                                 credit: {author}

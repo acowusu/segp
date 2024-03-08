@@ -34,6 +34,7 @@ import { getProjectName, getProjectPath, getIsDev, getLastProject, getRecentProj
 import * as projectData from "./projectData"
 import {generateTextFromLLM, generateTopics, generateOpenJourneyPrompt, generateOpenJourneyImage, generateSoundEffect} from "./server"
 import {getServiceStatus, launchService, shutdownService} from "./status"
+import { imageToVideo } from "./videoGen";
 const api = {
   loadReport,
   getScript,
@@ -78,6 +79,7 @@ const api = {
   getAvatars,
   setAvatar,
   fetchImages,
+  imageToVideo,
 };
 export default api;
 

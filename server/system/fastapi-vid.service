@@ -1,0 +1,12 @@
+[Unit]
+Description=Fast API Stable Video Diffusion Service
+After=network.target
+
+[Service]
+User=ls1221
+WorkingDirectory=/home/ls1221/segp/server/
+Environment=PATH=/opt/conda/envs/imgtovid/bin:$PATH
+ExecStart=/opt/conda/envs/imgtovid/bin/python vid.py
+
+[Install]
+WantedBy=multi-user.target

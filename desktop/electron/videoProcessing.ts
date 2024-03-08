@@ -53,6 +53,23 @@ export async function webmBLobToMp4(
   console.log("finished webm -> mp4");
 }
 
+/**
+ * returns the path of the transcoded video 
+ * @param vidPath path of the image to video asset (if not downloaded gotta download first)
+ */
+export async function transcodeImgVidToMp4(vidPath: string): Promise<string> {
+  console.log("started transcoding mp4 video");
+  const nonce = `vid-${Math.floor(Math.random() * 1000000)}`;
+  const out = path.join(getProjectPath(), `${nonce}.mp4`);
+  // try {
+  await (pool!.run(
+    { mp4: vidPath, out: out },
+    { name: "transcodeMp4ToH264Encoding" }
+    ) as Promise<void>);
+  console.log("done transcoding mp4 video");
+  return out;
+}
+
 export async function prepareMp4Blob(buff: ArrayBuffer): Promise<ArrayBuffer> {
   console.log("started creating the mp4 file");
   const nonce = `temp-${Math.floor(Math.random() * 1000000)}`;

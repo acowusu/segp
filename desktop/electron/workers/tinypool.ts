@@ -38,6 +38,22 @@ export const convertWebmToMp4 = async ({
   console.log('ok!', result)
 };
 
+export const transcodeMp4ToH264Encoding = async ({
+  mp4,
+  out
+}: {
+  mp4: string; 
+  out: string;
+}): Promise<void> => {
+  try {
+    await promiseSpawn(ffmpegPath, ["-i", `${mp4}`, "-y", "-vcodec", "libx264", `${out}`], {
+    });
+  } catch (error) {
+    console.error('failed!', error)
+
+  }
+}
+
 export const extractTextFromPDF = async ({
   filePath,projectPath
 }: {
