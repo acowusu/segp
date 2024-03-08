@@ -163,7 +163,7 @@ export const VideoGenerator: React.FC = () => {
 
         <div className="flex flex-row gap-8">
           {currentState === "initial" && (
-          <Skeleton className="aspect-video	 w-3/5 mb-4 flex align-center items-center justify-center flex-col	">
+          <Skeleton className="aspect-video	 w-4/5 mb-4 flex align-center items-center justify-center flex-col	">
             <Button
               className="ml-4"
               onClick={() => {
@@ -176,7 +176,7 @@ export const VideoGenerator: React.FC = () => {
           </Skeleton>
         )}
         {currentState === "playback" && (
-          <Skeleton className="aspect-video	 w-3/5 mb-4 flex align-center items-center	justify-center flex-col	">
+          <Skeleton className="aspect-video	 w-4/5 mb-4 flex align-center items-center	justify-center flex-col	">
             <Button
               className="ml-4"
               onClick={() => {
@@ -192,11 +192,11 @@ export const VideoGenerator: React.FC = () => {
           </Skeleton>
         )}
         <canvas
-          className={`w-3/5 mb-4 ${currentState === "playing" ? "" : "hidden"}`}
+          className={`w-4/5 mb-4 ${currentState === "playing" ? "" : "hidden"}`}
           ref={canvasRef}
         ></canvas>
         {(currentState === "rendering" || currentState === "etro") && (
-          <Skeleton className="aspect-video	 w-3/5 mb-4 flex align-center items-center	justify-center flex-col	">
+          <Skeleton className="aspect-video	 w-4/5 mb-4 flex align-center items-center	justify-center flex-col	">
             <Progress value={generationProgress} className="w-5/6 mt-4" />
             <p>{currentProcess}</p>
           </Skeleton>
