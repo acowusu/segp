@@ -156,7 +156,8 @@ export const generateScript = async (report: string, topic:Topic): Promise<Scrip
                 selectedScriptIndex: 0,
                 sectionName: section.title + " Part " + (i+1).toString(),
                 scriptTexts: [sentence.text],
-                scriptMedia: imgPrompts[0].unsplashedImages[0]
+                scriptMedia: imgPrompts[0].unsplashedImages[0],
+                soundEffectPrompt: "Autogeneffect"
                 }
         })
         return await Promise.all(sentences);
@@ -421,31 +422,35 @@ const generateSoundEffectPrompt = async (section: ScriptData): Promise<string> =
 
 export const generateSoundEffect = async (section: ScriptData): Promise<ScriptData> => {
 
-    const effectPrompt = await generateSoundEffectPrompt(section)
+    if (!section.soundEffectPrompt || section.soundEffectPrompt !== "No effect"){
 
-    const params = {
-        "script": effectPrompt,
-        "duration": 4
-    }
+        const effectPrompt = (section.soundEffectPrompt && section.soundEffectPrompt !== "Autogeneffect") ? section.soundEffectPrompt : await generateSoundEffectPrompt(section)
+        const params = {
+            "script": effectPrompt,
+            "duration": 3
+        }
 
-    const url = "https://iguana.alexo.uk/v7/generate_audio";
-    
-    try {
+        const url = "https://iguana.alexo.uk/v7/generate_audio";
         
+        try {
+            
 
-        const { destination } = await downloadFile(url, getProjectPath(), {
-            method: 'POST',
-            body: JSON.stringify(params),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-        section.soundEffectPrompt = effectPrompt
-        section.soundEffect = destination
-        return section;
-      
-    } catch (err) {
-        console.error("error:" + err);
-        throw Error("Error generating Audio Effect")
-    }
+            const { destination } = await downloadFile(url, getProjectPath(), {
+                method: 'POST',
+                body: JSON.stringify(params),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            section.soundEffectPrompt = effectPrompt
+            section.soundEffect = destination
+            return section;
+        
+        } catch (err) {
+            console.error("error:" + err);
+            throw Error("Error generating Audio Effect")
+        }
+    } else {
+        return section;    
+}
 }

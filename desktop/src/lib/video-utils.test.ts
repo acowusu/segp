@@ -104,31 +104,31 @@ describe("addSubtitleLayers", () => {
     // let sections: ScriptData[];
     // let movie: etro.Movie;
 
-    beforeEach(() => {
-        // sections = [
-        //     {
-        //         id: "1",
-        //         selectedScriptIndex: 0,
-        //         scriptTexts: ["Subtitle 1"],
-        //         sectionName: "Section 1",
-        //         scriptMedia: {url: "image1.jpg", author: "matthew"},
-        //         scriptDuration: 5,
-        //     },
-        //     {
-        //         id: "2",
-        //         scriptMedia: {url: "image2.jpg", author: "matthew"},
-        //         scriptDuration: 10,
-        //         sectionName: "Section 2",
-        //         selectedScriptIndex: 0,
-        //         scriptTexts: ["Subtitle 2"],
-        //     },
-        //     // Add more sections as needed
-        // ];
+    // beforeEach(() => {
+    //     sections = [
+    //         {
+    //             id: "1",
+    //             selectedScriptIndex: 0,
+    //             scriptTexts: ["Subtitle 1"],
+    //             sectionName: "Section 1",
+    //             scriptMedia: {url: "image1.jpg", author: "matthew"},
+    //             scriptDuration: 5,
+    //         },
+    //         {
+    //             id: "2",
+    //             scriptMedia: {url: "image2.jpg", author: "matthew"},
+    //             scriptDuration: 10,
+    //             sectionName: "Section 2",
+    //             selectedScriptIndex: 0,
+    //             scriptTexts: ["Subtitle 2"],
+    //         },
+    //         // Add more sections as needed
+    //     ];
 
-        // movie = new etro.Movie({
-        //     canvas: document.createElement("canvas")
-        // });
-    });
+    //     movie = new etro.Movie({
+    //         canvas: document.createElement("canvas")
+    //     });
+    // });
 
     test("should add subtitle layers to the movie", () => {
         //TODO FIX LATER
@@ -270,7 +270,7 @@ describe("addAudioLayers", () => {
             ...mockApi,
             toDataURL: async () => "data:image/png;base64,",
             getProjectHasBackgroundAudio: async () => false,
-            getProjectHasSoundEffect: async () => false
+            getProjectHasSoundEffect: async () => true
         });
 
         sections.push(sectionWithSoundEffect);

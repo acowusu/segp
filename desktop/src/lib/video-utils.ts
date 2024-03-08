@@ -200,14 +200,14 @@ export async function addAudioLayers(sections: ScriptData[], movie: etro.Movie) 
     });
     movie.layers.push(layer);
 
-    if (section.soundEffect) {
+    if (await window.api.getProjectHasSoundEffect() && section.soundEffect && section.soundEffectPrompt !== "No effect") {
       const effectLayer = new etro.layer.Audio({
         startTime: start,
         duration: Math.min(4, section.scriptDuration),
         source: await window.api.toDataURL(section.soundEffect, "audio/wav"),
         sourceStartTime: 0,
         muted: false, // default: false
-        volume: 0.6, // default: 1
+        volume: 1, // default: 1
         playbackRate: 1, 
       });
       movie.layers.push(effectLayer);
