@@ -237,8 +237,8 @@ export const VideoGenerator: React.FC = () => {
 
         </div>
         </div>
-      
-      
+
+
       </FramelessCard>
     </div>
   );
