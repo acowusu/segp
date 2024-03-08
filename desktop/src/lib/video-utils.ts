@@ -118,7 +118,7 @@ export async function addMediaLayers(sections: ScriptData[], movie: etro.Movie) 
       if (!section.scriptDuration) throw new Error("No duration found");
       var layer = null;
       if (section.scriptMediaIsVideo) {
-        const videoPath = section.scriptMedia.replace("local:///", "")
+        const videoPath = section.scriptMedia!.url.replace("local:///", "")
         console.log(section)
         console.log(videoPath)
         layer = new etro.layer.Video({
