@@ -125,7 +125,7 @@ test("shutdownService should throw an error if failed to shutdown the service", 
 });
 test("getServiceStatus should return an array of status objects", async () => {
     // Arrange
-    const statuses = ['Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive']
+    const statuses = ['Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive', 'Unresponsive']
     const expectedStatuses: Status[] = endpoints.map((endpoint, i) => ({
         url: endpoint.url,
         name: endpoint.name,

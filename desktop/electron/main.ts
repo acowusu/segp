@@ -21,16 +21,6 @@ let win: BrowserWindow | null
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
-protocol.registerSchemesAsPrivileged([
-  {
-    scheme: 'local',
-    privileges: {
-        bypassCSP: true,
-        stream: true,
-    }
-  }
-])
-
 async function handleFileOpen () {
   const { canceled, filePaths } = await dialog.showOpenDialog(win as BrowserWindow)
   let path = ""
@@ -90,6 +80,15 @@ app && app.on('activate', () => {
   }
 })
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'local',
+    privileges: {
+        bypassCSP: true,
+        stream: true,
+    }
+  }
+])
 
 app && app.whenReady().then(() => {
   protocol.handle('local', (request) =>{
