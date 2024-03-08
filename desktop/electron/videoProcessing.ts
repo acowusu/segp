@@ -55,7 +55,7 @@ export async function webmBLobToMp4(
 
 /**
  * returns the path of the transcoded video 
- * @param vidPath path of th e image to video asset (if not downloaded gotta download first)
+ * @param vidPath path of the image to video asset (if not downloaded gotta download first)
  */
 export async function transcodeImgVidToMp4(vidPath: string): Promise<string> {
   console.log("started transcoding mp4 video");
