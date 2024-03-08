@@ -2,6 +2,7 @@ import { downloadFile } from "./reportProcessing";
 import { getProjectPath } from "./metadata";
 import { readFile } from "node:fs/promises";
 import mime from "mime-types";
+import { transcodeImgVidToMp4 } from "./videoProcessing";
 
 export async function imageToVideo(imagePath: string, fps: number=7, videoLength: number=10): Promise<string> {
 
@@ -28,7 +29,10 @@ export async function imageToVideo(imagePath: string, fps: number=7, videoLength
         method: 'POST',
         body: form,
     });
+    console.log("Destination: (of initial video)", "local:///" + destination);
 
-    console.log("Destination: ", "local:///" + destination);
+    const newDestination = await transcodeImgVidToMp4(destination)
+
+    console.log("Destination: (of transcoded video)", "local:///" + newDestination);
     return "local:///" + destination;
 }
