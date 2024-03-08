@@ -76,7 +76,7 @@ export async function downloadFile(url: URL | RequestInfo, fileDirectory: string
 export async function fetchImages(prompts: Array<string>): Promise<Array<Array<unsplashedImages>>> {
 
   const imageFilePaths: Array<Array<unsplashedImages>> = [];
-  const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI'];
+  const unsplashAccessKeys = ['rlmP_s20oV0tzBO_AJk8lpZXQJluujDLu_OSDAR-aDA', 'uojJeEAyDSw-BFUiVGM8H6Nh4xxfaOusbBUHnOLev5Y', 'F-J-6NjEm7kDdL5kCDyFIzfyFyK3RTS1CMI4qaSE_6k', 'oj1NBnBmcZkgrrXShFqxDK_C9NyvUZqvvEsJWPIsoVI', 'ogmohep6A6sUkg4XalVaOjD4NMOUTM5SZxT_SyYGGio', 'Oel1y6GyfBinxf9eRXksMunRFX8bk-VaSJk2t7ItTQQ'];
   
   for (const prompt of prompts) {
     const unsplashAccessKey = unsplashAccessKeys.shift()
