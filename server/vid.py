@@ -6,14 +6,9 @@ import bentoml
 import PIL
 import torch
 import uvicorn
-from bentoml.io import Image
-from bentoml.io import JSON
-from diffusers.utils import export_to_video
-from diffusers.utils import load_image
-from fastapi import FastAPI
-from fastapi import File
-from fastapi import Form
-from fastapi import UploadFile
+from bentoml.io import JSON, Image
+from diffusers.utils import export_to_video, load_image
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse
 from typing_extensions import Annotated
 
