@@ -34,7 +34,7 @@ svc = bentoml.Service("svd-xt", runners=[svd_runner])
 def img2vid(input_data):
     """
 
-    :param input_data: 
+    :param input_data:
 
     """
     res = svd_runner.run(**input_data)
