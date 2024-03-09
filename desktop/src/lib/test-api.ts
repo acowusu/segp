@@ -205,4 +205,7 @@ export const mockApi:IAPI = {
     generateSoundEffect:  async () => {
         throw new Error("Function not implemented.");
     },
+    imageToVideo: async () => {
+        throw new Error("Function not implemented.");
+    },
 }

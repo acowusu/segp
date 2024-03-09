@@ -126,8 +126,7 @@ export const ScriptEditor: React.FC = () => {
   ) => {
     if (userInitiated && !script.scriptMediaIsVideo) {
       console.log(script.scriptMedia)
-      const imgPath = script.scriptMedia!.url.replace("local:///", "")
-      const video = window.api.imageToVideo(imgPath, 7, 10);
+      const video = window.api.imageToVideo(script.scriptMedia!.url, 7, 10);
       toast.promise(video, {
         loading: `Generating Video from ${script.scriptMedia} for ${script.sectionName}`,
         success: (video) => `Video Generated: ${video}`,
@@ -137,7 +136,7 @@ export const ScriptEditor: React.FC = () => {
       console.log(videoPath)
       const updatedItems = items.map((item) => {
         if (item.id === script.id) {
-          item.scriptMedia = {url: videoPath, author: "AI"};
+          item.scriptMedia = {url: videoPath, author: item.scriptMedia!.author};
           item.aiVideos = item.aiVideos ? [...item.aiVideos, videoPath] : [videoPath]
           console.log(item.aiVideos)
           item.scriptMediaIsVideo = true;
