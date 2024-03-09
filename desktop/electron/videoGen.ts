@@ -8,7 +8,16 @@ export async function imageToVideo(imagePath: string, fps: number=7, videoLength
 
     const endpoint = 'https://iguana.alexo.uk/v9/video';
 
-    console.log("Image Path: ", imagePath);
+    console.log("Script Media to Convert to Video: ", imagePath);
+
+    if (imagePath.startsWith("http")) {
+        const { destination } = await downloadFile(imagePath, getProjectPath());
+        console.log("Downloaded unsplashed image at: ", destination);
+        imagePath = destination;
+    } else {
+        imagePath = imagePath.replace("local:///", "");
+        console.log("Image Path: ", imagePath);
+    }
     const form = new FormData();
 
     const imageBuffer = await readFile(imagePath);
