@@ -5,6 +5,8 @@ import { PNG } from "pngjs";
 import {extractText, getDocumentProxy, getResolvedPDFJS } from "unpdf";
 import { ffmpegPath } from "../binUtils";
 import promiseSpawn from '@npmcli/promise-spawn'
+import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
+
 export const add =  ({ a, b }: { a: number, b: number }) => {
     return a + b
 }
@@ -26,6 +28,8 @@ export const convertWebmToMp4 = async ({
   webm: string;
   mp4: string;
 }): Promise<void> => {
+  
+
   let result;
   try {
     result = await promiseSpawn(ffmpegPath, ["-i", `${webm}`, "-y", `${mp4}`], {
@@ -45,13 +49,31 @@ export const transcodeMp4ToH264Encoding = async ({
   mp4: string; 
   out: string;
 }): Promise<void> => {
-  try {
-    await promiseSpawn(ffmpegPath, ["-i", `${mp4}`, "-y", "-vcodec", "libx264", `${out}`], {
-    });
-  } catch (error) {
-    console.error('failed!', error)
+  return new Promise((resolve, reject) => {
+    console.log("starting fluent-ffmpeg")
+    ffmpeg.setFfmpegPath(ffmpegPath)
+    
+    ffmpeg(mp4).videoCodec("libx264").output(out)
+    .on('error', function(err) {
+      reject()
+      console.log('An error occurred: ' + err.message);
+    })
+    .on('end', function() {
+      resolve();
+      console.log('Processing finished !');
+    })
+    .on('progress', function(progress) {
+      console.log('Processing: ' + progress.percent + '% done');
+    })
+    .run()
+  })
+  // try {
+  //   await promiseSpawn(ffmpegPath, ["-i", `${mp4}`, "-y", "-vcodec", "libx264", `${out}`], {
+  //   });
+  // } catch (error) {
+  //   console.error('failed!', error)
 
-  }
+  // }
 }
 
 export const extractTextFromPDF = async ({

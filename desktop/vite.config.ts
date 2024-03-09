@@ -39,6 +39,9 @@ export default defineConfig({
                 tinypool: resolve(__dirname, "electron/workers/tinypool.ts"),
                 'entry/worker':  resolve(__dirname, "node_modules/tinypool/dist/esm/entry/worker.js")
               },
+              external: [
+                "fluent-ffmpeg"
+              ]
             },
           },
         },
