@@ -12,7 +12,7 @@ import { CardDescription, CardHeader, CardTitle, FramelessCard } from "../compon
 import { addAudioLayers, addAvatarLayers, addImageLayers, addSubtitleLayers, generateAudio, generateAvatarSections } from "../lib/video-utils";
 
 
-const images = ["./fetching_loading.png", "./final_loading.png"];
+const images = ["./recording_audio.png", "./listening_audio.png", "./avatar_generation.png", "./downloading_gen.png"];
 
 /** TODOs:
  * -> settigns needs to be added, from the previous tabs? most important is aspect ratio
@@ -73,12 +73,12 @@ export const VideoGenerator: React.FC = () => {
   };
 
   const generateEtro = async () => {
-    setCurrentProcess("Starting");
+    setCurrentProcess("Starting...");
     setCurrentState("etro");
 
     const updateProgress = (progress: number) => {
       setGenerationProgress(progress);
-      if ((progress > 0) && (progress <= 50)) {
+      if (progress <= 50) {
         setCurrentProcess("Recording audio...");
         setCurrentImageIndex(0)
       }
@@ -92,6 +92,8 @@ export const VideoGenerator: React.FC = () => {
     await generateAvatarSections();
     console.log("audio generated backing should exist");
 
+    setGenerationProgress(0);
+    setCurrentImageIndex(2);
     const interval = setInterval(() => {
       setGenerationProgress((prev) => {
         if (prev < 95) return prev + 0.1;
@@ -131,7 +133,8 @@ export const VideoGenerator: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onStart: (_: MediaRecorder) => {
         console.log("recording started");
-        setCurrentProcess("Recording");
+        setCurrentProcess("Saving...");
+        setCurrentImageIndex(3)
       },
     })) as Blob;
     setGenerationProgress(20);
@@ -243,7 +246,7 @@ export const VideoGenerator: React.FC = () => {
       )}
       {(currentState === "rendering" || currentState === "etro") && (
         <Skeleton className="aspect-video w-full mb-4 flex align-center items-center justify-center flex-col ">
-        <img src={images[currentImageIndex]} alt="Loading" style={{ width: '300px', height: '300px' }}/>
+        <img src={images[currentImageIndex]} alt="Loading" style={{height: '300px' }}/>
         <Progress value={generationProgress} className="w-5/6 mt-4" />
         <p>{currentProcess}</p>
     </Skeleton>
