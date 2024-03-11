@@ -25,10 +25,11 @@ export function lerp(a: number, b: number, t: number, p: number) {
  * @returns A new etro.layer.Image instance representing the zoom layer.
  */
 const createZoomLayer = (section: ScriptData, start: number) => {
+  if (!section.scriptMedia) throw new Error("No media found");
   return new etro.layer.Image({
     startTime: start,
     duration: section.scriptDuration!,
-    source: section.scriptMedia!,
+    source: section.scriptMedia.url,
     destX: (_element: etro.EtroObject, time: number) => {
       return lerp(0, -WIDTH / 10, time, section.scriptDuration!);
     },
@@ -54,10 +55,11 @@ const createZoomLayer = (section: ScriptData, start: number) => {
  * @returns A new zoom-out layer.
  */
 const createZoomOutLayer = (section: ScriptData, start: number) => {
+  if (!section.scriptMedia) throw new Error("No media found");
   return new etro.layer.Image({
     startTime: start,
     duration: section.scriptDuration!,
-    source: section.scriptMedia!,
+    source: section.scriptMedia?.url,
     destX: (_element: etro.EtroObject, time: number) => {
       return lerp(-WIDTH / 10, 0, time, section.scriptDuration!);
     },
@@ -83,10 +85,11 @@ const createZoomOutLayer = (section: ScriptData, start: number) => {
  * @returns A new slide layer.
  */
 const createSlideLayer = (section: ScriptData, start: number) => {
+  if (!section.scriptMedia) throw new Error("No media found");
   return new etro.layer.Image({
     startTime: start,
     duration: section.scriptDuration!,
-    source: section.scriptMedia!,
+    source: section.scriptMedia.url,
     destX: (_element: etro.EtroObject, time: number) => {
       return lerp(0, -WIDTH / 5, time, section.scriptDuration!);
     },
